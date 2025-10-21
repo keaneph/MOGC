@@ -1,7 +1,8 @@
 import Link from "next/link" 
 import { MessageSquareWarningIcon } from "lucide-react"; 
-import { PrimaryButton } from "./primary-button";
 import { TooltipThis } from "./tooltip-this";
+import { DrawerDemo } from "./drawer";
+import { PrimaryButton } from "./primary-button";
 
 
 export function Announcements() {
@@ -33,9 +34,9 @@ export function Announcements() {
             {/* button section */}
             <div>
                 <TooltipThis label="Report any bugs you encounter!">
-                    <Link href="/report-bugs">
-                        <PrimaryButton content="Report bugs"/>
-                    </Link>
+                    <DrawerDemo
+                        trigger={<PrimaryButton content="Report bugs" />}
+                        />
                 </TooltipThis>
             </div>
         </div>
