@@ -13,7 +13,7 @@ export function TooltipThis({ children, label }: TooltipThisProps) {
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent className="z-[9999]">
         <p>{label}</p>
       </TooltipContent>
     </Tooltip>

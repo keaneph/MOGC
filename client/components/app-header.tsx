@@ -10,6 +10,7 @@ import {
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { TooltipThis } from "./tooltip-this";
+import { ContactDrawer } from "./drawer";
 
 export function AppHeader() {
   return (
@@ -55,9 +56,11 @@ export function AppHeader() {
             </TooltipThis>
 
             <TooltipThis label="Contact our support team for assistance">
-                <div className="cursor-pointer hover:underline underline-offset-4 decoration-2 decoration-white">
-                     Discuss your needs
-                </div>
+                    <div>
+                        <ContactDrawer trigger={<div className="cursor-pointer hover:underline underline-offset-4 decoration-2 decoration-white">
+                        Discuss your needs
+                        </div>} />
+                    </div>
             </TooltipThis>
 
             <TooltipThis label="View the documentation">
