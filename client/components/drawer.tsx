@@ -86,7 +86,7 @@ export function ContactDrawer({ trigger }: ContactDrawerProps ) {
             </div>
           ) : (    
             <div className="relative flex flex-col items-center justify-center">
-                <Image src={mochi} alt="Mochi Thinking" className="absolute cursor-pointer -bottom-10 right-160 w-40 transition-transform hover:scale-105" />
+                <Image src={mochi} alt="Mochi Thinking" className="absolute -bottom-10 right-160 w-40 transition-transform hover:scale-105" />
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-xl">
                   <FieldSet>
                       <FieldLegend className="text-center font-bold text-main !text-xl">Get in Touch</FieldLegend>
@@ -219,7 +219,7 @@ export function ContactDrawer({ trigger }: ContactDrawerProps ) {
                       </FieldGroup>
                   </FieldSet>
               </form>
-              <Image src={eureka} alt="Thinking" className="absolute -bottom-15 left-160 w-55 transition-transform hover:scale-105 cursor-pointer" />
+              <Image src={eureka} alt="Thinking" className="absolute -bottom-15 left-160 w-55 transition-transform hover:scale-105" />
             </div>
           )}   
         </div>

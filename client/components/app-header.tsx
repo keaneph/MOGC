@@ -12,14 +12,14 @@ import { Button } from "./ui/button";
 import { TooltipThis } from "./tooltip-this";
 import { ContactDrawer } from "./drawer";
 
-export function AppHeader() {
+export function AppHeader({role}: {role: string}) {
   return (
     <header className="sticky flex items-center h-14 border-b bg-main">
       {/* logo section */}
         <div className="flex border-b items-center justify-center w-14 h-14 bg-white">
             <TooltipThis label="Home">
                 <Button asChild variant="default" className="cursor-pointer p-1 h-auto hover:bg-primary/10">
-                    <Link href="/student/getting-started">
+                    <Link href="/">
                         <Image src={logo} alt="MSU-IIT OGC" className="h-10 w-10"  />
                     </Link>
                 </Button>
@@ -41,7 +41,7 @@ export function AppHeader() {
             <Badge
                 variant="secondary"
                 className="rounded-sm mt-0.5 w-28 h-4.5 text-xs flex items-center justify-center tracking-wide text-main"> 
-                Student
+                {role}
             </Badge>
             </div>
       </div>
