@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/logo.png";
@@ -11,8 +13,11 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { TooltipThis } from "./tooltip-this";
 import { ContactDrawer } from "./drawer";
+import { UserDropdown } from "./userprofile-dropdown";
+import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 
 export function AppHeader({role}: {role: string}) {
+    const userName = useSupabaseUser()
   return (
     <header className="sticky flex items-center h-14 border-b bg-main">
       {/* logo section */}
@@ -36,7 +41,7 @@ export function AppHeader({role}: {role: string}) {
         
         <div className="flex flex-col -mt-1.5">
             <span className="text-white font-medium tracking-wide">
-                Welcome Keane Pharelle!
+                Welcome {userName ?? 'Guest'}!
             </span>
             <Badge
                 variant="secondary"
@@ -85,14 +90,8 @@ export function AppHeader({role}: {role: string}) {
                 </Button>
             </TooltipThis>
 
-            <TooltipThis label="User Profile">
-                <Button asChild variant="default" className="cursor-pointer !p-1 h-auto w-auto hover:bg-primary/10">
-                    <Link href="/student/getting-started">
-                        <CircleUserRoundIcon className="!h-5.5 !w-5.5"/>
-                    </Link>
-                </Button>
-            </TooltipThis>
+            <UserDropdown /> 
         </div>
 </header>
-  );
+);
 }

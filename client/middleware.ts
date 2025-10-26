@@ -1,20 +1,19 @@
-import type { NextRequest } from 'next/server'
-import { updateSession } from './lib/middleware' // adjust path if needed
+import { updateSession } from '@/lib/middleware'
+import { type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  return updateSession(request)
+  return await updateSession(request)
 }
 
-// Configure which routes this middleware runs on
 export const config = {
   matcher: [
     /*
-      Run middleware on all routes except:
-      - /auth/*
-      - /login
-      - /_next (static assets)
-      - /favicon.ico
-    */
-    '/((?!auth|login|_next|favicon.ico).*)',
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

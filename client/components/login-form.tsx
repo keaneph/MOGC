@@ -49,15 +49,17 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               />
               <span className="text-2xl font-bold">MSU-IIT OGC</span>
             </div>
-            <h2 className="mt-10 text-2xl font-bold">Log in to your account</h2>
+            <h2 className="mt-8 text-2xl font-bold">Log in to your account</h2>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-px bg-gray-300" />
-            <span className="mx-8 text-xs text-gray-500 text-center">
-              Access your counseling sessions, assessments, and guidance resources in one place.
-            </span>
-            <div className="flex-1 h-px bg-gray-300" />
+          <div className="mt-8 w-full">
+            <div className="mx-auto max-w-md flex items-center">
+              <div className="flex-1 h-px bg-gray-300" />
+              <span className="mx-6 text-xs text-gray-500 text-center leading-snug max-w-xs">
+                Access your counseling sessions, assessments, and guidance resources in one place.
+              </span>
+              <div className="flex-1 h-px bg-gray-300" />
+            </div>
           </div>
 
           <div className="space-y-25">
@@ -66,9 +68,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full bg-red-900 hover:bg-red-1000 text-white"
+                className="w-full bg-red-900 hover:bg-red-1000 text-white rounded-sm"
                 disabled={isLoading}
               >
+                <img
+                    src="/google-icon.svg"
+                    alt="Google icon"
+                    className="!h-4.5 !w-4.5"
+                  />
                 {isLoading ? 'Redirecting...' : 'Continue with My.IIT'}
               </Button>
             </form>
