@@ -1,0 +1,87 @@
+'use client'
+
+import { useState } from 'react'
+import { createClient } from '@/lib/client'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import logo from '@/public/logo.png'
+
+export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleMyIITLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const supabase = createClient()
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) throw error
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen" {...props}>
+      <div
+        className="hidden md:block md:w-1/2 h-screen bg-cover bg-center"
+        style={{ backgroundImage: "url('/login-samplephoto.jpg')" }}
+      />
+
+      <div className="flex w-full flex-col justify-center px-8 md:w-2/3">
+        <div className="mx-auto w-full max-w-md space-y-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3">
+              <Image
+                src={logo}
+                alt="MSU-IIT OGC"
+                className="h-10 w-auto"
+              />
+              <span className="text-2xl font-bold">MSU-IIT OGC</span>
+            </div>
+            <h2 className="mt-10 text-2xl font-bold">Log in to your account</h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="mx-8 text-xs text-gray-500 text-center">
+              Access your counseling sessions, assessments, and guidance resources in one place.
+            </span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+
+          <div className="space-y-25">
+            <form onSubmit={handleMyIITLogin}>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full bg-red-900 hover:bg-red-1000 text-white"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Redirecting...' : 'Continue with My.IIT'}
+              </Button>
+            </form>
+
+        
+          <div className="text-center text-sm">
+              <a href="#" className="text-blue-600 hover:underline text-xs">
+                Go back to Homepage
+              </a>
+            </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  )
+}
