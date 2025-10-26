@@ -34,8 +34,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   return (
     <div className="flex min-h-screen" {...props}>
       <div
-        className="hidden md:block md:w-1/2 h-screen bg-cover bg-center"
-        style={{ backgroundImage: "url('/login-samplephoto.jpg')" }}
+        className="hidden md:block md:w-1/2 h-screen bg-cover bg-[position:38%_center]"
+        style={{ backgroundImage: "url('/login-photo.png')" }}
       />
 
       <div className="flex w-full flex-col justify-center px-8 md:w-2/3">
@@ -55,7 +55,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
           <div className="mt-8 w-full">
             <div className="mx-auto max-w-md flex items-center">
               <div className="flex-1 h-px bg-gray-300" />
-              <span className="mx-6 text-xs text-gray-500 text-center leading-snug max-w-xs">
+              <span className="mx-2 text-xs text-gray-500 text-center leading-snug max-w-xs">
                 Access your counseling sessions, assessments, and guidance resources in one place.
               </span>
               <div className="flex-1 h-px bg-gray-300" />
