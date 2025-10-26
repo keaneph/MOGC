@@ -90,7 +90,7 @@ export function AppHeader({role}: {role: string}) {
                 </Button>
             </TooltipThis>
 
-            <UserDropdown /> 
+            <UserDropdown role={role}/> 
         </div>
 </header>
 );
