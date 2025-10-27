@@ -5,12 +5,20 @@ import { AppHeader } from "@/components/app-header";
 import { Announcements } from "@/components/announcements";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { SiklabSheet } from "@/components/siklab-sheet";
+import { createClient } from "@/lib/server";
+import { redirect } from "next/navigation";
 
-export default function WithSidebarLayout({
+export default async function WithSidebarLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data?.claims) {
+    redirect("/auth/login")
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <TooltipProvider>

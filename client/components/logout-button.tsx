@@ -1,4 +1,3 @@
-// logout-button.tsx
 'use client'
 
 import { createClient } from '@/lib/client'
