@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { CircleUserRoundIcon, UsersIcon } from "lucide-react"
+import { CircleUserRoundIcon } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
