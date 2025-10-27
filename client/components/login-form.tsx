@@ -47,15 +47,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 alt="MSU-IIT OGC"
                 className="h-10 w-auto"
               />
-              <span className="text-2xl font-bold">MSU-IIT OGC</span>
+              <span className="text-2xl font-bold tracking-wide">MSU-IIT OGC</span>
             </div>
-            <h2 className="mt-8 text-2xl font-bold">Log in to your account</h2>
+            <h2 className="mt-8 text-2xl font-bold tracking-wide">Log in to your account</h2>
           </div>
 
           <div className="mt-8 w-full">
             <div className="mx-auto max-w-md flex items-center">
               <div className="flex-1 h-px bg-gray-300" />
-              <span className="mx-2 text-xs text-gray-500 text-center leading-snug max-w-xs">
+              <span className="mx-2 text-xs text-main2 text-center max-w-xs leading-snug tracking-wide">
                 Access your counseling sessions, assessments, and guidance resources in one place.
               </span>
               <div className="flex-1 h-px bg-gray-300" />
@@ -64,11 +64,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
           <div className="space-y-25">
             <form onSubmit={handleMyIITLogin}>
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p className="text-sm text-main">{error}</p>}
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full bg-red-900 hover:bg-red-1000 text-white rounded-sm"
+                className="w-full text-white bg-main hover:bg-main-dark rounded-sm tracking-wide cursor-pointer"
                 disabled={isLoading}
               >
                 <img
@@ -81,7 +81,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
             </form>
 
         
-          <div className="text-center text-sm">
+          <div className="text-center text-sm tracking-wide cursor-pointer">
               <a href="#" className="text-blue-600 hover:underline text-xs">
                 Go back to Homepage
               </a>

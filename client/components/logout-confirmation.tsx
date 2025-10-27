@@ -23,10 +23,7 @@ export function LogoutConfirmationDialog() {
         <DialogTrigger asChild>
             <DropdownMenuItem
                 onSelect={(e) => e.preventDefault()}
-                className="flex items-center w-full text-sm px-3 py-2 
-                            data-[highlighted]:bg-[oklch(0.32_0.161_26.99_/_0.2)] 
-                            data-[highlighted]:text-black 
-                            rounded-sm cursor-pointer"
+                className="text-sm px-3 py-2 rounded-sm w-full hover:bg-primary hover:text-accent-foreground cursor-pointer"
                 >
                 <LogOutIcon className="mr-2 h-4 w-4" />
                 Logout
@@ -44,21 +41,26 @@ export function LogoutConfirmationDialog() {
                 />
             </div>
             <DialogHeader>
-            <DialogTitle>Confirmation</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="tracking-wide">Confirmation</DialogTitle>
+            <DialogDescription className="tracking-wide">
                 Are you sure you want to log out of your account?
             </DialogDescription>
             </DialogHeader>
 
             <DialogFooter className="flex justify-end gap-2">
             <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button 
+                    variant="outline"
+                    className="rounded-sm tracking-wide cursor-pointer"
+                    >
+                    Cancel
+                </Button>
             </DialogClose>
 
             
                 <Button
                     onClick={logout}
-                    className="bg-[oklch(0.32_0.161_26.99)] hover:bg-[oklch(0.32_0.161_26.99_/_0.8)] text-white"
+                    className="bg-main hover:bg-main-dark text-white rounded-sm tracking-wide cursor-pointer"
                     >
                     Logout
                 </Button>
