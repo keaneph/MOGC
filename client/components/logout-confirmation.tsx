@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { LogOutIcon } from "lucide-react"
-import { useLogout } from "./logout-button"
+import { useLogout } from "@/hooks/use-logout"
 import { DropdownMenuItem } from "./ui/dropdown-menu"
 import Image from "next/image"
 
@@ -60,7 +60,7 @@ export function LogoutConfirmationDialog() {
             
                 <Button
                     onClick={logout}
-                    className="bg-main hover:bg-main-dark text-white rounded-sm tracking-wide cursor-pointer"
+                    className="rounded-sm cursor-pointer bg-main hover:bg-main/90 tracking-wide"
                     >
                     Logout
                 </Button>
