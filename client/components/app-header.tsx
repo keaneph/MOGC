@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/logo.png";
 import { 
-    CircleUserRoundIcon,
     LanguagesIcon,
     BellIcon,
     SearchIcon
@@ -14,7 +13,8 @@ import { Button } from "./ui/button";
 import { TooltipThis } from "./tooltip-this";
 import { ContactDrawer } from "./drawer";
 import { UserDropdown } from "./userprofile-dropdown";
-import { useSupabaseUser } from "@/hooks/useSupabaseUser";
+import { useSupabaseUser } from "@/hooks/use-supabase-user";
+import { UserAvatar } from "./user-avatar";
 
 export function AppHeader({role}: {role: string}) {
     const userName = useSupabaseUser()
@@ -34,10 +34,7 @@ export function AppHeader({role}: {role: string}) {
       {/* profile section */}
       <div className="flex items-center">
 
-        <div className="flex items-center justify-center w-14">
-        {/* svg has diff sizing*/}
-        <CircleUserRoundIcon className="text-white h-8 w-8" strokeWidth={1.5}/>
-        </div>
+        <UserAvatar />
         
         <div className="flex flex-col -mt-1.5">
             <span className="text-white font-medium tracking-wide">
