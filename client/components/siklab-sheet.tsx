@@ -18,18 +18,35 @@ import { Progress } from "@/components/ui/progress"
 import { ChevronsRightIcon } from "lucide-react"
 import { SiklabAccordion } from "./siklab-accordion"
 
-export function SiklabSheet() {
-  const [open, setOpen] = React.useState(false)
+type SiklabSheetProps = {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  accordionValue?: string | string[]
+  onAccordionValueChange?: (value: string | string[]) => void
+  showTrigger?: boolean
+}
+
+export function SiklabSheet({ open, onOpenChange, accordionValue, onAccordionValueChange, showTrigger = true }: SiklabSheetProps) {
+  const [localOpen, setLocalOpen] = React.useState(false)
+  const isControlled = open !== undefined
+  const openState = isControlled ? (open as boolean) : localOpen
+  const setOpen = (v: boolean) => {
+    if (onOpenChange) onOpenChange(v)
+    if (!isControlled) setLocalOpen(v)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-        <TooltipThis label="Open Siklab Guide">
-            <SheetTrigger asChild>
-                <Image 
-                  src={curious} 
-                  alt="Siklab Curious Logo" 
-                  className="cursor-pointer w-12 h-auto transition-transform hover:scale-110" />
-            </SheetTrigger>
-        </TooltipThis>
+  <Sheet open={openState} onOpenChange={setOpen}>
+    {showTrigger && (
+      <TooltipThis label="Open Siklab Guide">
+        <SheetTrigger asChild>
+          <Image 
+          src={curious} 
+          alt="Siklab Curious Logo" 
+          className="cursor-pointer w-12 h-auto transition-transform hover:scale-110" />
+        </SheetTrigger>
+      </TooltipThis>
+    )}
         
       <SheetContent className="w-90 flex flex-col overflow-visible">
         <SheetHeader className="bg-main h-48 relative">
@@ -43,8 +60,8 @@ export function SiklabSheet() {
               <Progress value={77} className="mb-6 mt-6 h-3 w-11/12" />
 
                 <div className="w-11/12 mb-2">
-                  <SiklabAccordion />
-                </div>
+                      <SiklabAccordion value={accordionValue} onValueChange={onAccordionValueChange} />
+                    </div>
                 
               </div>
         </SheetHeader>

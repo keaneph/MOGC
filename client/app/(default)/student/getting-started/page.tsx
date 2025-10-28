@@ -1,3 +1,6 @@
+"use client"
+
+import { useState } from "react"
 import { 
     MegaphoneIcon,
     MessagesSquareIcon,
@@ -12,8 +15,11 @@ import { Button } from "@/components/ui/button";
 import love from "@/public/love.png"
 import Image from "next/image";
 import { TooltipThis } from "@/components/tooltip-this";
+import { SiklabSheet } from "@/components/siklab-sheet"
 
 export default function GettingStartedPage() {
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined)
   return (
     <div
       id="main-container"
@@ -51,7 +57,7 @@ export default function GettingStartedPage() {
         </div>
 
         <div className="flex border-1 justify-center rounded-sm pl-3 pt-3 mb-12">
-          <div className="w-full flex-col ml-6 mt-5 w-auto h-auto">
+          <div className="w-full flex-col ml-6 mt-5 h-auto">
             
             <div className="text-lg font-semibold tracking-wide mb-6">
               Start Filling up Personal Demographic Form
@@ -69,13 +75,16 @@ export default function GettingStartedPage() {
                 </TooltipThis>
               </Link>
               <TooltipThis label="Learn more about personal demographic forms">
-              <Link
-                href="/onboarding"
-                className="ml-4"
+              <button
+                onClick={() => {
+                  setAccordionValue("item-1")
+                  setSheetOpen(true)
+                }}
+                className="ml-4 cursor-pointer"
                 style={{ color: "var(--link)" }}
               >
                 Learn more
-              </Link>
+              </button>
               </TooltipThis>
             </div>
 
@@ -114,13 +123,16 @@ export default function GettingStartedPage() {
                   </Button>
                 </TooltipThis>
                 <TooltipThis label="Learn more about counselor interviews">
-                  <Link
-                    href="/onboarding"
-                    className="ml-4"
-                    style={{ color: "var(--link)" }}
-                  >
-                  Learn more
-                </Link>
+                  <button
+                      onClick={() => {
+                        setAccordionValue("item-2")
+                        setSheetOpen(true)
+                      }}
+                      className="ml-4 cursor-pointer"
+                      style={{ color: "var(--link)" }}
+                    >
+                      Learn more
+                  </button>
               </TooltipThis>
               </div>
             </div>
@@ -149,13 +161,16 @@ export default function GettingStartedPage() {
                   </Button>
                 </TooltipThis>
                 <TooltipThis label="Learn more about initialization tests">
-                  <Link
-                    href="/onboarding"
-                    className="ml-4"
-                    style={{ color: "var(--link)" }}
-                  >
-                  Learn more
-                </Link>
+                  <button
+                      onClick={() => {
+                        setAccordionValue("item-3")
+                        setSheetOpen(true)
+                      }}
+                      className="ml-4 cursor-pointer"
+                      style={{ color: "var(--link)" }}
+                    >
+                      Learn more
+                  </button>
               </TooltipThis>
               </div>
             </div>
@@ -184,13 +199,16 @@ export default function GettingStartedPage() {
                   </Button>
                 </TooltipThis>
                 <TooltipThis label="Learn more about counseling sessions">
-                  <Link
-                    href="/onboarding"
-                    className="ml-4"
-                    style={{ color: "var(--link)" }}
-                  >
-                  Learn more
-                </Link>
+                  <button
+                      onClick={() => {
+                        setAccordionValue("item-4")
+                        setSheetOpen(true)
+                      }}
+                      className="ml-4 cursor-pointer"
+                      style={{ color: "var(--link)" }}
+                    >
+                      Learn more
+                  </button>
               </TooltipThis>
               </div>
             </div>
@@ -219,13 +237,16 @@ export default function GettingStartedPage() {
                   </Button>
                 </TooltipThis>
                 <TooltipThis label="Learn more about exploring MOGC">
-                  <Link
-                    href="/onboarding"
-                    className="ml-4"
-                    style={{ color: "var(--link)" }}
-                  >
-                  Learn more
-                </Link>
+                  <button
+                      onClick={() => {
+                        setAccordionValue("item-5")
+                        setSheetOpen(true)
+                      }}
+                      className="ml-4 cursor-pointer"
+                      style={{ color: "var(--link)" }}
+                    >
+                      Learn more
+                  </button>
               </TooltipThis>
               </div>
             </div>
@@ -236,6 +257,14 @@ export default function GettingStartedPage() {
 
         </div>
       </div>
+      {/* Siklab sheet (controlled) */}
+      <SiklabSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        accordionValue={accordionValue}
+        onAccordionValueChange={(v) => setAccordionValue(v as string)}
+        showTrigger={false}
+      />
     </div>
   );
 }

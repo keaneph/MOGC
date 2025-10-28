@@ -8,11 +8,18 @@ import { CircleCheckBigIcon } from "lucide-react"
 import { PrimaryButton } from "./primary-button"
 
 
-export function SiklabAccordion() {
+type SiklabAccordionProps = {
+    value?: string | string[]
+    onValueChange?: (value: string | string[]) => void
+}
+
+export function SiklabAccordion({ value, onValueChange }: SiklabAccordionProps) {
     return (
         <Accordion
             type="single"
             collapsible
+            value={value as string | undefined}
+            onValueChange={onValueChange}
             className="w-full tracking-wide">
             <AccordionItem value="item-1">
                 <AccordionTrigger className="cursor-pointer pl-2">
