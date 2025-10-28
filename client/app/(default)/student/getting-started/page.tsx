@@ -19,7 +19,7 @@ import { SiklabSheet } from "@/components/siklab-sheet"
 
 export default function GettingStartedPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined)
+  const [accordionValue, setAccordionValue] = useState("")
   return (
     <div
       id="main-container"

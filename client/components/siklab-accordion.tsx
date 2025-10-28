@@ -49,7 +49,7 @@ export function SiklabAccordion({ value, onValueChange }: SiklabAccordionProps) 
                 </AccordionTrigger>
                 <AccordionContent className="flex flex-col gap-4 pl-2 text-balance">
                 <p>
-                    After submitting your details, you’ll be scheduled for an initial interview with your assigned counselor. 
+                    After submitting your details, you&apos;ll be scheduled for an initial interview with your assigned counselor. 
                 </p>
                 <p>
                     This short session helps the counselor understand your background, interests, and current goals.
