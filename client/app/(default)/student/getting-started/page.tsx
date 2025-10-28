@@ -65,7 +65,7 @@ export default function GettingStartedPage() {
 
             <div className="text-md font-medium tracking-wide mb-6">
               Start filling up the personal demographic form <br/>
-              or use one of our samples to get started in minutes.
+              or interact with Siklab Guide to get started in minutes.
             </div>
 
             <div className="mb-6 text-sm font-medium tracking-wide ">
