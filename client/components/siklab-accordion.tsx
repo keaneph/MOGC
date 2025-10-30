@@ -8,11 +8,18 @@ import { CircleCheckBigIcon } from "lucide-react"
 import { PrimaryButton } from "./primary-button"
 
 
-export function SiklabAccordion() {
+type SiklabAccordionProps = {
+    value?: string | string[]
+    onValueChange?: (value: string | string[]) => void
+}
+
+export function SiklabAccordion({ value, onValueChange }: SiklabAccordionProps) {
     return (
         <Accordion
             type="single"
             collapsible
+            value={value as string | undefined}
+            onValueChange={onValueChange}
             className="w-full tracking-wide">
             <AccordionItem value="item-1">
                 <AccordionTrigger className="cursor-pointer pl-2">
@@ -42,7 +49,7 @@ export function SiklabAccordion() {
                 </AccordionTrigger>
                 <AccordionContent className="flex flex-col gap-4 pl-2 text-balance">
                 <p>
-                    After submitting your details, you’ll be scheduled for an initial interview with your assigned counselor. 
+                    After submitting your details, you&apos;ll be scheduled for an initial interview with your assigned counselor. 
                 </p>
                 <p>
                     This short session helps the counselor understand your background, interests, and current goals.

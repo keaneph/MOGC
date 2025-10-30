@@ -14,7 +14,7 @@ export function Announcements() {
             </div>
 
             {/* text section */}
-            <div style={{fontWeight: 450, fontSize: "0.9rem"}} className="md:text-left leading-relaxed text-center tracking-wide">
+            <div className="text-[13px] font-medium md:text-left leading-relaxed text-center tracking-wide">
                 Thank you for testing the Office of the Guidance and Counseling web application! This is a work
                 in progress and you can&nbsp;
 
