@@ -17,7 +17,9 @@ export async function GET(request: Request) {
       if (user) {
         if (!user.email?.endsWith("@g.msuiit.edu.ph")) {
           await supabase.auth.signOut()
-          return NextResponse.redirect(`${origin}/auth/error?reason=invalid-domain`)
+          return NextResponse.redirect(
+            `${origin}/auth/error?error=invalid-domain`
+          )
         }
 
         const { data: profile } = await supabase

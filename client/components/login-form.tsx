@@ -20,6 +20,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          queryParams: { prompt: "select_account" },
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
@@ -82,7 +83,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
         
           <div className="text-center text-sm tracking-wide cursor-pointer">
-              <a href="#" className="text-blue-600 hover:underline text-xs">
+              <a href="#" className="text-link hover:underline text-xs">
                 Go back to Homepage
               </a>
             </div>
