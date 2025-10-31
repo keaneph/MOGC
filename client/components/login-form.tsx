@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { createClient } from "@/lib/client"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import logo from "@/public/logo.png"
+import { toast } from "sonner"
+import { CircleCheckIcon } from "lucide-react"
+import CatImageSad from "./sad-toast"
 
 export function LoginForm({
   className,
@@ -12,6 +15,31 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [hasHydrated, setHasHydrated] = useState(false)
+
+  useEffect(() => {
+    setHasHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hasHydrated) return
+
+    const params = new URLSearchParams(window.location.search)
+    const toastFlag = params.get("toast")
+
+    if (toastFlag === "logout") {
+      toast.success(
+        <div className="relative flex w-full items-center pr-24">
+          <span className="pl-2">Logged out successfully</span>
+          <CatImageSad />
+        </div>,
+        {
+          duration: 3000,
+          icon: <CircleCheckIcon className="size-4" />,
+        }
+      )
+    }
+  }, [hasHydrated])
 
   const handleMyIITLogin = async (e: React.FormEvent) => {
     e.preventDefault()

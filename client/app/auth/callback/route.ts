@@ -33,7 +33,9 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/auth/error?error=no-profile`)
       }
 
-      return NextResponse.redirect(`${origin}/${role}/getting-started`)
+      return NextResponse.redirect(
+        `${origin}/${role}/getting-started?toast=success`
+      )
     }
   }
 

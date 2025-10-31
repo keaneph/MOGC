@@ -9,6 +9,6 @@ export function useLogout() {
   return async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/auth/login")
+    router.push("/auth/login?toast=logout")
   }
 }
