@@ -11,6 +11,7 @@ import {
 } from "./ui/dropdown-menu"
 import { Button } from "./ui/button"
 import { LogoutConfirmationDialog } from "./logout-confirmation"
+import { UserAvatar } from "./user-avatar"
 
 export function UserDropdown({ role }: { role: string }) {
     return (
@@ -20,7 +21,7 @@ export function UserDropdown({ role }: { role: string }) {
             variant="default"
             className="cursor-pointer !p-1 h-auto w-auto hover:bg-primary/10"
             >
-            <CircleUserRoundIcon className="!h-5.5 !w-5.5" />
+            <UserAvatar />
             </Button>
         </DropdownMenuTrigger>
 

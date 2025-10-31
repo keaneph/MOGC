@@ -69,13 +69,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full text-white bg-main hover:bg-main-dark rounded-sm tracking-wide cursor-pointer"
+                className="w-full text-white bg-main hover:bg-main-dark hover:text-white rounded-sm tracking-wide cursor-pointer"
                 disabled={isLoading}
               >
                 <img
                     src="/google-icon.svg"
                     alt="Google icon"
-                    className="!h-4.5 !w-4.5"
+                    width={18}
+                    height={18}
                   />
                 {isLoading ? 'Redirecting...' : 'Continue with My.IIT'}
               </Button>

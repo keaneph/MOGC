@@ -11,8 +11,8 @@ export default function Page({ searchParams, }: { searchParams: { [key: string]:
         <Image
           src="/error.png"
           alt="Error illustration"
-          width={500}
-          height={500}
+          width={300}
+          height={300}
           className="drop-shadow-xxl -mt-40"
         />
 
