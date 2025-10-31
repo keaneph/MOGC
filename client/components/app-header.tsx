@@ -24,7 +24,7 @@ export function AppHeader({role}: {role: string}) {
         <div className="flex border-b items-center justify-center w-14 h-14 bg-white">
             <TooltipThis label="Home">
                 <Button asChild variant="default" className="cursor-pointer p-1 h-auto hover:bg-primary/10">
-                    <Link href="/">
+                    <Link href={`/${role.toLowerCase()}/getting-started`}>
                         <Image src={logo} alt="MSU-IIT OGC" className="h-10 w-10"  />
                     </Link>
                 </Button>
