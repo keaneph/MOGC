@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { createClient } from '@/lib/client'
-import { useRouter } from 'next/navigation'
+import { createClient } from "@/lib/client"
+import { useRouter } from "next/navigation"
 
 export function useLogout() {
   const router = useRouter()
@@ -9,6 +9,6 @@ export function useLogout() {
   return async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push('/auth/login')
+    router.push("/auth/login")
   }
 }

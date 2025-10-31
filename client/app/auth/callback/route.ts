@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/server"
+import { getUserRole } from "@/lib/auth"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -14,30 +15,25 @@ export async function GET(request: Request) {
         data: { user },
       } = await supabase.auth.getUser()
 
-      if (user) {
-        if (!user.email?.endsWith("@g.msuiit.edu.ph")) {
-          await supabase.auth.signOut()
-          return NextResponse.redirect(
-            `${origin}/auth/error?error=invalid-domain`
-          )
-        }
-
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single()
-
-        if (profile?.role === "student") {
-          return NextResponse.redirect(`${origin}/student/getting-started`)
-        } else if (profile?.role === "counselor") {
-          return NextResponse.redirect(`${origin}/counselor/getting-started`)
-        } else {
-          return NextResponse.redirect(`${origin}/`)
-        }
+      if (!user) {
+        return NextResponse.redirect(`${origin}/auth/login`)
       }
 
-      return NextResponse.redirect(`${origin}/auth/login`)
+      if (!user.email?.endsWith("@g.msuiit.edu.ph")) {
+        await supabase.auth.signOut()
+        return NextResponse.redirect(
+          `${origin}/auth/error?error=invalid-domain`
+        )
+      }
+
+      const role = await getUserRole()
+
+      if (!role) {
+        await supabase.auth.signOut()
+        return NextResponse.redirect(`${origin}/auth/error?error=no-profile`)
+      }
+
+      return NextResponse.redirect(`${origin}/${role}/getting-started`)
     }
   }
 

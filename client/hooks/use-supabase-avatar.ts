@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/client'
+import { useEffect, useState } from "react"
+import { createClient } from "@/lib/client"
 
 export function useSupabaseAvatar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -16,14 +16,16 @@ export function useSupabaseAvatar() {
       }
     })
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const url = session.user.user_metadata?.avatar_url || null
-        setAvatarUrl(url)
-      } else {
-        setAvatarUrl(null)
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          const url = session.user.user_metadata?.avatar_url || null
+          setAvatarUrl(url)
+        } else {
+          setAvatarUrl(null)
+        }
       }
-    })
+    )
 
     return () => {
       subscription.subscription.unsubscribe()

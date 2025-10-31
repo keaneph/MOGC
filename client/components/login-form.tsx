@@ -1,12 +1,15 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { createClient } from '@/lib/client'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
-import logo from '@/public/logo.png'
+import { useState } from "react"
+import { createClient } from "@/lib/client"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import logo from "@/public/logo.png"
 
-export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -18,7 +21,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           queryParams: { prompt: "select_account" },
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -27,7 +30,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
       if (error) throw error
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : "An error occurred")
       setIsLoading(false)
     }
   }
@@ -35,7 +38,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   return (
     <div className="flex min-h-screen" {...props}>
       <div
-        className="hidden md:block md:w-1/2 h-screen bg-cover bg-[position:38%_center]"
+        className="hidden h-screen bg-cover bg-[position:38%_center] md:block md:w-1/2"
         style={{ backgroundImage: "url('/login-photo.png')" }}
       />
 
@@ -43,52 +46,52 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3">
-              <Image
-                src={logo}
-                alt="MSU-IIT OGC"
-                className="h-10 w-auto"
-              />
-              <span className="text-2xl font-bold tracking-wide">MSU-IIT OGC</span>
+              <Image src={logo} alt="MSU-IIT OGC" className="h-10 w-auto" />
+              <span className="text-2xl font-bold tracking-wide">
+                MSU-IIT OGC
+              </span>
             </div>
-            <h2 className="mt-8 text-2xl font-bold tracking-wide">Log in to your account</h2>
+            <h2 className="mt-8 text-2xl font-bold tracking-wide">
+              Log in to your account
+            </h2>
           </div>
 
           <div className="mt-8 w-full">
-            <div className="mx-auto max-w-md flex items-center">
-              <div className="flex-1 h-px bg-gray-300" />
-              <span className="mx-2 text-xs text-main2 text-center max-w-xs leading-snug tracking-wide">
-                Access your counseling sessions, assessments, and guidance resources in one place.
+            <div className="mx-auto flex max-w-md items-center">
+              <div className="h-px flex-1 bg-gray-300" />
+              <span className="text-main2 mx-2 max-w-xs text-center text-xs leading-snug tracking-wide">
+                Access your counseling sessions, assessments, and guidance
+                resources in one place.
               </span>
-              <div className="flex-1 h-px bg-gray-300" />
+              <div className="h-px flex-1 bg-gray-300" />
             </div>
           </div>
 
           <div className="space-y-25">
             <form onSubmit={handleMyIITLogin}>
-              {error && <p className="text-sm text-main">{error}</p>}
+              {error && <p className="text-main text-sm">{error}</p>}
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full text-white bg-main hover:bg-main-dark hover:text-white rounded-sm tracking-wide cursor-pointer"
+                className="bg-main hover:bg-main-dark w-full cursor-pointer rounded-sm tracking-wide text-white hover:text-white"
                 disabled={isLoading}
               >
                 <img
-                    src="/google-icon.svg"
-                    alt="Google icon"
-                    width={18}
-                    height={18}
-                  />
-                {isLoading ? 'Redirecting...' : 'Continue with My.IIT'}
+                  src="/google-icon.svg"
+                  alt="Google icon"
+                  width={18}
+                  height={18}
+                />
+                {isLoading ? "Redirecting..." : "Continue with My.IIT"}
               </Button>
             </form>
 
-        
-          <div className="text-center text-sm tracking-wide cursor-pointer">
-              <a href="#" className="text-link hover:underline text-xs">
+            <div className="cursor-pointer text-center text-sm tracking-wide">
+              <a href="#" className="text-link text-xs hover:underline">
                 Go back to Homepage
               </a>
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>
