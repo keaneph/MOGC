@@ -3,19 +3,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Announcements } from "@/components/announcements";
 import { AppHeader } from "@/components/app-header";
-import { createClient } from "@/lib/server";
-import { redirect } from "next/navigation";
 
 export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient()
-    const { data, error } = await supabase.auth.getClaims()
-    if (error || !data?.claims) {
-      redirect("/auth/login")
-    }
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
