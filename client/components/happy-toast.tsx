@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 const CatImage = () => {
   const [visible, setVisible] = useState(false)
@@ -15,9 +16,10 @@ const CatImage = () => {
 
   return (
     <div className="absolute -top-5 -right-15 -bottom-4 w-15 overflow-hidden">
-      <img
+      <Image
         src="/happy.png"
         alt="Happy Cat"
+        fill
         className={`h-full w-full object-cover object-top transition-transform duration-500 ${
           visible ? "translate-y-0" : "translate-y-full"
         }`}
