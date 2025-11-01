@@ -23,7 +23,7 @@ export function LogoutConfirmationDialog() {
       <DialogTrigger asChild>
         <DropdownMenuItem
           onSelect={(e) => e.preventDefault()}
-          className="hover:bg-primary hover:text-accent-foreground w-full cursor-pointer rounded-sm px-3 py-2 text-sm"
+          className="hover:bg-primary hover:text-accent-foreground w-full cursor-pointer rounded-sm px-3 py-2 text-[13px]"
         >
           <LogOutIcon className="mr-2 h-4 w-4" />
           Logout
