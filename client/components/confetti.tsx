@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import confetti from "canvas-confetti"
+import confetti, { Options } from "canvas-confetti"
 
 export default function Confetti() {
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Confetti() {
       useWorker: true,
     })
 
-    const makeShot = (particleRatio: number, opts: any) => {
+    const makeShot = (particleRatio: number, opts: Options) => {
       myConfetti({
         ...opts,
         origin: { x: 0.5, y: 0.2 },
