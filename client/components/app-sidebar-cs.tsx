@@ -36,7 +36,7 @@ const items = [
     title: "Getting Started",
     url: "/counselor/getting-started",
     icon: SparklesIcon,
-    noOutline: true, 
+    noOutline: true,
   },
   {
     title: "Activity",
@@ -95,24 +95,24 @@ export function AppSidebarCounselor() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <TooltipThis label={item.title}>
-                        <SidebarMenuButton asChild isActive={isActive}>
-                            <Link href={item.url} className="!gap-4">
-                                {item.noOutline ? (
-                                <Icon
-                                    fill={isActive ? "var(--main)" : "var(--main2)"}
-                                    stroke="none"
-                                    className="!w-4.5 !h-4.5"
-                                />
-                                ) : (
-                                <Icon
-                                    fill="none"
-                                    stroke={isActive ? "var(--main)" : "currentColor"}
-                                    className="!w-4.5 !h-4.5"
-                                />
-                                )}
-                                <span>{item.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={item.url} className="!gap-4">
+                          {item.noOutline ? (
+                            <Icon
+                              fill={isActive ? "var(--main)" : "var(--main2)"}
+                              stroke="none"
+                              className="!h-4.5 !w-4.5"
+                            />
+                          ) : (
+                            <Icon
+                              fill="none"
+                              stroke={isActive ? "var(--main)" : "currentColor"}
+                              className="!h-4.5 !w-4.5"
+                            />
+                          )}
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
                     </TooltipThis>
                   </SidebarMenuItem>
                 )
@@ -126,12 +126,12 @@ export function AppSidebarCounselor() {
         <SidebarSeparator />
         <button
           onClick={toggleSidebar}
-          className="flex w-full items-center justify-end pr-4 py-4 hover:bg-muted transition-colors cursor-pointer"
+          className="hover:bg-muted flex w-full cursor-pointer items-center justify-end py-4 pr-4 transition-colors"
         >
           {open ? (
-            <ChevronsLeftIcon className="w-5 h-5"/>
+            <ChevronsLeftIcon className="h-5 w-5" />
           ) : (
-            <ChevronsRightIcon className="w-5 h-5"/>
+            <ChevronsRightIcon className="h-5 w-5" />
           )}
         </button>
       </SidebarFooter>
