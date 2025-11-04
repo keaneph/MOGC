@@ -4,7 +4,7 @@ import { z } from "zod"
 import { contactFormSchema } from "./schemas"
 import { Resend } from "resend"
 
-const resend = new Resend("re_ebE3WYb5_JqNHMTRgEsHGFapEJLsARhV9")
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export const send = async (data: z.infer<typeof contactFormSchema>) => {
   try {
@@ -32,6 +32,3 @@ export const send = async (data: z.infer<typeof contactFormSchema>) => {
     return { success: false, error: String(error) }
   }
 }
-
-
-

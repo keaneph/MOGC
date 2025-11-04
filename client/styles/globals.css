@@ -19,6 +19,8 @@
   --color-link: var(--link);
   --color-main2: var(--main2);
   --color-main3: var(--main3);
+  --color-main3-dark: var(--main3-dark);
+  --color-main4: var(--main4);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
@@ -61,6 +63,8 @@
   --main-dark: oklch(0.32 0.161 26.99);
   --main2: oklch(0.3973 0.0108 264.44);
   --main3: oklch(0.8534 0.174477 91.2664);
+  --main3-dark: oklch(0.6827 0.157 91.2664);
+  --main4: oklch(0.5777 0.009 216.67);
   --link: oklch(0.5827 0.2115 264.71);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);

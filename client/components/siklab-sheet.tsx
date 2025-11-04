@@ -26,7 +26,13 @@ type SiklabSheetProps = {
   showTrigger?: boolean
 }
 
-export function SiklabSheet({ open, onOpenChange, accordionValue, onAccordionValueChange, showTrigger = true }: SiklabSheetProps) {
+export function SiklabSheet({
+  open,
+  onOpenChange,
+  accordionValue,
+  onAccordionValueChange,
+  showTrigger = true,
+}: SiklabSheetProps) {
   const [localOpen, setLocalOpen] = React.useState(false)
   const isControlled = open !== undefined
   const openState = isControlled ? (open as boolean) : localOpen
@@ -36,42 +42,50 @@ export function SiklabSheet({ open, onOpenChange, accordionValue, onAccordionVal
   }
 
   return (
-  <Sheet open={openState} onOpenChange={setOpen}>
-    {showTrigger && (
-      <TooltipThis label="Open Siklab Guide">
-        <SheetTrigger asChild>
-          <Image 
-          src={curious} 
-          alt="Siklab Curious Logo" 
-          className="cursor-pointer w-12 h-auto transition-transform hover:scale-110" />
-        </SheetTrigger>
-      </TooltipThis>
-    )}
-        
-      <SheetContent className="w-90 flex flex-col overflow-visible">
-        <SheetHeader className="bg-main h-48 relative">
-            <SheetTitle/>
-            <Image 
-              src={peeking} 
-              alt="Siklab Peeking Logo" 
-              className="absolute left-1/2 -translate-x-1/2 -top-5 z-11 h-55 w-37" />
-              
-            <div id="main-container" className="flex flex-col items-center bg-background absolute left-1/2 -translate-x-1/2 top-40 z-10 w-5/6 border-1 rounded-sm">
-              <Progress value={77} className="mb-6 mt-6 h-3 w-11/12" />
+    <Sheet open={openState} onOpenChange={setOpen}>
+      {showTrigger && (
+        <TooltipThis label="Open Siklab Guide">
+          <SheetTrigger asChild>
+            <Image
+              src={curious}
+              alt="Siklab Curious Logo"
+              className="h-auto w-12 cursor-pointer transition-transform hover:scale-110"
+            />
+          </SheetTrigger>
+        </TooltipThis>
+      )}
 
-                <div className="w-11/12 mb-2">
-                      <SiklabAccordion value={accordionValue} onValueChange={onAccordionValueChange} />
-                    </div>
-                
-              </div>
+      <SheetContent className="flex w-90 flex-col overflow-visible">
+        <SheetHeader className="bg-main relative h-48">
+          <SheetTitle />
+          <Image
+            src={peeking}
+            alt="Siklab Peeking Logo"
+            className="absolute -top-5 left-1/2 z-11 h-55 w-37 -translate-x-1/2"
+          />
+
+          <div
+            id="main-container"
+            className="bg-background absolute top-40 left-1/2 z-10 flex w-5/6 -translate-x-1/2 flex-col items-center rounded-sm border-1"
+          >
+            <Progress value={77} className="mt-6 mb-6 h-3 w-11/12" />
+
+            <div className="mb-2 w-11/12">
+              <SiklabAccordion
+                value={accordionValue}
+                onValueChange={onAccordionValueChange}
+              />
+            </div>
+          </div>
         </SheetHeader>
-        <SheetFooter className="p-0 gap-0">
-          <Separator className=""/>
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-0 flex w-full items-center justify-begin pl-4 pr-4 py-4 hover:bg-muted transition-colors cursor-pointer">
-            <ChevronsRightIcon className="w-5 h-5"/>
-        </button>
+        <SheetFooter className="gap-0 p-0">
+          <Separator className="" />
+          <button
+            onClick={() => setOpen(!open && !localOpen)}
+            className="justify-begin hover:bg-muted flex w-full cursor-pointer items-center p-0 py-4 pr-4 pl-4 transition-colors"
+          >
+            <ChevronsRightIcon className="h-5 w-5" />
+          </button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

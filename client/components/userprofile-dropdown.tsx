@@ -12,18 +12,21 @@ import {
 import { Button } from "./ui/button"
 import { LogoutConfirmationDialog } from "./logout-confirmation"
 import { UserAvatar } from "./user-avatar"
+import { TooltipThis } from "@/components/tooltip-this"
 
 export function UserDropdown({ role }: { role: string }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="default"
-          className="hover:bg-primary/10 h-10 w-10 cursor-pointer rounded-full !p-1"
-        >
-          <UserAvatar />
-        </Button>
-      </DropdownMenuTrigger>
+      <TooltipThis label="User Profile">
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="default"
+            className="hover:bg-primary/10 h-10 w-10 cursor-pointer rounded-full !p-1"
+          >
+            <UserAvatar />
+          </Button>
+        </DropdownMenuTrigger>
+      </TooltipThis>
 
       <DropdownMenuContent align="end" className="w-48" sideOffset={4}>
         {role === "Student" && (

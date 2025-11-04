@@ -6,7 +6,7 @@ const CatImage = () => {
 
   useEffect(() => {
     const showTimer = setTimeout(() => setVisible(true), 500)
-    const hideTimer = setTimeout(() => setVisible(false), 2500)
+    const hideTimer = setTimeout(() => setVisible(false), 2000)
 
     return () => {
       clearTimeout(showTimer)
