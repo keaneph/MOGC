@@ -1,8 +1,325 @@
-import { z } from "zod"
+import * as z from "zod"
 
 export const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   subject: z.string().min(2, "Subject must be at least 2 characters"),
   message: z.string().min(2, "Message must be at least 2 characters"),
+})
+
+export const studentIndividualDataSchema = z
+  .object({
+    idNo: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{4}$/, "Format must be YYYY-NNNN")
+      .refine(
+        (val) => {
+          const year = parseInt(val.slice(0, 4), 10)
+          const currentYear = new Date().getFullYear()
+          return year >= 2015 && year <= currentYear
+        },
+        { message: "Year must be between 2015 and current year" }
+      ),
+
+    course: z
+      .string()
+      .trim()
+      .min(2, "Course must be valid")
+      .max(100, "Course must be at most 100 characters"),
+
+    saseScore: z.coerce
+      .number<number>("SASE Score must be a number")
+      .min(0, "SASE Score must be at least 0")
+      .max(200, "SASE Score must be at most 200"),
+
+    academicYear: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{4}$/, "Format must be YYYY-YYYY")
+      .refine(
+        (val) => {
+          const [start, end] = val.split("-").map(Number)
+          const currentYear = new Date().getFullYear()
+          return start === currentYear && end === currentYear + 1
+        },
+        {
+          message:
+            "Academic year must be the current and next year (e.g. 2025-2026)",
+        }
+      ),
+
+    familyName: z
+      .string("Family name must be valid")
+      .trim()
+      .min(2, "Family name must be at least 2 characters")
+      .max(50, "Family name must be at most 50 characters"),
+
+    givenName: z
+      .string("Given name must be valid")
+      .trim()
+      .min(2, "Given name must be at least 2 characters")
+      .max(50, "Given name must be at most 50 characters"),
+
+    middleInitial: z
+      .string("Middle initial must be valid")
+      .trim()
+      .length(1, "Middle initial must be exactly 1 character"),
+
+    studentStatus: z.enum(["New", "Transferee", "Returnee", "Shiftee"]),
+
+    nickname: z
+      .string()
+      .trim()
+      .min(1, "Nickname must be at least 1 character")
+      .max(30, "Nickname must be at most 30 characters"),
+
+    age: z.coerce
+      .number<number>("Age must be valid")
+      .min(0, "Age cannot be negative")
+      .max(40, "Age must be at most 40"),
+
+    sex: z.enum(["Male", "Female"]),
+
+    citizenship: z
+      .string()
+      .trim()
+      .min(2, "Citizenship must be at least 2 characters")
+      .max(50, "Citizenship must be at most 50 characters"),
+
+    dateOfBirth: z
+      .string()
+      .trim()
+      .regex(/^\d{2}-\d{2}-\d{4}$/, "Format must be MM-DD-YYYY")
+      .refine(
+        (val) => {
+          const year = parseInt(val.slice(6, 10), 10)
+          const currentYear = new Date().getFullYear()
+          return year <= currentYear
+        },
+        { message: "Date of birth cannot be in the future" }
+      ),
+
+    placeOfBirth: z
+      .string()
+      .trim()
+      .min(2, "Place of birth must be at least 2 characters")
+      .max(50, "Place of birth must be at most 50 characters"),
+
+    religiousAffiliation: z
+      .string()
+      .trim()
+      .min(2, "Religious affiliation must be at least 2 characters")
+      .max(50, "Religious affiliation must be at most 50 characters"),
+
+    civilStatus: z.enum([
+      "Single",
+      "Married",
+      "Not legally married",
+      "Separated",
+      "Widowed",
+      "Others",
+    ]),
+
+    otherCivilStatus: z.string().trim().optional(),
+
+    noOfChildren: z.coerce
+      .number<number>("Number of children must be valid")
+      .min(0, "Number of children cannot be negative"),
+
+    addressInIligan: z
+      .string()
+      .trim()
+      .min(2, "Address in Iligan must be at least 2 characters")
+      .max(100, "Address in Iligan must be at most 100 characters"),
+
+    contactNo: z
+      .string()
+      .trim()
+      .regex(/^\d{11}$/, "Contact number must be 11 digits"),
+
+    homeAddress: z
+      .string()
+      .trim()
+      .min(2, "Home address must be at least 2 characters")
+      .max(100, "Home address must be at most 100 characters"),
+
+    staysWith: z.enum([
+      "Parents/Guardians",
+      "Board/Room mates",
+      "Relatives",
+      "Friends",
+      "Employer",
+      "Living on my own",
+    ]),
+
+    workingStudent: z.enum([
+      "Yes, full time",
+      "Yes, part time",
+      "No, but planning to work",
+      "No, and have no plan to work",
+    ]),
+
+    talentsAndSkills: z
+      .string()
+      .trim()
+      .min(2, "Talents and skills must be at least 2 characters")
+      .max(400, "Talents and skills must be at most 400 characters"),
+
+    leisureAndRecreationalActivities: z
+      .string()
+      .trim()
+      .min(
+        2,
+        "Leisure and recreational activities must be at least 2 characters"
+      )
+      .max(
+        400,
+        "Leisure and recreational activities must be at most 400 characters"
+      ),
+
+    seriousMedicalCondition: z.enum(["None", "Existing"]).optional(),
+
+    otherSeriousMedicalCondition: z.string().trim().optional(),
+
+    physicalDisability: z.enum(["None", "Existing"]).optional(),
+
+    otherPhysicalDisability: z.string().trim().optional(),
+
+    genderIdentity: z.enum([
+      "Male/Man",
+      "Female/Woman",
+      "Transgender Male/Man",
+      "Transgender Female/Woman",
+      "Gender Variant/Nonconforming",
+      "Not listed",
+      "Prefer not to answer",
+    ]),
+
+    sexualAttraction: z.enum([
+      "My same gender",
+      "Opposite my gender",
+      "Both men and women",
+      "All genders",
+      "Neither gender",
+      "Prefer not to answer",
+    ]),
+  })
+  .refine(
+    (data) => data.civilStatus !== "Others" || !!data.otherCivilStatus?.trim(),
+    {
+      message: "Please specify your civil status",
+      path: ["otherCivilStatus"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.seriousMedicalCondition !== "Existing" ||
+      !!data.otherSeriousMedicalCondition?.trim(),
+    {
+      message: "Please specify your medical condition",
+      path: ["otherSeriousMedicalCondition"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.physicalDisability !== "Existing" ||
+      !!data.otherPhysicalDisability?.trim(),
+    {
+      message: "Please specify your physical disability",
+      path: ["otherPhysicalDisability"],
+    }
+  )
+
+export const familyDataSchema = z.object({
+  fathersName: z
+    .string()
+    .trim()
+    .min(2, "Father's name must be at least 2 characters")
+    .max(50, "Father's name must be at most 50 characters"),
+
+  fathersStatus: z.enum(["Living", "Deceased"]),
+
+  fathersOccupation: z
+    .string()
+    .trim()
+    .min(2, "Father's occupation must be at least 2 characters")
+    .max(50, "Father's occupation must be at most 50 characters"),
+
+  fathersContactNo: z
+    .string()
+    .trim()
+    .regex(/^\d{11}$/, "Father's contact number must be 11 digits"),
+
+  mothersName: z
+    .string()
+    .trim()
+    .min(2, "Mother's name must be at least 2 characters")
+    .max(50, "Mother's name must be at most 50 characters"),
+
+  mothersStatus: z.enum(["Living", "Deceased"]),
+
+  mothersOccupation: z
+    .string()
+    .trim()
+    .min(2, "Mother's occupation must be at least 2 characters")
+    .max(50, "Mother's occupation must be at most 50 characters"),
+
+  mothersContactNo: z
+    .string()
+    .trim()
+    .regex(/^\d{11}$/, "Mother's contact number must be 11 digits"),
+
+  parentsMaritalStatus: z.enum([
+    "Married",
+    "Not Legally Married",
+    "Separated",
+    "Both parents remarried",
+    "One parent remarried",
+  ]),
+
+  familyMonthlyIncome: z.enum([
+    "Below 3,000",
+    "3,001-5,000",
+    "5,001-8,000",
+    "8,001-10,000",
+    "10,001-15,000",
+    "15,001-20,000",
+    "Above 20,001",
+  ]),
+
+  guardianName: z
+    .string()
+    .trim()
+    .min(2, "Guardian's name must be at least 2 characters")
+    .max(50, "Guardian's name must be at most 50 characters"),
+
+  guardianOccupation: z
+    .string()
+    .trim()
+    .min(2, "Guardian's occupation must be at least 2 characters")
+    .max(50, "Guardian's occupation must be at most 50 characters"),
+
+  guardianContactNo: z
+    .string()
+    .trim()
+    .regex(/^\d{11}$/, "Guardian's contact number must be 11 digits"),
+
+  relationshipWithGuardian: z
+    .string()
+    .trim()
+    .min(2, "Guardian's relationship must be at least 2 characters")
+    .max(50, "Guardian's relationship must be at most 50 characters"),
+
+  ordinalPosition: z.enum(["Only Child", "Eldest", "Middle", "Youngest"]),
+
+  noOfSiblings: z.coerce
+    .number<number>("Number of siblings must be valid")
+    .min(0, "Number of siblings cannot be negative"),
+
+  describeEnvironment: z
+    .string()
+    .trim()
+    .min(2, "Description must be at least 2 characters")
+    .max(50, "Description must be at most 50 characters"),
 })

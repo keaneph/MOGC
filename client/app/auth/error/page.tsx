@@ -1,13 +1,13 @@
 import Link from "next/link"
 import Image from "next/image"
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const error =
-    typeof searchParams.error === "string" ? searchParams.error : undefined
+  const params = await searchParams
+  const error = typeof params.error === "string" ? params.error : undefined
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
