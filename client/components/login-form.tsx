@@ -104,7 +104,7 @@ export function LoginForm({
                 className="bg-main hover:bg-main-dark w-full cursor-pointer rounded-sm tracking-wide text-white hover:text-white"
                 disabled={isLoading}
               >
-                <img
+                <Image
                   src="/google-icon.svg"
                   alt="Google icon"
                   width={18}
