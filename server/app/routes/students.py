@@ -80,20 +80,20 @@ def get_profile_progress(user_id: str):
         
         # check from most recent to least recent
         if data.get("guardian_name"):
-            last_section = 1
-            last_part = 1
+            last_section = 2
+            last_part = 0
         elif data.get("father_name"):
             last_section = 1
-            last_part = 0
+            last_part = 1
         elif data.get("gender_identity"):
-            last_section = 0
-            last_part = 2
+            last_section = 1
+            last_part = 0
         elif data.get("religious_affiliation"):
             last_section = 0
-            last_part = 1
+            last_part = 2
         elif data.get("id_number"):
             last_section = 0
-            last_part = 0
+            last_part = 1
         else:
             last_section = 0
             last_part = 0

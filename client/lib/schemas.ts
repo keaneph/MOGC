@@ -249,7 +249,10 @@ export const familyDataSchema = z.object({
   fathersContactNo: z
     .string()
     .trim()
-    .regex(/^\d{11}$/, "Father's contact number must be 11 digits"),
+    .refine(
+      (val) => val === "N/A" || /^\d{11}$/.test(val),
+      "Father's contact number must be 11 digits or 'N/A'"
+    ),
 
   mothersName: z
     .string()
@@ -268,7 +271,10 @@ export const familyDataSchema = z.object({
   mothersContactNo: z
     .string()
     .trim()
-    .regex(/^\d{11}$/, "Mother's contact number must be 11 digits"),
+    .refine(
+      (val) => val === "N/A" || /^\d{11}$/.test(val),
+      "Mother's contact number must be 11 digits or 'N/A'"
+    ),
 
   parentsMaritalStatus: z.enum([
     "Married",
