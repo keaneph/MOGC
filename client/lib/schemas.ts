@@ -107,7 +107,10 @@ export const studentIndividualDataSchema = z
     dateOfBirth: z
       .string()
       .trim()
-      .regex(/^\d{2}-\d{2}-\d{4}$/, "Format must be MM-DD-YYYY")
+      .regex(
+        /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])-\d{4}$/,
+        "Format must be MM-DD-YYYY"
+      )
       .refine(
         (val) => {
           const year = parseInt(val.slice(6, 10), 10)
@@ -145,11 +148,18 @@ export const studentIndividualDataSchema = z
     otherCivilStatus: z
       .string()
       .trim()
-      .regex(
-        /^[a-zA-Z\s'-]+$/,
-        "Civil status must contain only letters, spaces, hyphens, and apostrophes"
-      )
-      .optional(),
+      .optional()
+      .refine(
+        (val) => {
+          if (!val) return true
+          return /^[a-zA-Z\s'-]+$/.test(val)
+        },
+        {
+          message:
+            "Civil status must contain only letters, spaces, hyphens, and apostrophes",
+        }
+      ),
+
     noOfChildren: z.coerce
       .number<number>("Number of children must be valid")
       .min(0, "Number of children cannot be negative"),
@@ -163,7 +173,10 @@ export const studentIndividualDataSchema = z
     contactNo: z
       .string()
       .trim()
-      .regex(/^\d{11}$/, "Contact number must be 11 digits"),
+      .refine(
+        (val) => val === "N/A" || /^\d{11}$/.test(val),
+        "Contact number must be 11 digits or 'N/A'"
+      ),
 
     homeAddress: z
       .string()
@@ -505,5 +518,23 @@ export const academicDataSchema = z
     {
       message: "Scholar details must be provided when scholar is 'Yes'",
       path: ["scholarDetails"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.courseChoiceActor !== "Others" ||
+      !!data.otherCourseChoiceActor?.trim(),
+    {
+      message: "Please specify your why",
+      path: ["otherCourseChoiceActor"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.reasonsForChoosingiit !== "Others" ||
+      !!data.otherReasonForChoosingiit?.trim(),
+    {
+      message: "Please specify your reason for choosing IIT",
+      path: ["otherReasonForChoosingiit"],
     }
   )
