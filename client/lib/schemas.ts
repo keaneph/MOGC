@@ -133,7 +133,7 @@ export const studentIndividualDataSchema = z
       .max(50, "Religious affiliation must be at most 50 characters")
       .regex(
         /^[a-zA-Z\s'-]+$/,
-        "Family name must contain only letters, spaces, hyphens, and apostrophes"
+        "Must contain only letters, spaces, hyphens, and apostrophes"
       ),
 
     civilStatus: z.enum([
@@ -289,9 +289,9 @@ export const familyDataSchema = z.object({
     .trim()
     .min(2, "Father's occupation must be at least 2 characters")
     .max(50, "Father's occupation must be at most 50 characters")
-    .regex(
-      /^[a-zA-Z\s'-]+$/,
-      "Family occupation must contain only letters, spaces, hyphens, and apostrophes"
+    .refine(
+      (val) => val === "N/A" || /^[a-zA-Z\s'-,]+$/.test(val),
+      "Father's occupation must contain only letters, spaces, hyphens, and apostrophes or 'N/A'"
     ),
 
   fathersContactNo: z
@@ -319,9 +319,9 @@ export const familyDataSchema = z.object({
     .trim()
     .min(2, "Mother's occupation must be at least 2 characters")
     .max(50, "Mother's occupation must be at most 50 characters")
-    .regex(
-      /^[a-zA-Z\s'-]+$/,
-      "Mother's occupation must contain only letters, spaces, hyphens, and apostrophes"
+    .refine(
+      (val) => val === "N/A" || /^[a-zA-Z\s'-,]+$/.test(val),
+      "Mother's occupation must contain only letters, spaces, hyphens, and apostrophes or 'N/A'"
     ),
 
   mothersContactNo: z
@@ -334,7 +334,7 @@ export const familyDataSchema = z.object({
 
   parentsMaritalStatus: z.enum([
     "Married",
-    "Not Legally Married",
+    "Not legally married",
     "Separated",
     "Both parents remarried",
     "One parent remarried",
@@ -366,24 +366,24 @@ export const familyDataSchema = z.object({
     .min(2, "Guardian's occupation must be at least 2 characters")
     .max(50, "Guardian's occupation must be at most 50 characters")
     .regex(
-      /^[a-zA-Z\s'-]+$/,
+      /^[a-zA-Z\s'-,]+$/,
       "Guardians's occupation must contain only letters, spaces, hyphens, and apostrophes"
     ),
 
   guardianContactNo: z
     .string()
     .trim()
-    .regex(/^\d{11}$/, "Guardian's contact number must be 11 digits"),
+    .refine(
+      (val) => val === "N/A" || /^\d{11}$/.test(val),
+      "Guardian's contact number must be 11 digits or 'N/A'"
+    ),
 
   relationshipWithGuardian: z
     .string()
     .trim()
     .min(2, "Guardian's relationship must be at least 2 characters")
     .max(50, "Guardian's relationship must be at most 50 characters")
-    .regex(
-      /^[a-zA-Z\s]+$/,
-      "Mother's name must contain only letters, and spaces"
-    ),
+    .regex(/^[a-zA-Z\s]+$/, "Must contain only letters, and spaces"),
 
   ordinalPosition: z.enum(["Only Child", "Eldest", "Middle", "Youngest"]),
 
@@ -412,11 +412,16 @@ export const academicDataSchema = z
     scholarDetails: z
       .string()
       .trim()
-      .min(2, "Scholar details must be at least 2 characters")
-      .max(50, "Scholar details must be at most 50 characters")
-      .regex(
-        /^[a-zA-Z\s'-]+$/,
-        "Must contain only letters, spaces, hyphens, and apostrophes"
+      .optional()
+      .refine(
+        (val) => {
+          if (!val) return true
+          return /^[a-zA-Z\s'-]+$/.test(val)
+        },
+        {
+          message:
+            "Must contain only letters, spaces, hyphens, and apostrophes",
+        }
       ),
 
     lastSchoolAttended: z

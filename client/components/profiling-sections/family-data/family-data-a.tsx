@@ -58,14 +58,8 @@ export const FamilyDataASection = React.forwardRef<
     if (fathersStatus === "Deceased") {
       form.setValue("fathersOccupation", "N/A", { shouldValidate: false })
     }
-    if (fathersStatus === "Living") {
-      form.setValue("fathersOccupation", "", { shouldValidate: false })
-    }
     if (fathersStatus === "Deceased") {
       form.setValue("fathersContactNo", "N/A", { shouldValidate: false })
-    }
-    if (fathersStatus === "Living") {
-      form.setValue("fathersContactNo", "", { shouldValidate: false })
     }
   }, [fathersStatus, form])
 
@@ -75,14 +69,8 @@ export const FamilyDataASection = React.forwardRef<
     if (mothersStatus === "Deceased") {
       form.setValue("mothersOccupation", "N/A", { shouldValidate: false })
     }
-    if (mothersStatus === "Living") {
-      form.setValue("mothersOccupation", "", { shouldValidate: false })
-    }
     if (mothersStatus === "Deceased") {
       form.setValue("mothersContactNo", "N/A", { shouldValidate: false })
-    }
-    if (mothersStatus === "Living") {
-      form.setValue("mothersContactNo", "", { shouldValidate: false })
     }
   }, [mothersStatus, form])
 

@@ -11,6 +11,9 @@ import {
   CircleAlertIcon,
 } from "lucide-react"
 import { Progress } from "./ui/progress"
+import CatImage from "@/components/happy-toast"
+import CatImageSad from "@/components/sad-toast"
+import { CircleCheckIcon } from "lucide-react"
 import {
   HoverCard,
   HoverCardContent,
@@ -37,8 +40,20 @@ import {
   FamilyDataBSection,
   FamilyDataBSectionRef,
 } from "./profiling-sections/family-data/family-data-b"
+import {
+  AcademicDataASection,
+  AcademicDataASectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-a"
+import {
+  AcademicDataBSection,
+  AcademicDataBSectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-b"
 
-import { studentIndividualDataSchema, familyDataSchema } from "@/lib/schemas"
+import {
+  studentIndividualDataSchema,
+  familyDataSchema,
+  academicDataSchema,
+} from "@/lib/schemas"
 import {
   saveStudentSection,
   getStudentSection,
@@ -55,7 +70,12 @@ import { useRef } from "react"
 
 type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
-type FormFields = PersonalDataFormFields | FamilyDataFormFields
+type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
+
+type FormFields =
+  | PersonalDataFormFields
+  | FamilyDataFormFields
+  | AcademicDataFormFields
 
 export function InProgressProfile() {
   // 0–5 (6 sections)
@@ -128,6 +148,27 @@ export function InProgressProfile() {
         if (familyB && familyDataBRef.current && hasAnyData(familyB)) {
           familyDataBRef.current.form.reset(
             familyB as Parameters<typeof familyDataBRef.current.form.reset>[0]
+          )
+        }
+      }
+    } else if (currentSection === 2) {
+      // Academic Data
+      if (currentPart === 0) {
+        const academicA = transformFromAcademicDataA(fullProfile)
+        if (academicA && academicDataARef.current && hasAnyData(academicA)) {
+          academicDataARef.current.form.reset(
+            academicA as Parameters<
+              typeof academicDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const academicB = transformFromAcademicDataB(fullProfile)
+        if (academicB && academicDataBRef.current && hasAnyData(academicB)) {
+          academicDataBRef.current.form.reset(
+            academicB as Parameters<
+              typeof academicDataBRef.current.form.reset
+            >[0]
           )
         }
       }
@@ -247,6 +288,39 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromAcademicDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      generalPointAverage: dbRecord.shs_gpa,
+      scholar: dbRecord.is_scholar === true ? "Yes" : "No",
+      scholarDetails: dbRecord.scholarship_type,
+      lastSchoolAttended: dbRecord.previous_school_name,
+      lastSchoolAddress: dbRecord.previous_school_address,
+      shsTrack: dbRecord.shs_track,
+      shsStrand: dbRecord.shs_strand,
+      awards: dbRecord.awards_honors,
+    }
+  }
+
+  const transformFromAcademicDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      firstChoice: dbRecord.career_option_1,
+      secondChoice: dbRecord.career_option_2,
+      thirdChoice: dbRecord.career_option_3,
+      studentOrg: dbRecord.student_organizations,
+      courseChoiceActor: dbRecord.course_choice_actor,
+      otherCourseChoiceActor: dbRecord.course_choice_actor_others,
+      reasonsForChoosingiit: dbRecord.reasons_for_choosing_msuiit,
+      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
+      reasonForCourse: dbRecord.course_choice_reason,
+      careerPursuingInFuture: dbRecord.post_college_career_goal,
+      coCurricularActivities: dbRecord.cocurricular_activities,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -297,6 +371,8 @@ export function InProgressProfile() {
   const personalDataCRef = useRef<PersonalDataCSectionRef>(null)
   const familyDataARef = useRef<FamilyDataASectionRef>(null)
   const familyDataBRef = useRef<FamilyDataBSectionRef>(null)
+  const academicDataARef = useRef<AcademicDataASectionRef>(null)
+  const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 3 },
@@ -321,6 +397,10 @@ export function InProgressProfile() {
     if (currentSection === 1) {
       if (currentPart === 0) return familyDataARef
       if (currentPart === 1) return familyDataBRef
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0) return academicDataARef
+      if (currentPart === 1) return academicDataBRef
     }
     return null
   }
@@ -399,6 +479,35 @@ export function InProgressProfile() {
         ]
       }
     }
+    if (currentSection === 2) {
+      if (currentPart === 0) {
+        return [
+          "generalPointAverage",
+          "scholar",
+          "scholarDetails",
+          "lastSchoolAttended",
+          "lastSchoolAddress",
+          "shsTrack",
+          "shsStrand",
+          "awards",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "firstChoice",
+          "secondChoice",
+          "thirdChoice",
+          "studentOrg",
+          "courseChoiceActor",
+          "otherCourseChoiceActor",
+          "reasonsForChoosingiit",
+          "otherReasonForChoosingiit",
+          "reasonForCourse",
+          "careerPursuingInFuture",
+          "coCurricularActivities",
+        ]
+      }
+    }
     return []
   }
 
@@ -419,7 +528,16 @@ export function InProgressProfile() {
             "Validation failed, errors:",
             currentRef.current.form.formState.errors
           )
-          toast.error("Please fix the validation errors before proceeding")
+          toast.error(
+            <div className="relative flex w-full items-center pr-14">
+              <span className="pl-2">Failed to save. Please try again</span>
+              <CatImageSad />
+            </div>,
+            {
+              duration: 3000,
+              icon: <CircleCheckIcon className="size-4" />,
+            }
+          )
           return
         }
       }
@@ -444,7 +562,16 @@ export function InProgressProfile() {
           return // Prevent navigation if save fails
         }
 
-        toast.success("Section saved successfully", { duration: 2000 })
+        toast.success(
+          <div className="relative flex w-full items-center pr-18">
+            <span className="pl-2">Section saved successfully</span>
+            <CatImage />
+          </div>,
+          {
+            duration: 3000,
+            icon: <CircleCheckIcon className="size-4" />,
+          }
+        )
 
         // reload profile data after successful save to keep it in sync
         const updatedProfile = await getStudentProfile()
@@ -453,7 +580,16 @@ export function InProgressProfile() {
         }
       } catch (error) {
         console.error("Error saving section:", error)
-        toast.error("Failed to save. Please try again.", { duration: 3000 })
+        toast.error(
+          <div className="relative flex w-full items-center pr-14">
+            <span className="pl-2">Failed to save. Please try again</span>
+            <CatImageSad />
+          </div>,
+          {
+            duration: 3000,
+            icon: <CircleCheckIcon className="size-4" />,
+          }
+        )
         setIsSaving(false)
         return // prevent navigation if save fails
       } finally {
@@ -493,36 +629,6 @@ export function InProgressProfile() {
     }
   }
 
-  // Helper to get form ref for a specific section/part
-  const getFormRefForSection = (
-    sectionIndex: number,
-    partIndex: number
-  ): React.RefObject<
-    | PersonalDataASectionRef
-    | PersonalDataBSectionRef
-    | PersonalDataCSectionRef
-    | FamilyDataASectionRef
-    | FamilyDataBSectionRef
-  > | null => {
-    if (sectionIndex === 0) {
-      // Personal Data
-      if (partIndex === 0)
-        return personalDataARef as React.RefObject<PersonalDataASectionRef>
-      if (partIndex === 1)
-        return personalDataBRef as React.RefObject<PersonalDataBSectionRef>
-      if (partIndex === 2)
-        return personalDataCRef as React.RefObject<PersonalDataCSectionRef>
-    }
-    if (sectionIndex === 1) {
-      // Family Data
-      if (partIndex === 0)
-        return familyDataARef as React.RefObject<FamilyDataASectionRef>
-      if (partIndex === 1)
-        return familyDataBRef as React.RefObject<FamilyDataBSectionRef>
-    }
-    return null
-  }
-
   const handleReset = () => {
     const currentRef = getCurrentFormRef()
     if (currentRef?.current) {
@@ -552,6 +658,12 @@ export function InProgressProfile() {
     if (currentSection === 1) {
       if (currentPart === 0) return <FamilyDataASection ref={familyDataARef} />
       if (currentPart === 1) return <FamilyDataBSection ref={familyDataBRef} />
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0)
+        return <AcademicDataASection ref={academicDataARef} />
+      if (currentPart === 1)
+        return <AcademicDataBSection ref={academicDataBRef} />
     }
 
     // placeholder muna
@@ -902,7 +1014,7 @@ export function InProgressProfile() {
                 onClick={handleReset}
                 className="cursor-pointer border"
               >
-                Reset
+                Reset Changes
               </Button>
               <div className="flex gap-4">
                 <Button
@@ -925,9 +1037,9 @@ export function InProgressProfile() {
                   {isSaving
                     ? "Saving..."
                     : currentSection === sections.length - 1 &&
-                  currentPart === totalParts - 1
-                    ? "Finish"
-                    : "Proceed"}
+                        currentPart === totalParts - 1
+                      ? "Finish"
+                      : "Proceed"}
                 </Button>
 
                 {/* DEV BUTTON: just remove if ok na*/}
