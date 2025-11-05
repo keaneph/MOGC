@@ -118,8 +118,8 @@ export const PersonalDataBSection = React.forwardRef<
                         <SelectContent>
                           <SelectItem value="Single">Single</SelectItem>
                           <SelectItem value="Married">Married</SelectItem>
-                          <SelectItem value="Not Legally Married">
-                            Not Legally Married
+                          <SelectItem value="Not legally married">
+                            Not legally married
                           </SelectItem>
                           <SelectItem value="Separated">Separated</SelectItem>
                           <SelectItem value="Widowed">Widowed</SelectItem>

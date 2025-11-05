@@ -53,18 +53,27 @@ export const studentIndividualDataSchema = z
       .string("Family name must be valid")
       .trim()
       .min(2, "Family name must be at least 2 characters")
-      .max(50, "Family name must be at most 50 characters"),
+      .max(50, "Family name must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Family name must contain only letters, spaces, hyphens, and apostrophes"
+      ),
 
     givenName: z
       .string("Given name must be valid")
       .trim()
       .min(2, "Given name must be at least 2 characters")
-      .max(50, "Given name must be at most 50 characters"),
+      .max(50, "Given name must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Given name must contain only letters, spaces, hyphens, and apostrophes"
+      ),
 
     middleInitial: z
       .string("Middle initial must be valid")
       .trim()
-      .length(1, "Middle initial must be exactly 1 character"),
+      .length(1, "Middle initial must be exactly 1 character")
+      .regex(/^[a-zA-Z\s]+$/, "Middle Initial contain only letters"),
 
     studentStatus: z.enum(["New", "Transferee", "Returnee", "Shiftee"]),
 
@@ -72,7 +81,11 @@ export const studentIndividualDataSchema = z
       .string()
       .trim()
       .min(1, "Nickname must be at least 1 character")
-      .max(30, "Nickname must be at most 30 characters"),
+      .max(30, "Nickname must be at most 30 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Nickname must contain only letters, spaces, hyphens, and apostrophes"
+      ),
 
     age: z.coerce
       .number<number>("Age must be valid")
@@ -85,7 +98,11 @@ export const studentIndividualDataSchema = z
       .string()
       .trim()
       .min(2, "Citizenship must be at least 2 characters")
-      .max(50, "Citizenship must be at most 50 characters"),
+      .max(50, "Citizenship must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s-]+$/,
+        "Citizenship must contain only letters, spaces, and hyphens"
+      ),
 
     dateOfBirth: z
       .string()
@@ -110,7 +127,11 @@ export const studentIndividualDataSchema = z
       .string()
       .trim()
       .min(2, "Religious affiliation must be at least 2 characters")
-      .max(50, "Religious affiliation must be at most 50 characters"),
+      .max(50, "Religious affiliation must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Family name must contain only letters, spaces, hyphens, and apostrophes"
+      ),
 
     civilStatus: z.enum([
       "Single",
@@ -121,8 +142,14 @@ export const studentIndividualDataSchema = z
       "Others",
     ]),
 
-    otherCivilStatus: z.string().trim().optional(),
-
+    otherCivilStatus: z
+      .string()
+      .trim()
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Civil status must contain only letters, spaces, hyphens, and apostrophes"
+      )
+      .optional(),
     noOfChildren: z.coerce
       .number<number>("Number of children must be valid")
       .min(0, "Number of children cannot be negative"),
@@ -236,7 +263,11 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Father's name must be at least 2 characters")
-    .max(50, "Father's name must be at most 50 characters"),
+    .max(50, "Father's name must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Father's name must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   fathersStatus: z.enum(["Living", "Deceased"]),
 
@@ -244,7 +275,11 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Father's occupation must be at least 2 characters")
-    .max(50, "Father's occupation must be at most 50 characters"),
+    .max(50, "Father's occupation must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Family occupation must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   fathersContactNo: z
     .string()
@@ -258,7 +293,11 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Mother's name must be at least 2 characters")
-    .max(50, "Mother's name must be at most 50 characters"),
+    .max(50, "Mother's name must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Mother's name must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   mothersStatus: z.enum(["Living", "Deceased"]),
 
@@ -266,7 +305,11 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Mother's occupation must be at least 2 characters")
-    .max(50, "Mother's occupation must be at most 50 characters"),
+    .max(50, "Mother's occupation must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Mother's occupation must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   mothersContactNo: z
     .string()
@@ -298,13 +341,21 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Guardian's name must be at least 2 characters")
-    .max(50, "Guardian's name must be at most 50 characters"),
+    .max(50, "Guardian's name must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Guardian's name must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   guardianOccupation: z
     .string()
     .trim()
     .min(2, "Guardian's occupation must be at least 2 characters")
-    .max(50, "Guardian's occupation must be at most 50 characters"),
+    .max(50, "Guardian's occupation must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Guardians's occupation must contain only letters, spaces, hyphens, and apostrophes"
+    ),
 
   guardianContactNo: z
     .string()
@@ -315,7 +366,11 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Guardian's relationship must be at least 2 characters")
-    .max(50, "Guardian's relationship must be at most 50 characters"),
+    .max(50, "Guardian's relationship must be at most 50 characters")
+    .regex(
+      /^[a-zA-Z\s]+$/,
+      "Mother's name must contain only letters, and spaces"
+    ),
 
   ordinalPosition: z.enum(["Only Child", "Eldest", "Middle", "Youngest"]),
 
@@ -329,3 +384,126 @@ export const familyDataSchema = z.object({
     .min(2, "Description must be at least 2 characters")
     .max(50, "Description must be at most 50 characters"),
 })
+
+export const academicDataSchema = z
+  .object({
+    generalPointAverage: z
+      .string()
+      .trim()
+      .regex(/^\d*\.?\d*$/, "Only numbers and a single '.' are allowed")
+      .min(2, "GPA must be at least 2 characters")
+      .max(10, "GPA must be at most 10 characters"),
+
+    scholar: z.enum(["Yes", "No"]),
+
+    scholarDetails: z
+      .string()
+      .trim()
+      .min(2, "Scholar details must be at least 2 characters")
+      .max(50, "Scholar details must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Must contain only letters, spaces, hyphens, and apostrophes"
+      ),
+
+    lastSchoolAttended: z
+      .string()
+      .trim()
+      .min(2, "School name must be at least 2 characters")
+      .max(50, "School name must be at most 50 characters")
+      .regex(
+        /^[a-zA-Z\s.'\-,]+$/,
+        "School name must contain only letters, spaces, dots, hyphens, apostrophes, and commas"
+      ),
+
+    lastSchoolAddress: z
+      .string()
+      .trim()
+      .min(2, "School address must be at least 2 characters")
+      .max(50, "School address must be at most 50 characters"),
+
+    shsTrack: z.enum(["Academic", "Arts/Design", "Tech-Voc", "Sports"]),
+
+    shsStrand: z.enum(["GA", "STEM", "ABM", "HUMSS"]),
+
+    awards: z
+      .string()
+      .trim()
+      .min(2, "School address must be at least 2 characters")
+      .max(50, "School address must be at most 50 characters"),
+
+    firstChoice: z
+      .string()
+      .trim()
+      .min(2, "Course must be valid")
+      .max(100, "Course must be at most 100 characters"),
+
+    secondChoice: z
+      .string()
+      .trim()
+      .min(2, "Course must be valid")
+      .max(100, "Course must be at most 100 characters"),
+
+    thirdChoice: z
+      .string()
+      .trim()
+      .min(2, "Course must be valid")
+      .max(100, "Course must be at most 100 characters"),
+
+    studentOrg: z
+      .string()
+      .trim()
+      .min(2, "Student Organizations must be at least 2 characters")
+      .max(50, "Student Organizations must be at most 50 characters"),
+
+    courseChoiceActor: z.enum([
+      "Own Choice",
+      "Parents Choice",
+      "Siblings Choice",
+      "Relatives Choice",
+      "According to MSU-SASE score/slot",
+      "Others",
+    ]),
+    otherCourseChoiceActor: z.string().trim().optional(),
+
+    reasonsForChoosingiit: z.enum([
+      "Quality education",
+      "Affordable tuition fees",
+      "Scholarships",
+      "Proximity",
+      "Only school offering my course",
+      "Prestigious Institution",
+      "Others",
+    ]),
+    otherReasonForChoosingiit: z.string().trim().optional(),
+
+    reasonForCourse: z
+      .string()
+      .trim()
+      .min(2, "Reason must be at least 2 characters")
+      .max(50, "Reason must be at most 50 characters"),
+
+    careerPursuingInFuture: z
+      .string()
+      .trim()
+      .min(2, "Reason must be at least 2 characters")
+      .max(50, "Reason must be at most 50 characters"),
+
+    coCurricularActivities: z
+      .string()
+      .trim()
+      .min(2, "Co-curricular activities must be at least 2 characters")
+      .max(50, "Co-curricular activities must be at most 50 characters"),
+  })
+  .refine(
+    (data) => {
+      if (data.scholar === "Yes") {
+        return data.scholarDetails && data.scholarDetails.length >= 2
+      }
+      return true
+    },
+    {
+      message: "Scholar details must be provided when scholar is 'Yes'",
+      path: ["scholarDetails"],
+    }
+  )
