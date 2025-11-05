@@ -26,6 +26,13 @@ def convert_medical_condition_from_db(condition: Optional[str]) -> str:
     """Convert database medical condition to form format"""
     return "Existing" if condition == "Existing" else "None"
 
+def convert_scholar_status_to_boolean(status: str) -> bool:
+    """Convert 'Yes'/'No' from form to boolean for DB"""
+    return status == "Yes"
+
+def convert_scholar_boolean_to_status(value: Optional[bool]) -> str:
+    return "Yes" if value else "No"
+
 
 def transform_personal_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform Personal Data Part A form data to database format"""
@@ -105,6 +112,36 @@ def transform_family_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "ordinal_position": form_data.get("ordinalPosition"),
         "number_of_siblings": form_data.get("noOfSiblings"),
         "home_environment_description": form_data.get("describeEnvironment"),
+    }
+
+def transform_academic_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Academic Data Part A form data to database format"""
+    return {
+        "shs_gpa": form_data.get("generalPointAverage"),
+        "is_scholar": convert_scholar_status_to_boolean(form_data.get("scholar", "No")),
+        "scholarship_type": form_data.get("scholarDetails"),
+        "previous_school_name": form_data.get("lastSchoolAttended"),
+        "previous_school_address": form_data.get("lastSchoolAddress"),
+        "shs_track": form_data.get("shsTrack"),
+        "shs_strand": form_data.get("shsStrand"),
+        "awards_honors": form_data.get("awards"),
+    }
+
+def transform_academic_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Academic Data Part B form data to database format"""
+    return {
+        "career_option_1": form_data.get("firstChoice"),
+        "career_option_2": form_data.get("secondChoice"),
+        "career_option_3": form_data.get("thirdChoice"),
+        "student_organizations": form_data.get("studentOrg"),
+        "course_choice_actor": form_data.get("courseChoiceActor"),
+        "course_choice_actor_others": form_data.get("otherCourseChoiceActor"),
+        "reasons_for_choosing_msuiit": form_data.get("reasonsForChoosingiit"),
+        "reasons_for_choosing_msuiit_others": form_data.get("otherReasonForChoosingiit"),
+        "course_choice_reason": form_data.get("reasonForCourse"),
+        "post_college_career_goal": form_data.get("careerPursuingInFuture"),
+        "cocurricular_activities": form_data.get("coCurricularActivities"),
+
     }
 
 
@@ -188,6 +225,34 @@ def transform_from_family_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "describeEnvironment": db_record.get("home_environment_description"),
     }
 
+def transform_from_academic_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Academic Data Part A form format"""
+    return {
+        "generalPointAverage": db_record.get("shs_gpa"),
+        "scholar": convert_scholar_boolean_to_status(db_record.get("is_scholar")),
+        "scholarDetails": db_record.get("scholarship_type"),
+        "lastSchoolAttended": db_record.get("previous_school_name"),
+        "lastSchoolAddress": db_record.get("previous_school_address"),
+        "shsTrack": db_record.get("shs_track"),
+        "shsStrand": db_record.get("shs_strand"),
+        "awards": db_record.get("awards_honors"),
+    }
+
+def transform_from_academic_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Academic Data Part B form format"""
+    return {
+        "firstChoice": db_record.get("career_option_1"),
+        "secondChoice": db_record.get("career_option_2"),
+        "thirdChoice": db_record.get("career_option_3"),
+        "studentOrg": db_record.get("student_organizations"),
+        "courseChoiceActor": db_record.get("course_choice_actor"),
+        "otherCourseChoiceActor": db_record.get("course_choice_actor_others"),
+        "reasonsForChoosingiit": db_record.get("reasons_for_choosing_msuiit"),
+        "otherReasonForChoosingiit": db_record.get("reasons_for_choosing_msuiit_others"),
+        "reasonForCourse": db_record.get("course_choice_reason"),
+        "careerPursuingInFuture": db_record.get("post_college_career_goal"),
+        "coCurricularActivities": db_record.get("cocurricular_activities"),
+    }
 
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
@@ -257,5 +322,20 @@ def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("home_environment_description")
     )
     
+def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
+    """Check if all parts of Academic Data section are complete"""
+    part_a_complete = (
+        db_record.get("shs_gpa") is not None and
+        db_record.get("is_scholar") is not None and
+        (not db_record.get("is_scholar") or db_record.get("scholarship_type")) and
+        db_record.get("previous_school_name") and
+        db_record.get("previous_school_address") and
+        db_record.get("shs_track") and
+        db_record.get("shs_strand") and
+        db_record.get("awards_honors")
+    )
+    part_b_complete = (
+        db_record.get("student_organization")
+    )
     return part_a_complete and part_b_complete
 
