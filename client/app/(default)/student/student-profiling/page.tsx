@@ -1,5 +1,6 @@
 "use client"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import EmptyProfile from "@/components/empty-profile"
 import { InProgressProfile } from "@/components/inprogress-profile"
 import { PrimaryButton } from "@/components/primary-button"
@@ -40,9 +41,7 @@ export default function StudentProfilingPage() {
 
         <div>
           {hasProfile === null ? (
-            <div className="flex justify-center py-12">
-              <p className="text-muted-foreground">Loading...</p>
-            </div>
+            <Skeleton className="rounded-m h-[510px] w-full"></Skeleton>
           ) : hasProfile ? (
             <div>
               <InProgressProfile />
