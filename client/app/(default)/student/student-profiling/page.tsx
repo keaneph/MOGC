@@ -17,6 +17,9 @@ export default function StudentProfilingPage() {
     }
     checkProfile()
   }, [])
+  const handleCreateProfile = () => {
+    setHasProfile(true)
+  }
   return (
     <div id="main-container" className="mt-12 flex w-full justify-center px-6">
       {/* main content container */}
@@ -45,7 +48,7 @@ export default function StudentProfilingPage() {
               <InProgressProfile />
             </div>
           ) : (
-            <EmptyProfile />
+            <EmptyProfile onCreateProfile={handleCreateProfile} />
           )}
         </div>
       </div>

@@ -8,7 +8,11 @@ import {
 import sitting from "@/public/sitting.png"
 import Image from "next/image"
 
-export default function EmptyProfile() {
+interface EmptyProfileProps {
+  onCreateProfile: () => void
+}
+
+export default function EmptyProfile({ onCreateProfile }: EmptyProfileProps) {
   return (
     <Empty className="rounded-sm border-1 !pb-0">
       <EmptyHeader>
@@ -23,7 +27,7 @@ export default function EmptyProfile() {
           are and how we can support you best.
         </div>
 
-        <PrimaryButton content="Create Profile" />
+        <PrimaryButton content="Create Profile" onClick={onCreateProfile} />
       </EmptyContent>
       <div className="">
         <Image
