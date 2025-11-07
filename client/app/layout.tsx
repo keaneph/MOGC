@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "@/styles/globals.css"
 import { NextStepProvider, NextStep, Tour } from "nextstepjs"
-import WelcomeCard from "@/components/onboarding-cards/welcome-card"
+import OnboardingSelector from "@/components/onboarding/OnboardingSelector"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,46 +25,56 @@ const steps: Tour[] = [
         icon: "👋",
         title: "Welcome to MOGC!",
         content: "",
-        pointerRadius: 12,
+        pointerRadius: 5,
       },
       {
-        icon: "🚀",
+        icon: "🛸",
         title: "Revisit this guide!",
+        content: "",
+        selector: "#firstStepDIV",
+        side: "bottom",
+        pointerPadding: 5,
+        pointerRadius: 5,
+        viewportID: "scrollable-viewport",
+      },
+      {
+        icon: "🎂",
+        title: "Declare your existence!",
         content: "",
         selector: "#secondStepDIV",
         side: "bottom",
-        pointerPadding: 12,
-        pointerRadius: 12,
+        pointerPadding: 5,
+        pointerRadius: 5,
         viewportID: "scrollable-viewport",
       },
       {
-        icon: "👋",
-        title: "third test!",
+        icon: "⌛",
+        title: "What's next?",
         content: "",
         selector: "#thirdStepDIV",
-        side: "bottom",
-        pointerPadding: 12,
-        pointerRadius: 12,
+        side: "right",
+        pointerPadding: 5,
+        pointerRadius: 5,
         viewportID: "scrollable-viewport",
       },
       {
-        icon: "👋",
-        title: "fourth test!",
+        icon: "⌛",
+        title: "O captain! My captain!",
         content: "",
         selector: "#fourthStepDIV",
         side: "right",
-        pointerPadding: 8,
-        pointerRadius: 8,
+        pointerPadding: 5,
+        pointerRadius: 5,
         viewportID: "scrollable-viewport",
       },
       {
-        icon: "👋",
-        title: "fifth test!",
+        icon: "⌛",
+        title: "Einstein IQ?!",
         content: "",
         selector: "#fifthStepDIV",
         side: "left",
-        pointerPadding: 8,
-        pointerRadius: 8,
+        pointerPadding: 5,
+        pointerRadius: 5,
         viewportID: "scrollable-viewport",
       },
     ],
@@ -82,7 +92,7 @@ export default function RootLayout({
         <NextStepProvider>
           <NextStep
             steps={steps}
-            cardComponent={WelcomeCard}
+            cardComponent={OnboardingSelector}
             clickThroughOverlay={false}
           >
             {children}

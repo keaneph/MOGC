@@ -18,7 +18,7 @@ interface CustomCardProps {
   arrow: React.ReactNode
 }
 
-const SecondStepCard = ({
+const FirstStepCard = ({
   step,
   currentStep,
   totalSteps,
@@ -45,10 +45,10 @@ const SecondStepCard = ({
       <div className="px-6">
         <div className="mb-8 space-y-3 text-sm">
           <div>
-            This is mandatory for the country&apos;s young and upcoming
-            talents!{" "}
+            If ever you want to visit me again, just click the link in this
+            section!
           </div>
-          <div>Fill up the form so I can assist you better!</div>
+          <div>We&apos;ll start this wonderful journey again!</div>
         </div>
 
         <div className="-mb-2 flex flex-col gap-16">
@@ -87,4 +87,4 @@ const SecondStepCard = ({
   )
 }
 
-export default SecondStepCard
+export default FirstStepCard

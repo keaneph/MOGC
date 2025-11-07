@@ -74,12 +74,12 @@ export default function GettingStartedPage() {
     <div id="main-container" className="mt-12 flex w-full justify-center px-6">
       {/* main content container */}
       <div className="w-full max-w-5xl">
-        <div>
+        <div id="firstStepDIV">
           <div className="mb-10 text-3xl font-semibold tracking-wide">
             Getting Started
           </div>
 
-          <div id="secondStepDIV" className="mb-6 flex rounded-sm border p-3.5">
+          <div className="mb-6 flex rounded-sm border p-3.5">
             <div className="mr-3 flex justify-center">
               <MegaphoneIcon
                 className="mx-2 h-5 w-5"
@@ -101,45 +101,43 @@ export default function GettingStartedPage() {
           </div>
         </div>
 
-        <div className="mb-6 text-lg font-semibold tracking-wide">
-          Start Profiling
-        </div>
-
-        <div
-          id="thirdStepDIV"
-          className="mb-12 flex justify-center rounded-sm border pt-3 pl-3"
-        >
-          <div className="mt-5 ml-6 h-auto w-full flex-col">
-            <div className="mb-6 text-lg font-semibold tracking-wide">
-              Start Filling up Personal Demographic Form
-            </div>
-
-            <div className="text-md mb-6 font-medium tracking-wide">
-              Start filling up the personal demographic form <br />
-              or interact with Siklab Guide to get started in minutes.
-            </div>
-
-            <div className="mb-6 text-sm font-medium tracking-wide">
-              <Link href="/student/student-profiling">
-                <TooltipThis label="Fill up your personal demographic form now!">
-                  <PrimaryButton content="Create Profile" />
-                </TooltipThis>
-              </Link>
-              <TooltipThis label="Learn more about personal demographic forms">
-                <button
-                  onClick={() => {
-                    setAccordionValue("item-1")
-                    setSheetOpen(true)
-                  }}
-                  className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
-                >
-                  Learn more
-                </button>
-              </TooltipThis>
-            </div>
+        <div id="secondStepDIV">
+          <div className="mb-6 text-lg font-semibold tracking-wide">
+            Start Profiling
           </div>
-          <div className="flex w-full justify-end">
-            <Image src={love} alt="Love" className="mr-8 h-auto w-55" />
+          <div className="mb-12 flex justify-center rounded-sm border pt-3 pl-3">
+            <div className="mt-5 ml-6 h-auto w-full flex-col">
+              <div className="mb-6 text-lg font-semibold tracking-wide">
+                Start Filling up Personal Demographic Form
+              </div>
+
+              <div className="text-md mb-6 font-medium tracking-wide">
+                Start filling up the personal demographic form <br />
+                or interact with Siklab Guide to get started in minutes.
+              </div>
+
+              <div className="mb-6 text-sm font-medium tracking-wide">
+                <Link href="/student/student-profiling">
+                  <TooltipThis label="Fill up your personal demographic form now!">
+                    <PrimaryButton content="Create Profile" />
+                  </TooltipThis>
+                </Link>
+                <TooltipThis label="Learn more about personal demographic forms">
+                  <button
+                    onClick={() => {
+                      setAccordionValue("item-1")
+                      setSheetOpen(true)
+                    }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
+                  >
+                    Learn more
+                  </button>
+                </TooltipThis>
+              </div>
+            </div>
+            <div className="flex w-full justify-end">
+              <Image src={love} alt="Love" className="mr-8 h-auto w-55" />
+            </div>
           </div>
         </div>
 
@@ -147,7 +145,7 @@ export default function GettingStartedPage() {
           Next Steps
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div id="thirdStepDIV" className="grid grid-cols-2 gap-4">
           <div id="fourthStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
@@ -311,9 +309,8 @@ export default function GettingStartedPage() {
               </div>
             </div>
           </div>
-
-          <div className="h-15"></div>
         </div>
+        <div className="h-15"></div>
       </div>
       {/* Siklab sheet (controlled) */}
       <SiklabSheet
