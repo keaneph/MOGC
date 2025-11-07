@@ -40,14 +40,6 @@ import {
   FamilyDataBSection,
   FamilyDataBSectionRef,
 } from "./profiling-sections/family-data/family-data-b"
-import {
-  AcademicDataASection,
-  AcademicDataASectionRef,
-} from "./profiling-sections/academic-and-career-data/academic-data-a"
-import {
-  AcademicDataBSection,
-  AcademicDataBSectionRef,
-} from "./profiling-sections/academic-and-career-data/academic-data-b"
 
 import {
   studentIndividualDataSchema,
@@ -148,27 +140,6 @@ export function InProgressProfile() {
         if (familyB && familyDataBRef.current && hasAnyData(familyB)) {
           familyDataBRef.current.form.reset(
             familyB as Parameters<typeof familyDataBRef.current.form.reset>[0]
-          )
-        }
-      }
-    } else if (currentSection === 2) {
-      // Academic Data
-      if (currentPart === 0) {
-        const academicA = transformFromAcademicDataA(fullProfile)
-        if (academicA && academicDataARef.current && hasAnyData(academicA)) {
-          academicDataARef.current.form.reset(
-            academicA as Parameters<
-              typeof academicDataARef.current.form.reset
-            >[0]
-          )
-        }
-      } else if (currentPart === 1) {
-        const academicB = transformFromAcademicDataB(fullProfile)
-        if (academicB && academicDataBRef.current && hasAnyData(academicB)) {
-          academicDataBRef.current.form.reset(
-            academicB as Parameters<
-              typeof academicDataBRef.current.form.reset
-            >[0]
           )
         }
       }
@@ -288,39 +259,6 @@ export function InProgressProfile() {
     }
   }
 
-  const transformFromAcademicDataA = (
-    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
-  ) => {
-    return {
-      generalPointAverage: dbRecord.shs_gpa,
-      scholar: dbRecord.is_scholar === true ? "Yes" : "No",
-      scholarDetails: dbRecord.scholarship_type,
-      lastSchoolAttended: dbRecord.previous_school_name,
-      lastSchoolAddress: dbRecord.previous_school_address,
-      shsTrack: dbRecord.shs_track,
-      shsStrand: dbRecord.shs_strand,
-      awards: dbRecord.awards_honors,
-    }
-  }
-
-  const transformFromAcademicDataB = (
-    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
-  ) => {
-    return {
-      firstChoice: dbRecord.career_option_1,
-      secondChoice: dbRecord.career_option_2,
-      thirdChoice: dbRecord.career_option_3,
-      studentOrg: dbRecord.student_organizations,
-      courseChoiceActor: dbRecord.course_choice_actor,
-      otherCourseChoiceActor: dbRecord.course_choice_actor_others,
-      reasonsForChoosingiit: dbRecord.reasons_for_choosing_msuiit,
-      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
-      reasonForCourse: dbRecord.course_choice_reason,
-      careerPursuingInFuture: dbRecord.post_college_career_goal,
-      coCurricularActivities: dbRecord.cocurricular_activities,
-    }
-  }
-
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -371,8 +309,6 @@ export function InProgressProfile() {
   const personalDataCRef = useRef<PersonalDataCSectionRef>(null)
   const familyDataARef = useRef<FamilyDataASectionRef>(null)
   const familyDataBRef = useRef<FamilyDataBSectionRef>(null)
-  const academicDataARef = useRef<AcademicDataASectionRef>(null)
-  const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 3 },
@@ -397,10 +333,6 @@ export function InProgressProfile() {
     if (currentSection === 1) {
       if (currentPart === 0) return familyDataARef
       if (currentPart === 1) return familyDataBRef
-    }
-    if (currentSection === 2) {
-      if (currentPart === 0) return academicDataARef
-      if (currentPart === 1) return academicDataBRef
     }
     return null
   }
@@ -658,12 +590,6 @@ export function InProgressProfile() {
     if (currentSection === 1) {
       if (currentPart === 0) return <FamilyDataASection ref={familyDataARef} />
       if (currentPart === 1) return <FamilyDataBSection ref={familyDataBRef} />
-    }
-    if (currentSection === 2) {
-      if (currentPart === 0)
-        return <AcademicDataASection ref={academicDataARef} />
-      if (currentPart === 1)
-        return <AcademicDataBSection ref={academicDataBRef} />
     }
 
     // placeholder muna
