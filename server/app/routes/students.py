@@ -6,17 +6,23 @@ from app.models.student import (
     transform_personal_data_a,
     transform_personal_data_b,
     transform_personal_data_c,
+    transform_personal_data_d,
     transform_family_data_a,
     transform_family_data_b,
+    transform_family_data_c,
     transform_academic_data_a,
     transform_academic_data_b,
+    transform_academic_data_c,
     transform_from_personal_data_a,
     transform_from_personal_data_b,
     transform_from_personal_data_c,
+    transform_from_personal_data_d,
     transform_from_family_data_a,
     transform_from_family_data_b,
+    transform_from_family_data_c,
     transform_from_academic_data_a,
     transform_from_academic_data_b,
+    transform_from_academic_data_c,
     check_personal_data_complete,
     check_family_data_complete,
     check_academic_data_complete,
@@ -156,17 +162,23 @@ def get_student_section(user_id: str):
                 form_data = transform_from_personal_data_b(db_record)
             elif part_index == 2:
                 form_data = transform_from_personal_data_c(db_record)
+            elif part_index == 3:
+                form_data = transform_from_personal_data_d(db_record)
         
         elif section_index == 1:  # Family Data
             if part_index == 0:
                 form_data = transform_from_family_data_a(db_record)
             elif part_index == 1:
                 form_data = transform_from_family_data_b(db_record)
+            elif part_index == 2:
+                form_data = transform_from_family_data_c(db_record)
         elif section_index == 2:  # Academic Data
             if part_index == 0:
                 form_data = transform_from_academic_data_a(db_record)
             if part_index == 1:
                 form_data = transform_from_academic_data_b(db_record)
+            if part_index == 2:
+                form_data = transform_from_academic_data_c(db_record)
         
         return jsonify({"data": form_data}), 200
     except Exception as e:
@@ -202,17 +214,23 @@ def save_student_section(user_id: str):
                 db_data = transform_personal_data_b(form_data)
             elif part_index == 2:
                 db_data = transform_personal_data_c(form_data)
+            elif part_index == 3:
+                db_data = transform_personal_data_d(form_data)
         
         elif section_index == 1:  # Family Data
             if part_index == 0:
                 db_data = transform_family_data_a(form_data)
             elif part_index == 1:
                 db_data = transform_family_data_b(form_data)
+            elif part_index == 2:
+                db_data = transform_family_data_c(form_data)
         elif section_index == 2:  # Academic Data
             if part_index == 0:
                 db_data = transform_academic_data_a(form_data)
             if part_index == 1:
                 db_data = transform_academic_data_b(form_data)
+            if part_index == 2:
+                db_data = transform_academic_data_c(form_data)
         
         # always include auth_user_id
         db_data["auth_user_id"] = user_id

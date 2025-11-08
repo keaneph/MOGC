@@ -4,7 +4,7 @@ from datetime import datetime
 
 # type aliases
 SectionIndex = Literal[0, 1, 2, 3, 4, 5]
-PartIndex = Literal[0, 1, 2]
+PartIndex = Literal[0, 1, 2,3]
 
 
 def convert_status_to_boolean(status: str) -> bool:
@@ -45,21 +45,26 @@ def transform_personal_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "given_name": form_data.get("givenName"),
         "middle_initial": form_data.get("middleInitial"),
         "student_status": form_data.get("studentStatus"),
+    }
+
+def transform_personal_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Personal Data Part B form data to database format"""
+    return {
         "nickname": form_data.get("nickname"),
         "age": form_data.get("age"),
         "sex": form_data.get("sex"),
         "citizenship": form_data.get("citizenship"),
         "date_of_birth": form_data.get("dateOfBirth"),
         "place_of_birth": form_data.get("placeOfBirth"),
-    }
-
-
-def transform_personal_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Transform Personal Data Part B form data to database format"""
-    return {
-        "religious_affiliation": form_data.get("religiousAffiliation"),
         "civil_status": form_data.get("civilStatus"),
         "civil_status_others": form_data.get("otherCivilStatus"),
+    }
+
+def transform_personal_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Personal Data Part C form data to database format"""
+    
+    return {
+        "religious_affiliation": form_data.get("religiousAffiliation"),
         "number_of_children": form_data.get("noOfChildren"),
         "address_iligan": form_data.get("addressInIligan"),
         "contact_number": form_data.get("contactNo"),
@@ -67,14 +72,13 @@ def transform_personal_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "stays_with": form_data.get("staysWith"),
         "working_student_status": form_data.get("workingStudent"),
         "talents_skills": form_data.get("talentsAndSkills"),
+
     }
 
-
-def transform_personal_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Transform Personal Data Part C form data to database format"""
+def transform_personal_data_d(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Personal Data Part D form data to database format"""
     serious_medical_condition = form_data.get("seriousMedicalCondition") or "None"
     physical_disability = form_data.get("physicalDisability") or "None"
-    
     return {
         "leisure_activities": form_data.get("leisureAndRecreationalActivities"),
         "medical_condition": convert_medical_condition(serious_medical_condition),
@@ -84,7 +88,6 @@ def transform_personal_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "gender_identity": form_data.get("genderIdentity"),
         "attraction": form_data.get("sexualAttraction"),
     }
-
 
 def transform_family_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform Family Data Part A form data to database format"""
@@ -97,8 +100,6 @@ def transform_family_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "mother_deceased": convert_status_to_boolean(form_data.get("mothersStatus", "Living")),
         "mother_occupation": form_data.get("mothersOccupation"),
         "mother_contact_number": form_data.get("mothersContactNo"),
-        "parents_marital_status": form_data.get("parentsMaritalStatus"),
-        "family_monthly_income": form_data.get("familyMonthlyIncome"),
     }
 
 
@@ -111,6 +112,13 @@ def transform_family_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "guardian_relationship": form_data.get("relationshipWithGuardian"),
         "ordinal_position": form_data.get("ordinalPosition"),
         "number_of_siblings": form_data.get("noOfSiblings"),
+        "parents_marital_status": form_data.get("parentsMaritalStatus"),
+        "family_monthly_income": form_data.get("familyMonthlyIncome"),
+    }
+
+def transform_family_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Family Data Part C form data to database format"""
+    return {
         "home_environment_description": form_data.get("describeEnvironment"),
     }
 
@@ -136,14 +144,18 @@ def transform_academic_data_b(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "student_organizations": form_data.get("studentOrg"),
         "course_choice_actor": form_data.get("courseChoiceActor"),
         "course_choice_actor_others": form_data.get("otherCourseChoiceActor"),
-        "reasons_for_choosing_msuiit": form_data.get("reasonsForChoosingiit"),
-        "reasons_for_choosing_msuiit_others": form_data.get("otherReasonForChoosingiit"),
         "course_choice_reason": form_data.get("reasonForCourse"),
         "post_college_career_goal": form_data.get("careerPursuingInFuture"),
-        "cocurricular_activities": form_data.get("coCurricularActivities"),
 
     }
 
+def transform_academic_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform Academic Data Part C form data to database format"""
+    return {
+        "reasons_for_choosing_msuiit": form_data.get("reasonsForChoosingiit"),
+        "reasons_for_choosing_msuiit_others": form_data.get("otherReasonForChoosingiit"),
+        "cocurricular_activities": form_data.get("coCurricularActivities"),
+    }
 
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
     """Convert database record to Personal Data Part A form format"""
@@ -156,18 +168,17 @@ def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "givenName": db_record.get("given_name"),
         "middleInitial": db_record.get("middle_initial"),
         "studentStatus": db_record.get("student_status"),
+    }
+
+def transform_from_personal_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Personal Data Part B form format"""
+    return {
         "nickname": db_record.get("nickname"),
         "age": db_record.get("age"),
         "sex": db_record.get("sex"),
         "citizenship": db_record.get("citizenship"),
         "dateOfBirth": db_record.get("date_of_birth"),
         "placeOfBirth": db_record.get("place_of_birth"),
-    }
-
-
-def transform_from_personal_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
-    """Convert database record to Personal Data Part B form format"""
-    return {
         "religiousAffiliation": db_record.get("religious_affiliation"),
         "civilStatus": db_record.get("civil_status"),
         "otherCivilStatus": db_record.get("civil_status_others"),
@@ -179,7 +190,6 @@ def transform_from_personal_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "workingStudent": db_record.get("working_student_status"),
         "talentsAndSkills": db_record.get("talents_skills"),
     }
-
 
 def transform_from_personal_data_c(db_record: Dict[str, Any]) -> Dict[str, Any]:
     """Convert database record to Personal Data Part C form format"""
@@ -196,6 +206,17 @@ def transform_from_personal_data_c(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "sexualAttraction": db_record.get("attraction"),
     }
 
+def transform_from_personal_data_d(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Personal Data Part D form format"""
+    return {
+        "leisureAndRecreationalActivities": db_record.get("leisure_activities"),
+        "seriousMedicalCondition": convert_medical_condition_from_db(db_record.get("medical_condition")),
+        "otherSeriousMedicalCondition": db_record.get("medical_condition_others") or "",
+        "physicalDisability": convert_medical_condition_from_db(db_record.get("physical_disability")),
+        "otherPhysicalDisability": db_record.get("physical_disability_others") or "",
+        "genderIdentity": db_record.get("gender_identity"),
+        "sexualAttraction": db_record.get("attraction"),
+    }
 
 def transform_from_family_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
     """Convert database record to Family Data Part A form format"""
@@ -208,8 +229,6 @@ def transform_from_family_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "mothersStatus": convert_boolean_to_status(db_record.get("mother_deceased")),
         "mothersOccupation": db_record.get("mother_occupation"),
         "mothersContactNo": db_record.get("mother_contact_number"),
-        "parentsMaritalStatus": db_record.get("parents_marital_status"),
-        "familyMonthlyIncome": db_record.get("family_monthly_income"),
     }
 
 
@@ -222,6 +241,13 @@ def transform_from_family_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "relationshipWithGuardian": db_record.get("guardian_relationship"),
         "ordinalPosition": db_record.get("ordinal_position"),
         "noOfSiblings": db_record.get("number_of_siblings"),
+        "parentsMaritalStatus": db_record.get("parents_marital_status"),
+        "familyMonthlyIncome": db_record.get("family_monthly_income"),
+    }
+
+def transform_from_family_data_c(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Family Data Part C form format"""
+    return {
         "describeEnvironment": db_record.get("home_environment_description"),
     }
 
@@ -247,10 +273,22 @@ def transform_from_academic_data_b(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "studentOrg": db_record.get("student_organizations"),
         "courseChoiceActor": db_record.get("course_choice_actor"),
         "otherCourseChoiceActor": db_record.get("course_choice_actor_others"),
-        "reasonsForChoosingiit": db_record.get("reasons_for_choosing_msuiit"),
-        "otherReasonForChoosingiit": db_record.get("reasons_for_choosing_msuiit_others"),
         "reasonForCourse": db_record.get("course_choice_reason"),
         "careerPursuingInFuture": db_record.get("post_college_career_goal"),
+    }
+
+def transform_from_academic_data_c(db_record: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert database record to Academic Data Part C form format"""
+    db_reason = db_record.get("reasons_for_choosing_msuiit")
+
+    if not isinstance (db_reason,list):
+        reason_for_iit=[]
+    else:
+        reason_for_iit=db_reason
+
+    return {
+        "reasonsForChoosingiit": reason_for_iit,
+        "otherReasonForChoosingiit": db_record.get("reasons_for_choosing_msuiit_others"),
         "coCurricularActivities": db_record.get("cocurricular_activities"),
     }
 
@@ -321,6 +359,7 @@ def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("number_of_siblings") is not None and
         db_record.get("home_environment_description")
     )
+    return part_a_complete and part_b_complete
     
 def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Academic Data section are complete"""
@@ -333,9 +372,19 @@ def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("shs_track") and
         db_record.get("shs_strand") and
         db_record.get("awards_honors")
+
     )
     part_b_complete = (
-        db_record.get("student_organization")
+        db_record.get("career_option_1") and
+        db_record.get("career_option_2") and
+        db_record.get("career_option_3") and
+        db_record.get("student_organizations") and
+        db_record.get("course_choice_actor") and
+        (db_record.get("course_choice_actor") != "Others" or db_record.get("course_choice_actor_others")) and
+        db_record.get("course_choice_reason") and
+        db_record.get("post_college_career_goal")
     )
-    return part_a_complete and part_b_complete
+    part_c_complete = (
+        db_record.get("reasons_for_choosing_msuiit"))
+    return part_a_complete and part_b_complete and part_c_complete
 

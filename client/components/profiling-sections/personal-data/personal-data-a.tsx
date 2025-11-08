@@ -290,12 +290,6 @@ export const PersonalDataASection = React.forwardRef<
       givenName: "",
       middleInitial: "",
       studentStatus: undefined,
-      nickname: "",
-      age: undefined,
-      sex: undefined,
-      citizenship: "",
-      dateOfBirth: "",
-      placeOfBirth: "",
     },
   })
 
@@ -313,7 +307,7 @@ export const PersonalDataASection = React.forwardRef<
             Personal Data
           </FieldLegend>
           <FieldGroup>
-            <div className="-mb-2 grid grid-cols-4 gap-4">
+            <div className="-mb-2 grid grid-cols-2 gap-4">
               <Controller
                 name="idNo"
                 control={form.control}
@@ -450,6 +444,7 @@ export const PersonalDataASection = React.forwardRef<
                       <Input
                         {...field}
                         placeholder="2025-2026"
+                        value={field.value ?? ""}
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
@@ -462,9 +457,7 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-            </div>
 
-            <div className="-mb-2 grid grid-cols-3 gap-4">
               <Controller
                 name="familyName"
                 control={form.control}
@@ -477,6 +470,7 @@ export const PersonalDataASection = React.forwardRef<
                       <Input
                         {...field}
                         placeholder="Ledesma"
+                        value={field.value ?? ""}
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
@@ -535,9 +529,7 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-            </div>
 
-            <div className="-mb-2 grid grid-cols-4 gap-4">
               <Controller
                 name="studentStatus"
                 control={form.control}
@@ -561,159 +553,6 @@ export const PersonalDataASection = React.forwardRef<
                           <SelectItem value="Shiftee">Shiftee</SelectItem>
                         </SelectContent>
                       </Select>
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="nickname"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Nickname:
-                      </FieldLabel>
-                      <Input {...field} placeholder="Yan" autoComplete="off" />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="age"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">Age:</FieldLabel>
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        type="number"
-                        placeholder="18"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="sex"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">Sex:</FieldLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? ""}
-                      >
-                        <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select sex" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Male">Male</SelectItem>
-                          <SelectItem value="Female">Female</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-            </div>
-
-            <div className="-mb-2 grid grid-cols-3 gap-4">
-              <Controller
-                name="citizenship"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Citizenship:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Filipino"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="dateOfBirth"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Date of Birth:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="MM-DD-YYYY"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="placeOfBirth"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Place of Birth:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="City, Country"
-                        autoComplete="off"
-                      />
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"

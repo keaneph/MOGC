@@ -18,7 +18,7 @@ type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormData = z.infer<typeof familyDataSchema>
 type AcademicDataFormData = z.infer<typeof academicDataSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
-type PartIndex = 0 | 1 | 2
+type PartIndex = 0 | 1 | 2 | 3
 
 // database record type (dapat ni imatch sa Supabase)
 type StudentRecord = {

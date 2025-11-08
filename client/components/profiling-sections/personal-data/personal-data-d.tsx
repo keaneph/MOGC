@@ -16,181 +16,87 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
-import { familyDataSchema } from "@/lib/schemas"
+import { studentIndividualDataSchema } from "@/lib/schemas"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-export interface FamilyDataBSectionRef {
-  form: UseFormReturn<z.infer<typeof familyDataSchema>>
+export interface PersonalDataDSectionRef {
+  form: UseFormReturn<z.infer<typeof studentIndividualDataSchema>>
 }
 
-export const FamilyDataBSection = React.forwardRef<
-  FamilyDataBSectionRef,
+export const PersonalDataDSection = React.forwardRef<
+  PersonalDataDSectionRef,
   object
 >((props, ref) => {
-  const form = useForm<z.infer<typeof familyDataSchema>>({
-    resolver: zodResolver(familyDataSchema),
+  const form = useForm<z.infer<typeof studentIndividualDataSchema>>({
+    resolver: zodResolver(studentIndividualDataSchema),
     mode: "onChange",
     defaultValues: {
-      guardianName: "",
-      guardianOccupation: "",
-      guardianContactNo: "",
-      relationshipWithGuardian: "",
-      ordinalPosition: undefined,
-      noOfSiblings: undefined,
-      parentsMaritalStatus: undefined,
-      familyMonthlyIncome: undefined,
+      leisureAndRecreationalActivities: "",
+      seriousMedicalCondition: "None",
+      otherSeriousMedicalCondition: "",
+      physicalDisability: "None",
+      otherPhysicalDisability: "",
+      genderIdentity: undefined,
+      sexualAttraction: undefined,
     },
   })
+
+  // watch for changes to seriousMedicalCondition and clear "other" field when "None" is selected
+  const seriousMedicalCondition = form.watch("seriousMedicalCondition")
+  React.useEffect(() => {
+    if (seriousMedicalCondition === "None") {
+      form.setValue("otherSeriousMedicalCondition", "", {
+        shouldValidate: false,
+      })
+    }
+  }, [seriousMedicalCondition, form])
+
+  // watch for changes to physicalDisability and clear "other" field when "None" is selected
+  const physicalDisability = form.watch("physicalDisability")
+  React.useEffect(() => {
+    if (physicalDisability === "None") {
+      form.setValue("otherPhysicalDisability", "", { shouldValidate: false })
+    }
+  }, [physicalDisability, form])
 
   React.useImperativeHandle(ref, () => ({
     form,
   }))
-
-  const ordinalPosition = form.watch("ordinalPosition")
-  React.useEffect(() => {
-    if (ordinalPosition === "Only Child") {
-      form.setValue("noOfSiblings", 0, { shouldValidate: false })
-    }
-  }, [ordinalPosition, form])
 
   return (
     <form className="w-full">
       <Field>
         <FieldSet>
           <FieldLegend className="text-foreground font-semibold tracking-wide">
-            Family Data
+            Personal Data
           </FieldLegend>
           <FieldGroup>
             <div className="-mb-2 grid grid-cols-2 gap-4">
               <Controller
-                name="guardianName"
+                name="seriousMedicalCondition"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Guardian&apos;s Name:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Pedro Santos"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="guardianOccupation"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Guardian&apos;s Occupation:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Engineer"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="guardianContactNo"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Guardian&apos;s Contact No:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="09171234567"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="relationshipWithGuardian"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Relationship with Guardian:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Grandmother"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-              <Controller
-                name="ordinalPosition"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Ordinal Position:
+                        Serious Medical Condition:
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="None" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Only Child">Only Child</SelectItem>
-                          <SelectItem value="Eldest">Eldest</SelectItem>
-                          <SelectItem value="Middle">Middle</SelectItem>
-                          <SelectItem value="Youngest">Youngest</SelectItem>
+                          <SelectItem value="None">None</SelectItem>
+                          <SelectItem value="Existing">Existing</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -205,23 +111,93 @@ export const FamilyDataBSection = React.forwardRef<
               />
 
               <Controller
-                name="noOfSiblings"
+                name="otherSeriousMedicalCondition"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        No. of Siblings:
+                        If existing, please specify:
                       </FieldLabel>
                       <Input
                         {...field}
-                        type="number"
-                        placeholder="0"
-                        value={field.value ?? ""}
+                        placeholder="Specify medical condition"
+                        autoComplete="off"
                         disabled={
-                          form.watch("ordinalPosition") === "Only Child"
+                          form.watch("seriousMedicalCondition") !== "Existing"
                         }
+                        className={cn(
+                          "transition-opacity",
+                          form.watch("seriousMedicalCondition") === "Existing"
+                            ? "opacity-100"
+                            : "opacity-50"
+                        )}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="physicalDisability"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        Physical Disability:
+                      </FieldLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
+                        <SelectTrigger className="w-full cursor-pointer">
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="None">None</SelectItem>
+                          <SelectItem value="Existing">Existing</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="otherPhysicalDisability"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        If existing, please specify:
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Specify physical disability"
                         autoComplete="off"
+                        disabled={
+                          form.watch("physicalDisability") !== "Existing"
+                        }
+                        className={cn(
+                          "transition-opacity",
+                          form.watch("physicalDisability") === "Existing"
+                            ? "opacity-100"
+                            : "opacity-50"
+                        )}
                       />
                       {fieldState.invalid && (
                         <FieldError
@@ -234,32 +210,38 @@ export const FamilyDataBSection = React.forwardRef<
                 )}
               />
               <Controller
-                name="parentsMaritalStatus"
+                name="genderIdentity"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Parents&apos; Marital Status:
+                        Gender Identity:
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Select identity" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Married">Married</SelectItem>
-                          <SelectItem value="Not legally married">
-                            Not legally married
+                          <SelectItem value="Male/Man">Male/Man</SelectItem>
+                          <SelectItem value="Female/Woman">
+                            Female/Woman
                           </SelectItem>
-                          <SelectItem value="Separated">Separated</SelectItem>
-                          <SelectItem value="Both parents remarried">
-                            Both parents remarried
+                          <SelectItem value="Transgender Male/Man">
+                            Transgender Male/Man
                           </SelectItem>
-                          <SelectItem value="One parent remarried">
-                            One parent remarried
+                          <SelectItem value="Transgender Female/Woman">
+                            Transgender Female/Woman
+                          </SelectItem>
+                          <SelectItem value="Gender Variant/Nonconforming">
+                            Gender Variant/Nonconforming
+                          </SelectItem>
+                          <SelectItem value="Not listed">Not listed</SelectItem>
+                          <SelectItem value="Prefer not to answer">
+                            Prefer not to answer
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -275,42 +257,39 @@ export const FamilyDataBSection = React.forwardRef<
               />
 
               <Controller
-                name="familyMonthlyIncome"
+                name="sexualAttraction"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Family Monthly Income:
+                        To whom are you attracted to?
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select monthly income" />
+                          <SelectValue placeholder="Select attraction" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Below 3,000">
-                            Below 3,000
+                          <SelectItem value="My same gender">
+                            My same gender
                           </SelectItem>
-                          <SelectItem value="3,001-5,000">
-                            3,001-5,000
+                          <SelectItem value="Opposite my gender">
+                            Opposite my gender
                           </SelectItem>
-                          <SelectItem value="5,001-8,000">
-                            5,001-8,000
+                          <SelectItem value="Both men and women">
+                            Both men and women
                           </SelectItem>
-                          <SelectItem value="8,001-10,000">
-                            8,001-10,000
+                          <SelectItem value="All genders">
+                            All genders
                           </SelectItem>
-                          <SelectItem value="10,001-15,000">
-                            10,001-15,000
+                          <SelectItem value="Neither gender">
+                            Neither gender
                           </SelectItem>
-                          <SelectItem value="15,001-20,000">
-                            15,001-20,000
-                          </SelectItem>
-                          <SelectItem value="Above 20,001">
-                            Above 20,001
+                          <SelectItem value="Prefer not to answer">
+                            Prefer not to answer
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -325,6 +304,32 @@ export const FamilyDataBSection = React.forwardRef<
                 )}
               />
             </div>
+            <Controller
+              name="leisureAndRecreationalActivities"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel className="text-foreground">
+                      Leisure and Recreational Activities:
+                    </FieldLabel>
+                    <Textarea
+                      className="min-h-[35.5px]"
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="List your leisure and recreational activities"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError
+                        className="text-[12px]"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
+            />
           </FieldGroup>
         </FieldSet>
       </Field>
@@ -332,4 +337,4 @@ export const FamilyDataBSection = React.forwardRef<
   )
 })
 
-FamilyDataBSection.displayName = "FamilyDataBSection"
+PersonalDataDSection.displayName = "PersonalDataDSection"
