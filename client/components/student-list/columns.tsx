@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EyeIcon, NotepadText } from "lucide-react"
+import { Badge } from "../ui/badge"
 
 export type CounselorStudentListItem = {
   idNumber: string
@@ -90,7 +91,6 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
           : value === "low risk"
             ? "bg-[var(--status-green)]"
             : "bg-[var(--status-yellow)]"
-
       const textColor =
         value === "high risk" || value === "low risk"
           ? "text-white"
@@ -98,11 +98,12 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
 
       return (
         <div className="flex justify-center">
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-center text-[10px] font-medium ${bgColor} ${textColor}`}
+          <Badge
+            variant="secondary"
+            className={`text-[10px] ${bgColor} ${textColor}`}
           >
             {formattedValue}
-          </span>
+          </Badge>
         </div>
       )
     },
@@ -137,11 +138,12 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
 
       return (
         <div className="flex justify-center">
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-center text-[10px] font-medium ${bgColor} ${textColor}`}
+          <Badge
+            variant="secondary"
+            className={`text-[10px] ${bgColor} ${textColor}`}
           >
             {formattedValue}
-          </span>
+          </Badge>
         </div>
       )
     },
@@ -172,11 +174,12 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
 
       return (
         <div className="flex justify-center">
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-center text-[10px] font-medium ${bgColor} ${textColor}`}
+          <Badge
+            variant="secondary"
+            className={`text-[10px] ${bgColor} ${textColor}`}
           >
             {formattedValue}
-          </span>
+          </Badge>
         </div>
       )
     },

@@ -27,7 +27,7 @@ export default function StudentsPage() {
   const [page, setPage] = useState(1)
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const pageSize = 4
+  const pageSize = 10
   const filteredStudents = students.filter((student) => {
     const term = searchTerm.toLowerCase()
     return (
