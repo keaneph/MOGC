@@ -70,7 +70,12 @@ export function DocumentationTable() {
             level, interview status, and counseling progress. Each row includes
             action buttons for viewing, editing, and deleting records. Status
             indicators are color-coded for clarity, and the table supports
-            real-time updates for streamlined tracking and intervention.
+            real-time updates for streamlined tracking and intervention. <br />
+            <br /> The list includes a searchable function by{" "}
+            <strong>student name and ID number</strong>, enabling quick
+            filtering of records. Users can also sort data by clicking on column
+            headers, making it easy to organize information by course, year
+            level, risk status, or other key attributes.
           </TableCell>
         </TableRow>
       </TableBody>
