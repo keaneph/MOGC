@@ -280,6 +280,7 @@ export const AcademicDataASection = React.forwardRef<
                       {...field}
                       value={field.value ?? ""}
                       placeholder=" with high honor, 1st place in science fair"
+                      className="min-h-[35.5px]"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (

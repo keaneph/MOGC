@@ -484,15 +484,9 @@ export const academicDataSchema = z
     ]),
     otherCourseChoiceActor: z.string().trim().optional(),
 
-    reasonsForChoosingiit: z.enum([
-      "Quality education",
-      "Affordable tuition fees",
-      "Scholarships",
-      "Proximity",
-      "Only school offering my course",
-      "Prestigious Institution",
-      "Others",
-    ]),
+    reasonsForChoosingiit: z
+      .array(z.string())
+      .min(1, "Please select at least one reason for choosing IIT."),
     otherReasonForChoosingiit: z.string().trim().optional(),
 
     reasonForCourse: z
@@ -536,10 +530,11 @@ export const academicDataSchema = z
   )
   .refine(
     (data) =>
-      data.reasonsForChoosingiit !== "Others" ||
+      !data.reasonsForChoosingiit.includes("Others") ||
       !!data.otherReasonForChoosingiit?.trim(),
     {
-      message: "Please specify your reason for choosing IIT",
+      message:
+        "Please specify your reason for choosing IIT when 'Others' is selected.",
       path: ["otherReasonForChoosingiit"],
     }
   )

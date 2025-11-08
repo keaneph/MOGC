@@ -289,11 +289,8 @@ export const AcademicDataBSection = React.forwardRef<
       studentOrg: "",
       courseChoiceActor: undefined,
       otherCourseChoiceActor: "",
-      reasonsForChoosingiit: undefined,
-      otherReasonForChoosingiit: "",
       reasonForCourse: "",
       careerPursuingInFuture: "",
-      coCurricularActivities: "",
     },
   })
 
@@ -310,15 +307,6 @@ export const AcademicDataBSection = React.forwardRef<
     }
   }, [courseChoiceActor, form])
 
-  const reasonsForChoosingiit = form.watch("reasonsForChoosingiit")
-  React.useEffect(() => {
-    if (reasonsForChoosingiit !== "Others") {
-      form.setValue("otherReasonForChoosingiit", "None", {
-        shouldValidate: false,
-      })
-    }
-  }, [reasonsForChoosingiit, form])
-
   React.useImperativeHandle(ref, () => ({
     form,
   }))
@@ -331,7 +319,7 @@ export const AcademicDataBSection = React.forwardRef<
             Academic Data
           </FieldLegend>
           <FieldGroup>
-            <div className="-mb-2 grid grid-cols-4 gap-4">
+            <div className="-mb-2 grid grid-cols-2 gap-4">
               <Controller
                 name="firstChoice"
                 control={form.control}
@@ -565,8 +553,6 @@ export const AcademicDataBSection = React.forwardRef<
                   </Field>
                 )}
               />
-            </div>
-            <div className="-mb-2 grid grid-cols-4 gap-4">
               <Controller
                 name="courseChoiceActor"
                 control={form.control}
@@ -637,82 +623,6 @@ export const AcademicDataBSection = React.forwardRef<
                 )}
               />
               <Controller
-                name="reasonsForChoosingiit"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Why choose IIT?:
-                      </FieldLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? ""}
-                      >
-                        <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Quality education">
-                            Quality education
-                          </SelectItem>
-                          <SelectItem value="Affordable tuition fees">
-                            Affordable tuition fees
-                          </SelectItem>
-                          <SelectItem value="Scholarships">
-                            Scholarships
-                          </SelectItem>
-                          <SelectItem value="Proximity">Proximity</SelectItem>
-                          <SelectItem value="Only school offering my course">
-                            Only school offering my course
-                          </SelectItem>
-                          <SelectItem value="Prestigious Institution">
-                            Prestigious Institution
-                          </SelectItem>
-                          <SelectItem value="Others">Others</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-              <Controller
-                name="otherReasonForChoosingiit"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        If others, specify:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Specify why IIT"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                        disabled={
-                          form.watch("reasonsForChoosingiit") !== "Others"
-                        }
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-            </div>
-            <div className="-mb-2 grid grid-cols-2 gap-4">
-              <Controller
                 name="reasonForCourse"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -765,31 +675,6 @@ export const AcademicDataBSection = React.forwardRef<
                 )}
               />
             </div>
-            <Controller
-              name="coCurricularActivities"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel className="text-foreground">
-                      Co-Curricular Activities
-                    </FieldLabel>
-                    <Textarea
-                      {...field}
-                      value={field.value ?? ""}
-                      placeholder=" basketball, volunteering, dance club"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError
-                        className="text-[12px]"
-                        errors={[fieldState.error]}
-                      />
-                    )}
-                  </FieldContent>
-                </Field>
-              )}
-            />
           </FieldGroup>
         </FieldSet>
       </Field>
