@@ -17,6 +17,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { SearchInput } from "@/components/student-list/search-input"
+import { SortingState } from "@tanstack/react-table"
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<CounselorStudentListItem[]>([])
@@ -24,7 +25,9 @@ export default function StudentsPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(1)
-  const pageSize = 2
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  const pageSize = 4
   const filteredStudents = students.filter((student) => {
     const term = searchTerm.toLowerCase()
     return (
@@ -33,8 +36,23 @@ export default function StudentsPage() {
     )
   })
 
+  const sortedStudents = [...filteredStudents].sort((a, b) => {
+    for (const sort of sorting) {
+      const { id, desc } = sort
+      const aValue = a[id as keyof CounselorStudentListItem]
+      const bValue = b[id as keyof CounselorStudentListItem]
+
+      const aStr = String(aValue).toLowerCase()
+      const bStr = String(bValue).toLowerCase()
+
+      if (aStr < bStr) return desc ? 1 : -1
+      if (aStr > bStr) return desc ? -1 : 1
+    }
+    return 0
+  })
+
   const totalPages = Math.ceil(filteredStudents.length / pageSize)
-  const paginatedData = filteredStudents.slice(
+  const paginatedData = sortedStudents.slice(
     (page - 1) * pageSize,
     page * pageSize
   )
@@ -78,7 +96,12 @@ export default function StudentsPage() {
         {!loading && !error && (
           <div className="container h-[500px] w-full overflow-y-auto">
             <div className="overflow-y-auto rounded-md border shadow-sm">
-              <DataTable columns={columns} data={paginatedData} />
+              <DataTable
+                columns={columns}
+                data={paginatedData}
+                sorting={sorting}
+                setSorting={setSorting}
+              />
             </div>
             <div className="mt-2 flex justify-center">
               <Pagination className="justify-end">

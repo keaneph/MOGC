@@ -16,22 +16,54 @@ export type CounselorStudentListItem = {
 export const columns: ColumnDef<CounselorStudentListItem>[] = [
   {
     accessorKey: "idNumber",
-    header: "ID Number",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        ID Number
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 85,
   },
   {
     accessorKey: "studentName",
-    header: "Student Name",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Student Name
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 190,
   },
   {
     accessorKey: "course",
-    header: "Course",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Course
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 150,
   },
   {
     accessorKey: "yearLevel",
-    header: "Year Level",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Year Level
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 80,
     cell: ({ getValue }) => (
       <div className="text-center">{getValue() as string}</div>
@@ -39,7 +71,15 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
   },
   {
     accessorKey: "assessment",
-    header: "Assessment",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Assessment
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 100,
     cell: ({ getValue }) => {
       const value = getValue<string>()
@@ -69,7 +109,15 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
   },
   {
     accessorKey: "initialInterview",
-    header: "Initial Interview",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Initial Interview
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 104,
     cell: ({ getValue }) => {
       const value = getValue() as string
@@ -100,7 +148,15 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
   },
   {
     accessorKey: "counselingStatus",
-    header: "Counseling Status",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Counseling Status
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
     size: 120,
     cell: ({ getValue }) => {
       const value = getValue() as string
