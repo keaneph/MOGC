@@ -52,7 +52,7 @@ export const AcademicDataCSection = React.forwardRef<
 
   React.useEffect(() => {
     if (!isOthersSelected) {
-      form.setValue("otherReasonForChoosingiit", "None", {
+      form.setValue("otherReasonForChoosingiit", "", {
         shouldValidate: false,
       })
     }
@@ -88,6 +88,7 @@ export const AcademicDataCSection = React.forwardRef<
                         >
                           <Checkbox
                             id={option}
+                            className="hover:bg-secondary cursor-pointer"
                             checked={field.value?.includes(option)}
                             onCheckedChange={(checked) => {
                               let newArray = Array.isArray(field.value)
@@ -105,7 +106,7 @@ export const AcademicDataCSection = React.forwardRef<
                           />
                           <label
                             htmlFor={option}
-                            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                           >
                             {option}
                           </label>
@@ -162,7 +163,7 @@ export const AcademicDataCSection = React.forwardRef<
                       {...field}
                       value={field.value ?? ""}
                       className="min-h-[35.5px]"
-                      placeholder=" basketball, volunteering, dance club"
+                      placeholder="Basketball, Volunteering, Dance Club, etc."
                       autoComplete="off"
                     />
                     {fieldState.invalid && (

@@ -77,7 +77,12 @@ export const AcademicDataASection = React.forwardRef<
                       <FieldLabel className="text-foreground">
                         General Point Average
                       </FieldLabel>
-                      <Input {...field} placeholder="1.00" autoComplete="off" />
+                      <Input
+                        {...field}
+                        placeholder="1.00"
+                        autoComplete="off"
+                        value={field.value ?? ""}
+                      />
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"
@@ -183,7 +188,7 @@ export const AcademicDataASection = React.forwardRef<
                       </FieldLabel>
                       <Input
                         {...field}
-                        placeholder="Philippine Science High School - NMCLDN"
+                        placeholder="Balo-i, Lanao del Norte"
                         value={field.value ?? ""}
                         autoComplete="off"
                       />
@@ -279,7 +284,7 @@ export const AcademicDataASection = React.forwardRef<
                     <Textarea
                       {...field}
                       value={field.value ?? ""}
-                      placeholder=" with high honor, 1st place in science fair"
+                      placeholder="With High Honors, 1st place in Science Fair, etc."
                       className="min-h-[35.5px]"
                       autoComplete="off"
                     />
