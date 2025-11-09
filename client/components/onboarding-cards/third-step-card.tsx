@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import Image from "next/image"
-import Coffee from "@/public/coffee.png"
+import Telescope from "@/public/telescope.png"
 
 interface CustomCardProps {
   step: Step
@@ -44,9 +44,10 @@ const ThirdStepCard = ({
 
       <div className="px-6">
         <div className="mb-8 space-y-3 text-sm">
+          <div>All done? Awesome! </div>
           <div>
-            After filling up the form, you can take a look at these amazingly
-            cat-astrophic features!
+            We will be using this to navigate and conquer through the dark and
+            stormy seas ahead!
           </div>
         </div>
 
@@ -70,7 +71,7 @@ const ThirdStepCard = ({
               onClick={skipTour}
               className="text-link w-[85px] cursor-pointer text-left text-sm decoration-2 underline-offset-4 hover:underline"
             >
-              Maybe later
+              Skip tour
             </button>
             <div className="text-muted-foreground text-sm">
               {currentStep} / {totalSteps - 1}
@@ -79,8 +80,8 @@ const ThirdStepCard = ({
         </div>
       </div>
 
-      <div className="absolute right-34 bottom-0 h-21 w-18 overflow-clip">
-        <Image src={Coffee} alt="Siklab Drinking Coffee" />
+      <div className="absolute right-32 bottom-0 h-24 w-22 overflow-clip">
+        <Image src={Telescope} alt="Siklab Looking Into A Telescope" />
       </div>
     </Card>
   )

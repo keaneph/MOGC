@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import Image from "next/image"
-import Coffee from "@/public/coffee.png"
+import Recruit from "@/public/recruit.png"
 
 interface CustomCardProps {
   step: Step
@@ -44,11 +44,12 @@ const FifthStepCard = ({
 
       <div className="px-6">
         <div className="mb-8 space-y-3 text-sm">
+          <div>Don&apos;t forget to take your first set of tests!</div>
           <div>
-            Seek out your counselor for a one-on-one interview to discuss your
-            goals and aspirations.
+            The IQ, EQ, and other tests are your crew members, ready to help you
+            discover your unique potential.
           </div>
-          <div>They&apos;re here to guide you on your journey to success!</div>
+          <div>You will need them in your adventure!</div>
         </div>
 
         <div className="-mb-2 flex flex-col gap-16">
@@ -71,7 +72,7 @@ const FifthStepCard = ({
               onClick={skipTour}
               className="text-link w-[85px] cursor-pointer text-left text-sm decoration-2 underline-offset-4 hover:underline"
             >
-              Maybe later
+              Skip tour
             </button>
             <div className="text-muted-foreground text-sm">
               {currentStep} / {totalSteps - 1}
@@ -80,8 +81,8 @@ const FifthStepCard = ({
         </div>
       </div>
 
-      <div className="absolute right-34 bottom-0 h-21 w-18 overflow-clip">
-        <Image src={Coffee} alt="Siklab Drinking Coffee" />
+      <div className="absolute right-34 bottom-0 h-25 w-21 overflow-clip">
+        <Image src={Recruit} alt="Siklab Recruiting" />
       </div>
     </Card>
   )

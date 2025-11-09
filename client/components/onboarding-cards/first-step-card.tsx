@@ -45,10 +45,10 @@ const FirstStepCard = ({
       <div className="px-6">
         <div className="mb-8 space-y-3 text-sm">
           <div>
-            If ever you want to visit me again, just click the link in this
-            section!
+            You can revisit this tour anytime, just click the link in this
+            section and we can start all over again.
           </div>
-          <div>We&apos;ll start this wonderful journey again!</div>
+          <div> And yes, coffee&apos;s on me!</div>
         </div>
 
         <div className="-mb-2 flex flex-col gap-16">
@@ -71,7 +71,7 @@ const FirstStepCard = ({
               onClick={skipTour}
               className="text-link w-[85px] cursor-pointer text-left text-sm decoration-2 underline-offset-4 hover:underline"
             >
-              Maybe later
+              Skip tour
             </button>
             <div className="text-muted-foreground text-sm">
               {currentStep} / {totalSteps - 1}
@@ -80,7 +80,7 @@ const FirstStepCard = ({
         </div>
       </div>
 
-      <div className="absolute right-34 bottom-0 h-21 w-18 overflow-clip">
+      <div className="absolute right-33 bottom-0 h-24 w-22 overflow-clip">
         <Image src={Coffee} alt="Siklab Drinking Coffee" />
       </div>
     </Card>

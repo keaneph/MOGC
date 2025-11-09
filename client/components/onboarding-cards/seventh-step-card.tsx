@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import Image from "next/image"
-import Pirate from "@/public/pirate.png"
+import Hyped from "@/public/hyped.png"
 
 interface CustomCardProps {
   step: Step
@@ -18,7 +18,7 @@ interface CustomCardProps {
   arrow: React.ReactNode
 }
 
-const FourthStepCard = ({
+const SeventhStepCard = ({
   step,
   currentStep,
   totalSteps,
@@ -44,11 +44,12 @@ const FourthStepCard = ({
 
       <div className="px-6">
         <div className="mb-8 space-y-3 text-sm">
-          <div>Now the real journey begins!</div>
+          <div>The sea is vast, and so is MOGC!</div>
           <div>
-            Schedule your first interview with your counselor and set sail
-            toward success!
+            We&apos;ll be the anchor that supports you as you explore - so go
+            ahead and make the most of this journey.
           </div>
+          <div>We&apos;ll be with you every step of the way!</div>
         </div>
 
         <div className="-mb-2 flex flex-col gap-16">
@@ -80,11 +81,11 @@ const FourthStepCard = ({
         </div>
       </div>
 
-      <div className="absolute right-33 bottom-0 h-27 w-24 overflow-clip">
-        <Image src={Pirate} alt="Siklab As A Pirate" />
+      <div className="absolute right-33 bottom-0 h-25 w-21 overflow-clip">
+        <Image src={Hyped} alt="Siklab Hyped" />
       </div>
     </Card>
   )
 }
 
-export default FourthStepCard
+export default SeventhStepCard

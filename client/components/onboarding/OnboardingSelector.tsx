@@ -8,6 +8,9 @@ import FirstStepCard from "@/components/onboarding-cards/first-step-card"
 import ThirdStepCard from "@/components/onboarding-cards/third-step-card"
 import FourthStepCard from "@/components/onboarding-cards/fourth-step-card"
 import FifthStepCard from "@/components/onboarding-cards/fifth-step-card"
+import SixthStepCard from "@/components/onboarding-cards/sixth-step-card"
+import SeventhStepCard from "@/components/onboarding-cards/seventh-step-card"
+import ClosingCard from "@/components/onboarding-cards/closing-card"
 
 interface OnboardingCardProps {
   step: Step
@@ -42,6 +45,12 @@ const OnboardingSelector = (props: OnboardingCardProps) => {
       return <FourthStepCard {...safeProps} />
     case 5:
       return <FifthStepCard {...safeProps} />
+    case 6:
+      return <SixthStepCard {...safeProps} />
+    case 7:
+      return <SeventhStepCard {...safeProps} />
+    case 8:
+      return <ClosingCard {...safeProps} />
     default:
       // Fallback to WelcomeCard (safe default)
       return <WelcomeCard {...safeProps} />

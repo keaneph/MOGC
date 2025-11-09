@@ -228,7 +228,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
 
-          <div className="flex rounded-sm border p-6">
+          <div id="sixthStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <SpeechIcon
@@ -269,7 +269,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
 
-          <div className="flex rounded-sm border p-6">
+          <div id="seventhStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <TelescopeIcon
