@@ -25,7 +25,6 @@ const SeventhStepCard = ({
   nextStep,
   prevStep,
   skipTour,
-  arrow,
 }: CustomCardProps) => {
   return (
     <Card className="relative w-[350px] tracking-wide">

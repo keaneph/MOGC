@@ -54,7 +54,7 @@ const ClosingCard = ({
 
         <div className="-mb-2 flex flex-col gap-12">
           <Button
-            onClick={nextStep}
+            onClick={skipTour}
             className="bg-main hover:bg-main/90 w-[150px] cursor-pointer rounded-sm tracking-wide"
           >
             See you around!
@@ -66,9 +66,6 @@ const ClosingCard = ({
             Back
           </button>
         </div>
-
-        {/* Arrow indicator */}
-        {arrow}
       </div>
 
       <div className="absolute right-5 bottom-0 h-36 w-32 overflow-clip">
