@@ -18,7 +18,7 @@ interface CustomCardProps {
   arrow: React.ReactNode
 }
 
-const WelcomeCard = ({ step, nextStep, skipTour, arrow }: CustomCardProps) => {
+const WelcomeCard = ({ step, nextStep, skipTour }: CustomCardProps) => {
   return (
     <Card className="relative w-[350px] tracking-wide">
       <button

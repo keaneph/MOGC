@@ -18,15 +18,7 @@ interface CustomCardProps {
   arrow: React.ReactNode
 }
 
-const ClosingCard = ({
-  step,
-  currentStep,
-  totalSteps,
-  nextStep,
-  prevStep,
-  skipTour,
-  arrow,
-}: CustomCardProps) => {
+const ClosingCard = ({ step, prevStep, skipTour }: CustomCardProps) => {
   return (
     <Card className="relative w-[350px] tracking-wide">
       <button
