@@ -20,7 +20,8 @@ import { toast } from "sonner"
 import CatImage from "@/components/happy-toast"
 import { CircleCheckIcon } from "lucide-react"
 import Confetti from "@/components/confetti"
-import { useNextStep, NextStepViewport } from "nextstepjs"
+import { useNextStep } from "nextstepjs"
+import { getOnboardingStatus } from "@/lib/api/students"
 
 export default function GettingStartedPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -36,9 +37,24 @@ export default function GettingStartedPage() {
   }, [])
 
   useEffect(() => {
-    if (hasHydrated) {
-      startNextStep("welcomeTour")
-    }
+    if (!hasHydrated) return
+    ;(async () => {
+      try {
+        const result = await getOnboardingStatus()
+        console.log("Onboarding status result:", result)
+        const { startTour } = result
+
+        if (startTour) {
+          console.log("Starting welcome tour")
+          startNextStep("welcomeTour")
+        } else {
+          console.log("Onboarding completed, not starting tour")
+        }
+      } catch (error) {
+        console.error("Error getting onboarding status:", error)
+        startNextStep("welcomeTour")
+      }
+    })()
   }, [hasHydrated, startNextStep])
 
   useEffect(() => {

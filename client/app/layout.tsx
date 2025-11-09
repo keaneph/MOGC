@@ -3,7 +3,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "@/styles/globals.css"
 import { NextStepProvider, NextStep, Tour } from "nextstepjs"
-import OnboardingSelector from "@/components/onboarding/OnboardingSelector"
+import OnboardingWithPersistence from "@/components/onboarding/OnboardingWithPersistence"
+import { easeIn } from "motion/react"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -119,7 +120,11 @@ export default function RootLayout({
         <NextStepProvider>
           <NextStep
             steps={steps}
-            cardComponent={OnboardingSelector}
+            cardComponent={OnboardingWithPersistence}
+            cardTransition={{
+              ease: "backOut",
+              duration: 0.3,
+            }}
             clickThroughOverlay={false}
           >
             {children}

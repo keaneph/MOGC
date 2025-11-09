@@ -19,6 +19,46 @@ from app.models.student import (
 
 students_bp = Blueprint("students", __name__, url_prefix="/api/students")
 
+@students_bp.route("/profile/onboarding-status", methods=["GET"])
+@require_auth
+def get_onboarding_status(user_id: str):
+    """
+    Check if user needs to start the welcome tour.
+    Returns { startTour: true/false }
+    """
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+        response = (
+            supabase.table("profiles")
+            .select("onboarding_completed")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+
+        if not response.data:
+            # Profile doesn't exist or error occurred, show tour (macheck sa db kay nullable mn)
+            #  print(f"User {user_id}: Profile not found or no data returned")
+            return jsonify({"startTour": True}), 200
+
+        profile = response.data
+        onboarding_completed = profile.get("onboarding_completed")
+        
+        if onboarding_completed is True:
+            start_tour = False
+        elif isinstance(onboarding_completed, str) and onboarding_completed.lower() == "true":
+            start_tour = False
+        else:
+            start_tour = True
+        
+        # print(f"User {user_id}: onboarding_completed={onboarding_completed} (type: {type(onboarding_completed).__name__}), start_tour={start_tour}")
+        
+        return jsonify({"startTour": start_tour}), 200
+
+    except Exception as e:
+        # print(f"Exception in get_onboarding_status: {e}")
+        return jsonify({"startTour": True}), 200
+
 
 @students_bp.route("/profile/exists", methods=["GET"])
 @require_auth

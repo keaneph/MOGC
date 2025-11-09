@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import React from "react"
 import { Step } from "nextstepjs"
 import { Card } from "@/components/ui/card"
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import Image from "next/image"
 import Salute from "@/public/salute.png"
+import Confetti3 from "@/components/confetti3"
 
 interface CustomCardProps {
   step: Step
@@ -19,6 +21,7 @@ interface CustomCardProps {
 }
 
 const ClosingCard = ({ step, prevStep, skipTour }: CustomCardProps) => {
+  const [showConfetti, setShowConfetti] = useState(false)
   return (
     <Card className="relative w-[350px] tracking-wide">
       <button
@@ -46,7 +49,11 @@ const ClosingCard = ({ step, prevStep, skipTour }: CustomCardProps) => {
 
         <div className="-mb-2 flex flex-col gap-12">
           <Button
-            onClick={skipTour}
+            onClick={() => {
+              if (skipTour) skipTour()
+              setShowConfetti(true)
+              setTimeout(() => setShowConfetti(false), 10000)
+            }}
             className="bg-main hover:bg-main/90 w-[150px] cursor-pointer rounded-sm tracking-wide"
           >
             See you around!
@@ -63,6 +70,7 @@ const ClosingCard = ({ step, prevStep, skipTour }: CustomCardProps) => {
       <div className="absolute right-5 bottom-0 h-36 w-32 overflow-clip">
         <Image src={Salute} alt="Siklab Salutes You" />
       </div>
+      {showConfetti && <Confetti3 />}
     </Card>
   )
 }
