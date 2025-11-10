@@ -91,7 +91,7 @@ def get_profile_progress(user_id: str):
         response = (
             supabase.table("students")
             .select(
-                "is_personal_data_complete, is_family_data_complete, "
+                "is_personal_data_complete, is_family_data_complete, is_academic_data_complete "
                 "id_number, religious_affiliation, gender_identity, "
                 "father_name, guardian_name"
             )
