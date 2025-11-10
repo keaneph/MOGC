@@ -16,147 +16,154 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
-import { familyDataSchema } from "@/lib/schemas"
+import { academicDataSchema } from "@/lib/schemas"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-export interface FamilyDataBSectionRef {
-  form: UseFormReturn<z.infer<typeof familyDataSchema>>
+export interface AcademicDataASectionRef {
+  form: UseFormReturn<z.infer<typeof academicDataSchema>>
 }
 
-export const FamilyDataBSection = React.forwardRef<
-  FamilyDataBSectionRef,
+export const AcademicDataASection = React.forwardRef<
+  AcademicDataASectionRef,
   object
 >((props, ref) => {
-  const form = useForm<z.infer<typeof familyDataSchema>>({
-    resolver: zodResolver(familyDataSchema),
+  const form = useForm<z.infer<typeof academicDataSchema>>({
+    resolver: zodResolver(academicDataSchema),
     mode: "onChange",
     defaultValues: {
-      guardianName: "",
-      guardianOccupation: "",
-      guardianContactNo: "",
-      relationshipWithGuardian: "",
-      ordinalPosition: undefined,
-      noOfSiblings: undefined,
-      parentsMaritalStatus: undefined,
-      familyMonthlyIncome: undefined,
+      generalPointAverage: "",
+      scholar: undefined,
+      scholarDetails: "",
+      lastSchoolAttended: "",
+      lastSchoolAddress: "",
+      shsTrack: undefined,
+      shsStrand: undefined,
+      awards: "",
     },
   })
+
+  const scholar = form.watch("scholar")
+  React.useEffect(() => {
+    if (scholar !== "Yes") {
+      form.setValue("scholarDetails", "", { shouldValidate: false })
+    }
+  }, [scholar, form])
 
   React.useImperativeHandle(ref, () => ({
     form,
   }))
-
-  const ordinalPosition = form.watch("ordinalPosition")
-  React.useEffect(() => {
-    if (ordinalPosition === "Only Child") {
-      form.setValue("noOfSiblings", 0, { shouldValidate: false })
-    }
-  }, [ordinalPosition, form])
 
   return (
     <form className="w-full">
       <Field>
         <FieldSet>
           <FieldLegend className="text-foreground font-semibold tracking-wide">
-            Family Data
+            Academic Data
           </FieldLegend>
           <FieldGroup>
+            <div className="-mb-2 grid grid-cols-3 gap-4">
+              <Controller
+                name="generalPointAverage"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        General Point Average
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="1.00"
+                        autoComplete="off"
+                        value={field.value ?? ""}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="scholar"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        Are you a Scholar?
+                      </FieldLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
+                        <SelectTrigger className="w-full cursor-pointer">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Yes">Yes</SelectItem>
+                          <SelectItem value="No">No</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="scholarDetails"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        if Yes, please specify
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Specify scholarship type"
+                        value={field.value ?? ""}
+                        disabled={scholar !== "Yes"}
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+            </div>
             <div className="-mb-2 grid grid-cols-2 gap-4">
               <Controller
-                name="guardianName"
+                name="lastSchoolAttended"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Guardian&apos;s Name:
+                        Last School Attended
                       </FieldLabel>
                       <Input
                         {...field}
-                        placeholder="Pedro Santos"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="guardianOccupation"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Guardian&apos;s Occupation:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Engineer"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="guardianContactNo"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Guardian&apos;s Contact No:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="09171234567"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="relationshipWithGuardian"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Relationship with Guardian:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Grandmother"
+                        placeholder="Philippine Science High School - NMCLDN"
                         value={field.value ?? ""}
                         autoComplete="off"
                       />
@@ -171,26 +178,53 @@ export const FamilyDataBSection = React.forwardRef<
                 )}
               />
               <Controller
-                name="ordinalPosition"
+                name="lastSchoolAddress"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Ordinal Position:
+                        School Address
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Balo-i, Lanao del Norte"
+                        value={field.value ?? ""}
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="shsTrack"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        SHS Track
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Select SHS Track" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Only Child">Only Child</SelectItem>
-                          <SelectItem value="Eldest">Eldest</SelectItem>
-                          <SelectItem value="Middle">Middle</SelectItem>
-                          <SelectItem value="Youngest">Youngest</SelectItem>
+                          <SelectItem value="Academic">Academic</SelectItem>
+                          <SelectItem value="Tech-Voc">Tech-Voc</SelectItem>
+                          <SelectItem value="Arts/Design">
+                            Arts/Design
+                          </SelectItem>
+                          <SelectItem value="Sports">Sports</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -205,113 +239,26 @@ export const FamilyDataBSection = React.forwardRef<
               />
 
               <Controller
-                name="noOfSiblings"
+                name="shsStrand"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        No. of Siblings:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="0"
-                        value={field.value ?? ""}
-                        disabled={
-                          form.watch("ordinalPosition") === "Only Child"
-                        }
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-              <Controller
-                name="parentsMaritalStatus"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Parents&apos; Marital Status:
+                        SHS Strand
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Select SHS Strand" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Married">Married</SelectItem>
-                          <SelectItem value="Not legally married">
-                            Not legally married
-                          </SelectItem>
-                          <SelectItem value="Separated">Separated</SelectItem>
-                          <SelectItem value="Both parents remarried">
-                            Both parents remarried
-                          </SelectItem>
-                          <SelectItem value="One parent remarried">
-                            One parent remarried
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="familyMonthlyIncome"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Family Monthly Income:
-                      </FieldLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? ""}
-                      >
-                        <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select monthly income" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Below 3,000">
-                            Below 3,000
-                          </SelectItem>
-                          <SelectItem value="3,001-5,000">
-                            3,001-5,000
-                          </SelectItem>
-                          <SelectItem value="5,001-8,000">
-                            5,001-8,000
-                          </SelectItem>
-                          <SelectItem value="8,001-10,000">
-                            8,001-10,000
-                          </SelectItem>
-                          <SelectItem value="10,001-15,000">
-                            10,001-15,000
-                          </SelectItem>
-                          <SelectItem value="15,001-20,000">
-                            15,001-20,000
-                          </SelectItem>
-                          <SelectItem value="Above 20,001">
-                            Above 20,001
-                          </SelectItem>
+                          <SelectItem value="GA">GA</SelectItem>
+                          <SelectItem value="STEM">STEM</SelectItem>
+                          <SelectItem value="ABM">ABM</SelectItem>
+                          <SelectItem value="HUMSS">HUMSS</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -325,6 +272,32 @@ export const FamilyDataBSection = React.forwardRef<
                 )}
               />
             </div>
+            <Controller
+              name="awards"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel className="text-foreground">
+                      Awards/Honors
+                    </FieldLabel>
+                    <Textarea
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="With High Honors, 1st place in Science Fair, etc."
+                      className="min-h-[35.5px]"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError
+                        className="text-[12px]"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
+            />
           </FieldGroup>
         </FieldSet>
       </Field>
@@ -332,4 +305,4 @@ export const FamilyDataBSection = React.forwardRef<
   )
 })
 
-FamilyDataBSection.displayName = "FamilyDataBSection"
+AcademicDataASection.displayName = "AcademicDataASection"
