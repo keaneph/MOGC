@@ -33,6 +33,10 @@ import {
   PersonalDataCSectionRef,
 } from "./profiling-sections/personal-data/personal-data-c"
 import {
+  PersonalDataDSection,
+  PersonalDataDSectionRef,
+} from "./profiling-sections/personal-data/personal-data-d"
+import {
   FamilyDataASection,
   FamilyDataASectionRef,
 } from "./profiling-sections/family-data/family-data-a"
@@ -40,6 +44,22 @@ import {
   FamilyDataBSection,
   FamilyDataBSectionRef,
 } from "./profiling-sections/family-data/family-data-b"
+import {
+  FamilyDataCSection,
+  FamilyDataCSectionRef,
+} from "./profiling-sections/family-data/family-data-c"
+import {
+  AcademicDataASection,
+  AcademicDataASectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-a"
+import {
+  AcademicDataBSection,
+  AcademicDataBSectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-b"
+import {
+  AcademicDataCSection,
+  AcademicDataCSectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-c"
 
 import {
   studentIndividualDataSchema,
@@ -131,6 +151,13 @@ export function InProgressProfile() {
             dataC as Parameters<typeof personalDataCRef.current.form.reset>[0]
           )
         }
+      } else if (currentPart === 3) {
+        const dataD = transformFromPersonalDataD(fullProfile)
+        if (dataD && personalDataDRef.current && hasAnyData(dataD)) {
+          personalDataDRef.current.form.reset(
+            dataD as Parameters<typeof personalDataDRef.current.form.reset>[0]
+          )
+        }
       }
     } else if (currentSection === 1) {
       // Family Data
@@ -146,6 +173,43 @@ export function InProgressProfile() {
         if (familyB && familyDataBRef.current && hasAnyData(familyB)) {
           familyDataBRef.current.form.reset(
             familyB as Parameters<typeof familyDataBRef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const familyC = transformFromFamilyDataC(fullProfile)
+        if (familyC && familyDataCRef.current && hasAnyData(familyC)) {
+          familyDataCRef.current.form.reset(
+            familyC as Parameters<typeof familyDataCRef.current.form.reset>[0]
+          )
+        }
+      }
+    } else if (currentSection === 2) {
+      // Academic Data
+      if (currentPart === 0) {
+        const academicA = transformFromAcademicDataA(fullProfile)
+        if (academicA && academicDataARef.current && hasAnyData(academicA)) {
+          academicDataARef.current.form.reset(
+            academicA as Parameters<
+              typeof academicDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const academicB = transformFromAcademicDataB(fullProfile)
+        if (academicB && academicDataBRef.current && hasAnyData(academicB)) {
+          academicDataBRef.current.form.reset(
+            academicB as Parameters<
+              typeof academicDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const academicC = transformFromAcademicDataC(fullProfile)
+        if (academicC && academicDataCRef.current && hasAnyData(academicC)) {
+          academicDataCRef.current.form.reset(
+            academicC as Parameters<
+              typeof academicDataCRef.current.form.reset
+            >[0]
           )
         }
       }
@@ -181,12 +245,6 @@ export function InProgressProfile() {
       givenName: dbRecord.given_name,
       middleInitial: dbRecord.middle_initial,
       studentStatus: dbRecord.student_status,
-      nickname: dbRecord.nickname,
-      age: dbRecord.age,
-      sex: dbRecord.sex,
-      citizenship: dbRecord.citizenship,
-      dateOfBirth: dbRecord.date_of_birth,
-      placeOfBirth: dbRecord.place_of_birth,
     }
   }
 
@@ -194,9 +252,22 @@ export function InProgressProfile() {
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
     return {
-      religiousAffiliation: dbRecord.religious_affiliation,
+      nickname: dbRecord.nickname,
+      age: dbRecord.age,
+      sex: dbRecord.sex,
+      citizenship: dbRecord.citizenship,
+      dateOfBirth: dbRecord.date_of_birth,
+      placeOfBirth: dbRecord.place_of_birth,
       civilStatus: dbRecord.civil_status,
       otherCivilStatus: dbRecord.civil_status_others,
+    }
+  }
+
+  const transformFromPersonalDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      religiousAffiliation: dbRecord.religious_affiliation,
       noOfChildren: dbRecord.number_of_children,
       addressInIligan: dbRecord.address_iligan,
       contactNo: dbRecord.contact_number,
@@ -207,7 +278,7 @@ export function InProgressProfile() {
     }
   }
 
-  const transformFromPersonalDataC = (
+  const transformFromPersonalDataD = (
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
     const seriousMedicalCondition =
@@ -246,8 +317,6 @@ export function InProgressProfile() {
       mothersStatus: dbRecord.mother_deceased === true ? "Deceased" : "Living",
       mothersOccupation: dbRecord.mother_occupation,
       mothersContactNo: dbRecord.mother_contact_number,
-      parentsMaritalStatus: dbRecord.parents_marital_status,
-      familyMonthlyIncome: dbRecord.family_monthly_income,
     }
   }
 
@@ -261,7 +330,56 @@ export function InProgressProfile() {
       relationshipWithGuardian: dbRecord.guardian_relationship,
       ordinalPosition: dbRecord.ordinal_position,
       noOfSiblings: dbRecord.number_of_siblings,
+      parentsMaritalStatus: dbRecord.parents_marital_status,
+      familyMonthlyIncome: dbRecord.family_monthly_income,
+    }
+  }
+  const transformFromFamilyDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
       describeEnvironment: dbRecord.home_environment_description,
+    }
+  }
+
+  const transformFromAcademicDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      generalPointAverage: dbRecord.shs_gpa,
+      scholar: dbRecord.is_scholar === true ? "Yes" : "No",
+      scholarDetails: dbRecord.scholarship_type,
+      lastSchoolAttended: dbRecord.previous_school_name,
+      lastSchoolAddress: dbRecord.previous_school_address,
+      shsTrack: dbRecord.shs_track,
+      shsStrand: dbRecord.shs_strand,
+      awards: dbRecord.awards_honors,
+    }
+  }
+
+  const transformFromAcademicDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      firstChoice: dbRecord.career_option_1,
+      secondChoice: dbRecord.career_option_2,
+      thirdChoice: dbRecord.career_option_3,
+      studentOrg: dbRecord.student_organizations,
+      courseChoiceActor: dbRecord.course_choice_actor,
+      otherCourseChoiceActor: dbRecord.course_choice_actor_others,
+      reasonForCourse: dbRecord.course_choice_reason,
+      careerPursuingInFuture: dbRecord.post_college_career_goal,
+    }
+  }
+
+  const transformFromAcademicDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbReasons = dbRecord.reasons_for_choosing_msuiit
+    return {
+      reasonsForChoosingiit: Array.isArray(dbReasons) ? dbReasons : [],
+      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
+      coCurricularActivities: dbRecord.cocurricular_activities,
     }
   }
 
@@ -320,13 +438,18 @@ export function InProgressProfile() {
   const personalDataARef = useRef<PersonalDataASectionRef>(null)
   const personalDataBRef = useRef<PersonalDataBSectionRef>(null)
   const personalDataCRef = useRef<PersonalDataCSectionRef>(null)
+  const personalDataDRef = useRef<PersonalDataDSectionRef>(null)
   const familyDataARef = useRef<FamilyDataASectionRef>(null)
   const familyDataBRef = useRef<FamilyDataBSectionRef>(null)
+  const familyDataCRef = useRef<FamilyDataCSectionRef>(null)
+  const academicDataARef = useRef<AcademicDataASectionRef>(null)
+  const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
+  const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
 
   const sections = [
-    { name: "Personal Data", parts: 3 },
-    { name: "Family Data", parts: 2 },
-    { name: "Academic Data", parts: 2 },
+    { name: "Personal Data", parts: 4 },
+    { name: "Family Data", parts: 3 },
+    { name: "Academic Data", parts: 3 },
     { name: "Distance Learning", parts: 2 },
     { name: "Psychosocial", parts: 2 },
     { name: "Needs Assessment", parts: 2 },
@@ -342,10 +465,17 @@ export function InProgressProfile() {
       if (currentPart === 0) return personalDataARef
       if (currentPart === 1) return personalDataBRef
       if (currentPart === 2) return personalDataCRef
+      if (currentPart === 3) return personalDataDRef
     }
     if (currentSection === 1) {
       if (currentPart === 0) return familyDataARef
       if (currentPart === 1) return familyDataBRef
+      if (currentPart === 2) return familyDataCRef
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0) return academicDataARef
+      if (currentPart === 1) return academicDataBRef
+      if (currentPart === 2) return academicDataCRef
     }
     return null
   }
@@ -363,19 +493,23 @@ export function InProgressProfile() {
           "givenName",
           "middleInitial",
           "studentStatus",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
           "nickname",
           "age",
           "sex",
           "citizenship",
           "dateOfBirth",
           "placeOfBirth",
-        ]
-      }
-      if (currentPart === 1) {
-        return [
-          "religiousAffiliation",
           "civilStatus",
           "otherCivilStatus",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "religiousAffiliation",
           "noOfChildren",
           "addressInIligan",
           "contactNo",
@@ -385,7 +519,7 @@ export function InProgressProfile() {
           "talentsAndSkills",
         ]
       }
-      if (currentPart === 2) {
+      if (currentPart === 3) {
         return [
           "leisureAndRecreationalActivities",
           "seriousMedicalCondition",
@@ -408,8 +542,6 @@ export function InProgressProfile() {
           "mothersStatus",
           "mothersOccupation",
           "mothersContactNo",
-          "parentsMaritalStatus",
-          "familyMonthlyIncome",
         ]
       }
       if (currentPart === 1) {
@@ -420,8 +552,12 @@ export function InProgressProfile() {
           "relationshipWithGuardian",
           "ordinalPosition",
           "noOfSiblings",
-          "describeEnvironment",
+          "parentsMaritalStatus",
+          "familyMonthlyIncome",
         ]
+      }
+      if (currentPart === 2) {
+        return ["describeEnvironment"]
       }
     }
     if (currentSection === 2) {
@@ -445,10 +581,14 @@ export function InProgressProfile() {
           "studentOrg",
           "courseChoiceActor",
           "otherCourseChoiceActor",
-          "reasonsForChoosingiit",
-          "otherReasonForChoosingiit",
           "reasonForCourse",
           "careerPursuingInFuture",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "reasonsForChoosingiit",
+          "otherReasonForChoosingiit",
           "coCurricularActivities",
         ]
       }
@@ -496,7 +636,7 @@ export function InProgressProfile() {
         const result = await saveStudentSection(
           formData,
           currentSection as 0 | 1 | 2 | 3 | 4 | 5,
-          currentPart as 0 | 1 | 2
+          currentPart as 0 | 1 | 2 | 3
         )
 
         if (!result.success) {
@@ -659,10 +799,21 @@ export function InProgressProfile() {
         return <PersonalDataBSection ref={personalDataBRef} />
       if (currentPart === 2)
         return <PersonalDataCSection ref={personalDataCRef} />
+      if (currentPart === 3)
+        return <PersonalDataDSection ref={personalDataDRef} />
     }
     if (currentSection === 1) {
       if (currentPart === 0) return <FamilyDataASection ref={familyDataARef} />
       if (currentPart === 1) return <FamilyDataBSection ref={familyDataBRef} />
+      if (currentPart === 2) return <FamilyDataCSection ref={familyDataCRef} />
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0)
+        return <AcademicDataASection ref={academicDataARef} />
+      if (currentPart === 1)
+        return <AcademicDataBSection ref={academicDataBRef} />
+      if (currentPart === 2)
+        return <AcademicDataCSection ref={academicDataCRef} />
     }
 
     // placeholder muna

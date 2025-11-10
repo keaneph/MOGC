@@ -16,9 +16,6 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select"
-import { ChevronsUpDown, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -32,12 +29,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { ChevronsUpDown, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
-import { studentIndividualDataSchema } from "@/lib/schemas"
+import { academicDataSchema } from "@/lib/schemas"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 const courses = [
   {
@@ -270,30 +271,41 @@ const courses = [
   },
 ]
 
-export interface PersonalDataASectionRef {
-  form: UseFormReturn<z.infer<typeof studentIndividualDataSchema>>
+export interface AcademicDataBSectionRef {
+  form: UseFormReturn<z.infer<typeof academicDataSchema>>
 }
 
-export const PersonalDataASection = React.forwardRef<
-  PersonalDataASectionRef,
+export const AcademicDataBSection = React.forwardRef<
+  AcademicDataBSectionRef,
   object
 >((props, ref) => {
-  const form = useForm<z.infer<typeof studentIndividualDataSchema>>({
-    resolver: zodResolver(studentIndividualDataSchema),
+  const form = useForm<z.infer<typeof academicDataSchema>>({
+    resolver: zodResolver(academicDataSchema),
     mode: "onChange",
     defaultValues: {
-      idNo: "",
-      course: "",
-      saseScore: undefined,
-      academicYear: "",
-      familyName: "",
-      givenName: "",
-      middleInitial: "",
-      studentStatus: undefined,
+      firstChoice: "",
+      secondChoice: "",
+      thirdChoice: "",
+      studentOrg: "",
+      courseChoiceActor: undefined,
+      otherCourseChoiceActor: "",
+      reasonForCourse: "",
+      careerPursuingInFuture: "",
     },
   })
 
-  const [open, setOpen] = React.useState(false)
+  const [openFirst, setOpenFirst] = React.useState(false)
+  const [openSecond, setOpenSecond] = React.useState(false)
+  const [openThird, setOpenThird] = React.useState(false)
+
+  const courseChoiceActor = form.watch("courseChoiceActor")
+  React.useEffect(() => {
+    if (courseChoiceActor !== "Others") {
+      form.setValue("otherCourseChoiceActor", "", {
+        shouldValidate: false,
+      })
+    }
+  }, [courseChoiceActor, form])
 
   React.useImperativeHandle(ref, () => ({
     form,
@@ -304,50 +316,25 @@ export const PersonalDataASection = React.forwardRef<
       <Field>
         <FieldSet>
           <FieldLegend className="text-foreground font-semibold tracking-wide">
-            Personal Data
+            Academic Data
           </FieldLegend>
           <FieldGroup>
             <div className="-mb-2 grid grid-cols-2 gap-4">
               <Controller
-                name="idNo"
+                name="firstChoice"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        ID No:
+                        1st Course Choice
                       </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="2023-0079"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="course"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Course
-                      </FieldLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
+                      <Popover open={openFirst} onOpenChange={setOpenFirst}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={open}
+                            aria-expanded={openFirst}
                             className={cn(
                               "w-auto cursor-pointer justify-between overflow-hidden",
                               field.value ? "text-foreground" : "text-main4"
@@ -375,7 +362,7 @@ export const PersonalDataASection = React.forwardRef<
                                     value={c.value}
                                     onSelect={(v) => {
                                       field.onChange(v)
-                                      setOpen(false)
+                                      setOpenFirst(false)
                                     }}
                                   >
                                     {c.label}
@@ -404,23 +391,67 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-
               <Controller
-                name="saseScore"
+                name="secondChoice"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        SASE Score:
+                        2nd Course Choice
                       </FieldLabel>
-                      <Input
-                        {...field}
-                        type="number"
-                        value={field.value ?? ""}
-                        placeholder="120"
-                        autoComplete="off"
-                      />
+                      <Popover open={openSecond} onOpenChange={setOpenSecond}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openSecond}
+                            className={cn(
+                              "w-auto cursor-pointer justify-between overflow-hidden",
+                              field.value ? "text-foreground" : "text-main4"
+                            )}
+                          >
+                            {field.value
+                              ? courses.find((c) => c.value === field.value)
+                                  ?.label
+                              : "Select course..."}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[260px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search course..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>No course found.</CommandEmpty>
+                              <CommandGroup>
+                                {courses.map((c) => (
+                                  <CommandItem
+                                    key={c.value}
+                                    value={c.value}
+                                    onSelect={(v) => {
+                                      field.onChange(v)
+                                      setOpenSecond(false)
+                                    }}
+                                  >
+                                    {c.label}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        c.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"
@@ -431,22 +462,67 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-
               <Controller
-                name="academicYear"
+                name="thirdChoice"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Academic Year:
+                        3rd Course Choice
                       </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="2025-2026"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
+                      <Popover open={openThird} onOpenChange={setOpenThird}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openThird}
+                            className={cn(
+                              "w-auto cursor-pointer justify-between overflow-hidden",
+                              field.value ? "text-foreground" : "text-main4"
+                            )}
+                          >
+                            {field.value
+                              ? courses.find((c) => c.value === field.value)
+                                  ?.label
+                              : "Select course..."}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[260px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search course..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>No course found.</CommandEmpty>
+                              <CommandGroup>
+                                {courses.map((c) => (
+                                  <CommandItem
+                                    key={c.value}
+                                    value={c.value}
+                                    onSelect={(v) => {
+                                      field.onChange(v)
+                                      setOpenThird(false)
+                                    }}
+                                  >
+                                    {c.label}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        c.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"
@@ -457,22 +533,16 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-
               <Controller
-                name="familyName"
+                name="studentOrg"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Family Name:
+                        Student Organizations
                       </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Ledesma"
-                        value={field.value ?? ""}
-                        autoComplete="off"
-                      />
+                      <Input {...field} placeholder="AIM" autoComplete="off" />
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"
@@ -483,61 +553,14 @@ export const PersonalDataASection = React.forwardRef<
                   </Field>
                 )}
               />
-
               <Controller
-                name="givenName"
+                name="courseChoiceActor"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Given Name:
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        placeholder="Keane Pharelle"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="middleInitial"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Middle Initial:
-                      </FieldLabel>
-                      <Input {...field} placeholder="B" autoComplete="off" />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="studentStatus"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Student Status:
+                        Course was choosen by:
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -547,12 +570,100 @@ export const PersonalDataASection = React.forwardRef<
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="New">New</SelectItem>
-                          <SelectItem value="Transferee">Transferee</SelectItem>
-                          <SelectItem value="Returnee">Returnee</SelectItem>
-                          <SelectItem value="Shiftee">Shiftee</SelectItem>
+                          <SelectItem value="Own Choice">Own Choice</SelectItem>
+                          <SelectItem value="Parents Choice">
+                            Parents Choice
+                          </SelectItem>
+                          <SelectItem value="Siblings Choice">
+                            Siblings Choice
+                          </SelectItem>
+                          <SelectItem value="Relatives Choice">
+                            Relatives Choice
+                          </SelectItem>
+                          <SelectItem value="According to MSU-SASE score/slot">
+                            According to MSU-SASE score/slot
+                          </SelectItem>
+                          <SelectItem value="Others">Others</SelectItem>
                         </SelectContent>
                       </Select>
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="otherCourseChoiceActor"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        If others, specify:
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Specify who"
+                        value={field.value ?? ""}
+                        autoComplete="off"
+                        disabled={form.watch("courseChoiceActor") !== "Others"}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="reasonForCourse"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        What is your (or parents&#39;/other&#39;s) reason for
+                        choosing the course?
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Specify your reason for choosing your course"
+                        value={field.value ?? ""}
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="careerPursuingInFuture"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        What career do you see yourself pursuing after college
+                        education?
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="Specify what career you want to pursue"
+                        value={field.value ?? ""}
+                        autoComplete="off"
+                      />
                       {fieldState.invalid && (
                         <FieldError
                           className="text-[12px]"
@@ -571,4 +682,4 @@ export const PersonalDataASection = React.forwardRef<
   )
 })
 
-PersonalDataASection.displayName = "PersonalDataASection"
+AcademicDataBSection.displayName = "AcademicDataBSection"
