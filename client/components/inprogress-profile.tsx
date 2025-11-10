@@ -81,6 +81,12 @@ export function InProgressProfile() {
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [loadedProfileData, setLoadedProfileData] =
     useState<Awaited<ReturnType<typeof getStudentProfile>>>(null) // Store full profile data
+  const [completedSections, setCompletedSections] = useState<Set<number>>(
+    new Set()
+  ) // Track completed sections
+  const [lastPartPerSection, setLastPartPerSection] = useState<
+    Map<number, number>
+  >(new Map()) // Track last part visited per section
   const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const circleRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -281,7 +287,14 @@ export function InProgressProfile() {
           // Restore navigation position
           setCurrentSection(progress.lastSection)
           setCurrentPart(progress.lastPart)
+          // Track the last part for the restored section
+          setLastPartPerSection((prev) =>
+            new Map(prev).set(progress.lastSection!, progress.lastPart!)
+          )
         }
+
+        // Use completed sections from progress API
+        setCompletedSections(new Set(progress.completedSections || []))
 
         // Fetch ALL profile data and store it
         // Forms will be populated when they become visible
@@ -531,9 +544,19 @@ export function InProgressProfile() {
 
     // proceed to next part or section
     if (currentPart < totalParts - 1) {
-      setCurrentPart((p) => p + 1)
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
     } else if (currentSection < sections.length - 1) {
-      setCurrentSection((s) => s + 1)
+      // track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
       setCurrentPart(0)
     }
   }
@@ -542,9 +565,19 @@ export function InProgressProfile() {
   const handleProceedDEV = async () => {
     // proceed to next part or section
     if (currentPart < totalParts - 1) {
-      setCurrentPart((p) => p + 1)
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
     } else if (currentSection < sections.length - 1) {
-      setCurrentSection((s) => s + 1)
+      // Track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
       setCurrentPart(0)
     }
   }
@@ -553,11 +586,29 @@ export function InProgressProfile() {
     // Navigate to previous part/section
     // Data is already loaded from initial populateAllForms(), so we just navigate
     if (currentPart > 0) {
-      setCurrentPart((p) => p - 1)
+      const prevPart = currentPart - 1
+      setCurrentPart(prevPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, prevPart)
+      )
     } else if (currentSection > 0) {
-      setCurrentSection((s) => s - 1)
-      const prevParts = sections[currentSection - 1].parts
-      setCurrentPart(prevParts - 1)
+      const prevSection = currentSection - 1
+      setCurrentSection(prevSection)
+      const prevParts = sections[prevSection].parts
+      // If we've visited this section before, go to the last part we visited
+      // Otherwise, go to the last part of the section (if completed) or first part
+      const lastVisitedPart = lastPartPerSection.get(prevSection)
+      const isCompleted = completedSections.has(prevSection)
+      if (lastVisitedPart !== undefined) {
+        setCurrentPart(lastVisitedPart)
+      } else if (isCompleted) {
+        // If completed but never tracked, go to last part
+        setCurrentPart(prevParts - 1)
+      } else {
+        // Otherwise start at the beginning
+        setCurrentPart(0)
+      }
     }
   }
 
@@ -570,11 +621,33 @@ export function InProgressProfile() {
 
   // handle step click - navigate to section's first part
   const handleStepClick = (sectionIndex: number) => {
-    // only allow navigation to sections that have been reached (or current section)
-    if (sectionIndex <= currentSection) {
+    // allow navigation to sections that are completed OR the current section
+    const isCompleted = completedSections.has(sectionIndex)
+    const isCurrent = sectionIndex === currentSection
+    if (isCompleted || isCurrent) {
       // Navigate to section - data is already loaded from initial populateAllForms()
       setCurrentSection(sectionIndex)
-      setCurrentPart(0)
+
+      // If it's the current section, stay at current part
+      if (isCurrent) {
+        // Stay at current part
+        return
+      }
+
+      // If completed, go to the last part of that section for quick navigation
+      // Otherwise, check if we've visited this section before
+      if (isCompleted) {
+        const sectionParts = sections[sectionIndex].parts
+        setCurrentPart(sectionParts - 1) // Go to last part of completed section
+      } else {
+        // Check if we've visited this section before
+        const lastVisitedPart = lastPartPerSection.get(sectionIndex)
+        if (lastVisitedPart !== undefined) {
+          setCurrentPart(lastVisitedPart)
+        } else {
+          setCurrentPart(0) // Start at beginning if never visited
+        }
+      }
     }
   }
 
@@ -737,8 +810,11 @@ export function InProgressProfile() {
         </div>
 
         {stepIcons.map((Icon, index) => {
-          const isActive = index <= currentSection
-          const isClickable = index <= currentSection
+          // Section is active/clickable if it's completed OR it's the current section
+          const isCompleted = completedSections.has(index)
+          const isCurrent = index === currentSection
+          const isActive = isCompleted || isCurrent
+          const isClickable = isCompleted || isCurrent
           const mainColor = isActive ? "bg-main" : "bg-main4"
           const shadowColor = isActive ? "bg-main-dark" : "bg-main2"
 
