@@ -133,11 +133,11 @@ export default function GettingStartedPage() {
               </div>
 
               <div className="mb-6 text-sm font-medium tracking-wide">
-                <Link href="/student/student-profiling">
-                  <TooltipThis label="Fill up your personal demographic form now!">
+                <TooltipThis label="Fill up your personal demographic form now!">
+                  <Link href="/student/student-profiling">
                     <PrimaryButton content="Create Profile" />
-                  </TooltipThis>
-                </Link>
+                  </Link>
+                </TooltipThis>
                 <TooltipThis label="Learn more about personal demographic forms">
                   <button
                     onClick={() => {
@@ -181,12 +181,14 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to book an appointment with your counselor">
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer rounded-sm tracking-wide"
-                  >
-                    Go Next
-                  </Button>
+                  <Link href="/student/counseling">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer rounded-sm tracking-wide"
+                    >
+                      Go Next
+                    </Button>
+                  </Link>
                 </TooltipThis>
                 <TooltipThis label="Learn more about counselor interviews">
                   <button
@@ -222,12 +224,14 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to take the initialization tests">
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer rounded-sm tracking-wide"
-                  >
-                    Go Next
-                  </Button>
+                  <Link href="/student/counseling">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer rounded-sm tracking-wide"
+                    >
+                      Go Next
+                    </Button>
+                  </Link>
                 </TooltipThis>
                 <TooltipThis label="Learn more about initialization tests">
                   <button
@@ -263,12 +267,14 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to schedule counseling sessions">
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer rounded-sm tracking-wide"
-                  >
-                    Go Next
-                  </Button>
+                  <Link href="/student/counseling">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer rounded-sm tracking-wide"
+                    >
+                      Go Next
+                    </Button>
+                  </Link>
                 </TooltipThis>
                 <TooltipThis label="Learn more about counseling sessions">
                   <button
@@ -304,12 +310,14 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to explore the MOGC application">
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer rounded-sm tracking-wide"
-                  >
-                    Go Next
-                  </Button>
+                  <Link href="/documentation">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer rounded-sm tracking-wide"
+                    >
+                      Go Next
+                    </Button>
+                  </Link>
                 </TooltipThis>
                 <TooltipThis label="Learn more about exploring MOGC">
                   <button
@@ -326,7 +334,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
         </div>
-        <div className="h-15"></div>
+        <div className="h-5"></div>
       </div>
       {/* Siklab sheet (controlled) */}
       <SiklabSheet

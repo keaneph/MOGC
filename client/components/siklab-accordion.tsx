@@ -39,8 +39,11 @@ export function SiklabAccordion({
           <p>
             Once completed, proceed to the next step for your initial interview.
           </p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -60,8 +63,11 @@ export function SiklabAccordion({
             This short session helps the counselor understand your background,
             interests, and current goals.
           </p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -79,8 +85,11 @@ export function SiklabAccordion({
             learning style, career preferences, and key areas to develop.
           </p>
           <p>Use this information to plan your next steps effectively.</p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -100,8 +109,11 @@ export function SiklabAccordion({
             Once your session is booked, you’ll receive a confirmation with the
             details.
           </p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -119,8 +131,11 @@ export function SiklabAccordion({
             programs, and career guidance seminars.
           </p>
           <p>Stay tuned for more updates!</p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -138,8 +153,11 @@ export function SiklabAccordion({
             options.
           </p>
           <p>Your data remains confidential and secure at all times.</p>
-          <div className="w-auto">
+          <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
+            <button className="text-link w-auto cursor-pointer text-left text-xs decoration-2 underline-offset-4 hover:underline">
+              Read Documentation
+            </button>
           </div>
         </AccordionContent>
       </AccordionItem>
