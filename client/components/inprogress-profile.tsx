@@ -33,6 +33,10 @@ import {
   PersonalDataCSectionRef,
 } from "./profiling-sections/personal-data/personal-data-c"
 import {
+  PersonalDataDSection,
+  PersonalDataDSectionRef,
+} from "./profiling-sections/personal-data/personal-data-d"
+import {
   FamilyDataASection,
   FamilyDataASectionRef,
 } from "./profiling-sections/family-data/family-data-a"
@@ -41,6 +45,10 @@ import {
   FamilyDataBSectionRef,
 } from "./profiling-sections/family-data/family-data-b"
 import {
+  FamilyDataCSection,
+  FamilyDataCSectionRef,
+} from "./profiling-sections/family-data/family-data-c"
+import {
   AcademicDataASection,
   AcademicDataASectionRef,
 } from "./profiling-sections/academic-and-career-data/academic-data-a"
@@ -48,6 +56,10 @@ import {
   AcademicDataBSection,
   AcademicDataBSectionRef,
 } from "./profiling-sections/academic-and-career-data/academic-data-b"
+import {
+  AcademicDataCSection,
+  AcademicDataCSectionRef,
+} from "./profiling-sections/academic-and-career-data/academic-data-c"
 
 import {
   studentIndividualDataSchema,
@@ -56,7 +68,6 @@ import {
 } from "@/lib/schemas"
 import {
   saveStudentSection,
-  getStudentSection,
   profileExists,
   getProfileProgress,
   getStudentProfile,
@@ -89,6 +100,12 @@ export function InProgressProfile() {
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [loadedProfileData, setLoadedProfileData] =
     useState<Awaited<ReturnType<typeof getStudentProfile>>>(null) // Store full profile data
+  const [completedSections, setCompletedSections] = useState<Set<number>>(
+    new Set()
+  ) // Track completed sections
+  const [lastPartPerSection, setLastPartPerSection] = useState<
+    Map<number, number>
+  >(new Map()) // Track last part visited per section
   const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const circleRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -133,6 +150,13 @@ export function InProgressProfile() {
             dataC as Parameters<typeof personalDataCRef.current.form.reset>[0]
           )
         }
+      } else if (currentPart === 3) {
+        const dataD = transformFromPersonalDataD(fullProfile)
+        if (dataD && personalDataDRef.current && hasAnyData(dataD)) {
+          personalDataDRef.current.form.reset(
+            dataD as Parameters<typeof personalDataDRef.current.form.reset>[0]
+          )
+        }
       }
     } else if (currentSection === 1) {
       // Family Data
@@ -148,6 +172,13 @@ export function InProgressProfile() {
         if (familyB && familyDataBRef.current && hasAnyData(familyB)) {
           familyDataBRef.current.form.reset(
             familyB as Parameters<typeof familyDataBRef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const familyC = transformFromFamilyDataC(fullProfile)
+        if (familyC && familyDataCRef.current && hasAnyData(familyC)) {
+          familyDataCRef.current.form.reset(
+            familyC as Parameters<typeof familyDataCRef.current.form.reset>[0]
           )
         }
       }
@@ -168,6 +199,15 @@ export function InProgressProfile() {
           academicDataBRef.current.form.reset(
             academicB as Parameters<
               typeof academicDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const academicC = transformFromAcademicDataC(fullProfile)
+        if (academicC && academicDataCRef.current && hasAnyData(academicC)) {
+          academicDataCRef.current.form.reset(
+            academicC as Parameters<
+              typeof academicDataCRef.current.form.reset
             >[0]
           )
         }
@@ -204,12 +244,6 @@ export function InProgressProfile() {
       givenName: dbRecord.given_name,
       middleInitial: dbRecord.middle_initial,
       studentStatus: dbRecord.student_status,
-      nickname: dbRecord.nickname,
-      age: dbRecord.age,
-      sex: dbRecord.sex,
-      citizenship: dbRecord.citizenship,
-      dateOfBirth: dbRecord.date_of_birth,
-      placeOfBirth: dbRecord.place_of_birth,
     }
   }
 
@@ -217,9 +251,22 @@ export function InProgressProfile() {
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
     return {
-      religiousAffiliation: dbRecord.religious_affiliation,
+      nickname: dbRecord.nickname,
+      age: dbRecord.age,
+      sex: dbRecord.sex,
+      citizenship: dbRecord.citizenship,
+      dateOfBirth: dbRecord.date_of_birth,
+      placeOfBirth: dbRecord.place_of_birth,
       civilStatus: dbRecord.civil_status,
       otherCivilStatus: dbRecord.civil_status_others,
+    }
+  }
+
+  const transformFromPersonalDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      religiousAffiliation: dbRecord.religious_affiliation,
       noOfChildren: dbRecord.number_of_children,
       addressInIligan: dbRecord.address_iligan,
       contactNo: dbRecord.contact_number,
@@ -230,7 +277,7 @@ export function InProgressProfile() {
     }
   }
 
-  const transformFromPersonalDataC = (
+  const transformFromPersonalDataD = (
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
     const seriousMedicalCondition =
@@ -269,8 +316,6 @@ export function InProgressProfile() {
       mothersStatus: dbRecord.mother_deceased === true ? "Deceased" : "Living",
       mothersOccupation: dbRecord.mother_occupation,
       mothersContactNo: dbRecord.mother_contact_number,
-      parentsMaritalStatus: dbRecord.parents_marital_status,
-      familyMonthlyIncome: dbRecord.family_monthly_income,
     }
   }
 
@@ -284,6 +329,14 @@ export function InProgressProfile() {
       relationshipWithGuardian: dbRecord.guardian_relationship,
       ordinalPosition: dbRecord.ordinal_position,
       noOfSiblings: dbRecord.number_of_siblings,
+      parentsMaritalStatus: dbRecord.parents_marital_status,
+      familyMonthlyIncome: dbRecord.family_monthly_income,
+    }
+  }
+  const transformFromFamilyDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
       describeEnvironment: dbRecord.home_environment_description,
     }
   }
@@ -313,10 +366,18 @@ export function InProgressProfile() {
       studentOrg: dbRecord.student_organizations,
       courseChoiceActor: dbRecord.course_choice_actor,
       otherCourseChoiceActor: dbRecord.course_choice_actor_others,
-      reasonsForChoosingiit: dbRecord.reasons_for_choosing_msuiit,
-      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
       reasonForCourse: dbRecord.course_choice_reason,
       careerPursuingInFuture: dbRecord.post_college_career_goal,
+    }
+  }
+
+  const transformFromAcademicDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbReasons = dbRecord.reasons_for_choosing_msuiit
+    return {
+      reasonsForChoosingiit: Array.isArray(dbReasons) ? dbReasons : [],
+      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
       coCurricularActivities: dbRecord.cocurricular_activities,
     }
   }
@@ -343,7 +404,14 @@ export function InProgressProfile() {
           // Restore navigation position
           setCurrentSection(progress.lastSection)
           setCurrentPart(progress.lastPart)
+          // Track the last part for the restored section
+          setLastPartPerSection((prev) =>
+            new Map(prev).set(progress.lastSection!, progress.lastPart!)
+          )
         }
+
+        // Use completed sections from progress API
+        setCompletedSections(new Set(progress.completedSections || []))
 
         // Fetch ALL profile data and store it
         // Forms will be populated when they become visible
@@ -369,15 +437,18 @@ export function InProgressProfile() {
   const personalDataARef = useRef<PersonalDataASectionRef>(null)
   const personalDataBRef = useRef<PersonalDataBSectionRef>(null)
   const personalDataCRef = useRef<PersonalDataCSectionRef>(null)
+  const personalDataDRef = useRef<PersonalDataDSectionRef>(null)
   const familyDataARef = useRef<FamilyDataASectionRef>(null)
   const familyDataBRef = useRef<FamilyDataBSectionRef>(null)
+  const familyDataCRef = useRef<FamilyDataCSectionRef>(null)
   const academicDataARef = useRef<AcademicDataASectionRef>(null)
   const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
+  const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
 
   const sections = [
-    { name: "Personal Data", parts: 3 },
-    { name: "Family Data", parts: 2 },
-    { name: "Academic Data", parts: 2 },
+    { name: "Personal Data", parts: 4 },
+    { name: "Family Data", parts: 3 },
+    { name: "Academic Data", parts: 3 },
     { name: "Distance Learning", parts: 2 },
     { name: "Psychosocial", parts: 2 },
     { name: "Needs Assessment", parts: 2 },
@@ -393,14 +464,17 @@ export function InProgressProfile() {
       if (currentPart === 0) return personalDataARef
       if (currentPart === 1) return personalDataBRef
       if (currentPart === 2) return personalDataCRef
+      if (currentPart === 3) return personalDataDRef
     }
     if (currentSection === 1) {
       if (currentPart === 0) return familyDataARef
       if (currentPart === 1) return familyDataBRef
+      if (currentPart === 2) return familyDataCRef
     }
     if (currentSection === 2) {
       if (currentPart === 0) return academicDataARef
       if (currentPart === 1) return academicDataBRef
+      if (currentPart === 2) return academicDataCRef
     }
     return null
   }
@@ -418,19 +492,23 @@ export function InProgressProfile() {
           "givenName",
           "middleInitial",
           "studentStatus",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
           "nickname",
           "age",
           "sex",
           "citizenship",
           "dateOfBirth",
           "placeOfBirth",
-        ]
-      }
-      if (currentPart === 1) {
-        return [
-          "religiousAffiliation",
           "civilStatus",
           "otherCivilStatus",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "religiousAffiliation",
           "noOfChildren",
           "addressInIligan",
           "contactNo",
@@ -440,7 +518,7 @@ export function InProgressProfile() {
           "talentsAndSkills",
         ]
       }
-      if (currentPart === 2) {
+      if (currentPart === 3) {
         return [
           "leisureAndRecreationalActivities",
           "seriousMedicalCondition",
@@ -463,8 +541,6 @@ export function InProgressProfile() {
           "mothersStatus",
           "mothersOccupation",
           "mothersContactNo",
-          "parentsMaritalStatus",
-          "familyMonthlyIncome",
         ]
       }
       if (currentPart === 1) {
@@ -475,8 +551,12 @@ export function InProgressProfile() {
           "relationshipWithGuardian",
           "ordinalPosition",
           "noOfSiblings",
-          "describeEnvironment",
+          "parentsMaritalStatus",
+          "familyMonthlyIncome",
         ]
+      }
+      if (currentPart === 2) {
+        return ["describeEnvironment"]
       }
     }
     if (currentSection === 2) {
@@ -500,10 +580,14 @@ export function InProgressProfile() {
           "studentOrg",
           "courseChoiceActor",
           "otherCourseChoiceActor",
-          "reasonsForChoosingiit",
-          "otherReasonForChoosingiit",
           "reasonForCourse",
           "careerPursuingInFuture",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "reasonsForChoosingiit",
+          "otherReasonForChoosingiit",
           "coCurricularActivities",
         ]
       }
@@ -551,7 +635,7 @@ export function InProgressProfile() {
         const result = await saveStudentSection(
           formData,
           currentSection as 0 | 1 | 2 | 3 | 4 | 5,
-          currentPart as 0 | 1 | 2
+          currentPart as 0 | 1 | 2 | 3
         )
 
         if (!result.success) {
@@ -599,9 +683,19 @@ export function InProgressProfile() {
 
     // proceed to next part or section
     if (currentPart < totalParts - 1) {
-      setCurrentPart((p) => p + 1)
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
     } else if (currentSection < sections.length - 1) {
-      setCurrentSection((s) => s + 1)
+      // track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
       setCurrentPart(0)
     }
   }
@@ -610,9 +704,19 @@ export function InProgressProfile() {
   const handleProceedDEV = async () => {
     // proceed to next part or section
     if (currentPart < totalParts - 1) {
-      setCurrentPart((p) => p + 1)
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
     } else if (currentSection < sections.length - 1) {
-      setCurrentSection((s) => s + 1)
+      // Track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
       setCurrentPart(0)
     }
   }
@@ -621,11 +725,29 @@ export function InProgressProfile() {
     // Navigate to previous part/section
     // Data is already loaded from initial populateAllForms(), so we just navigate
     if (currentPart > 0) {
-      setCurrentPart((p) => p - 1)
+      const prevPart = currentPart - 1
+      setCurrentPart(prevPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, prevPart)
+      )
     } else if (currentSection > 0) {
-      setCurrentSection((s) => s - 1)
-      const prevParts = sections[currentSection - 1].parts
-      setCurrentPart(prevParts - 1)
+      const prevSection = currentSection - 1
+      setCurrentSection(prevSection)
+      const prevParts = sections[prevSection].parts
+      // If we've visited this section before, go to the last part we visited
+      // Otherwise, go to the last part of the section (if completed) or first part
+      const lastVisitedPart = lastPartPerSection.get(prevSection)
+      const isCompleted = completedSections.has(prevSection)
+      if (lastVisitedPart !== undefined) {
+        setCurrentPart(lastVisitedPart)
+      } else if (isCompleted) {
+        // If completed but never tracked, go to last part
+        setCurrentPart(prevParts - 1)
+      } else {
+        // Otherwise start at the beginning
+        setCurrentPart(0)
+      }
     }
   }
 
@@ -638,11 +760,33 @@ export function InProgressProfile() {
 
   // handle step click - navigate to section's first part
   const handleStepClick = (sectionIndex: number) => {
-    // only allow navigation to sections that have been reached (or current section)
-    if (sectionIndex <= currentSection) {
+    // allow navigation to sections that are completed OR the current section
+    const isCompleted = completedSections.has(sectionIndex)
+    const isCurrent = sectionIndex === currentSection
+    if (isCompleted || isCurrent) {
       // Navigate to section - data is already loaded from initial populateAllForms()
       setCurrentSection(sectionIndex)
-      setCurrentPart(0)
+
+      // If it's the current section, stay at current part
+      if (isCurrent) {
+        // Stay at current part
+        return
+      }
+
+      // If completed, go to the last part of that section for quick navigation
+      // Otherwise, check if we've visited this section before
+      if (isCompleted) {
+        const sectionParts = sections[sectionIndex].parts
+        setCurrentPart(sectionParts - 1) // Go to last part of completed section
+      } else {
+        // Check if we've visited this section before
+        const lastVisitedPart = lastPartPerSection.get(sectionIndex)
+        if (lastVisitedPart !== undefined) {
+          setCurrentPart(lastVisitedPart)
+        } else {
+          setCurrentPart(0) // Start at beginning if never visited
+        }
+      }
     }
   }
 
@@ -654,16 +798,21 @@ export function InProgressProfile() {
         return <PersonalDataBSection ref={personalDataBRef} />
       if (currentPart === 2)
         return <PersonalDataCSection ref={personalDataCRef} />
+      if (currentPart === 3)
+        return <PersonalDataDSection ref={personalDataDRef} />
     }
     if (currentSection === 1) {
       if (currentPart === 0) return <FamilyDataASection ref={familyDataARef} />
       if (currentPart === 1) return <FamilyDataBSection ref={familyDataBRef} />
+      if (currentPart === 2) return <FamilyDataCSection ref={familyDataCRef} />
     }
     if (currentSection === 2) {
       if (currentPart === 0)
         return <AcademicDataASection ref={academicDataARef} />
       if (currentPart === 1)
         return <AcademicDataBSection ref={academicDataBRef} />
+      if (currentPart === 2)
+        return <AcademicDataCSection ref={academicDataCRef} />
     }
 
     // placeholder muna
@@ -811,8 +960,11 @@ export function InProgressProfile() {
         </div>
 
         {stepIcons.map((Icon, index) => {
-          const isActive = index <= currentSection
-          const isClickable = index <= currentSection
+          // Section is active/clickable if it's completed OR it's the current section
+          const isCompleted = completedSections.has(index)
+          const isCurrent = index === currentSection
+          const isActive = isCompleted || isCurrent
+          const isClickable = isCompleted || isCurrent
           const mainColor = isActive ? "bg-main" : "bg-main4"
           const shadowColor = isActive ? "bg-main-dark" : "bg-main2"
 

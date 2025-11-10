@@ -7,6 +7,7 @@ import type { z } from "zod"
 import type {
   studentIndividualDataSchema,
   familyDataSchema,
+  academicDataSchema,
 } from "@/lib/schemas"
 
 const API_BASE_URL =
@@ -15,8 +16,9 @@ const API_BASE_URL =
 // type definitions
 type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormData = z.infer<typeof familyDataSchema>
+type AcademicDataFormData = z.infer<typeof academicDataSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
-type PartIndex = 0 | 1 | 2
+type PartIndex = 0 | 1 | 2 | 3
 
 // database record type (dapat ni imatch sa Supabase)
 type StudentRecord = {
@@ -70,8 +72,28 @@ type StudentRecord = {
   ordinal_position?: string
   number_of_siblings?: number
   home_environment_description?: string
+  shs_gpa?: string
+  previous_school_name?: string
+  previous_school_address?: string
+  shs_track?: string
+  shs_strand?: string
+  is_scholar?: boolean
+  scholarship_type?: string
+  awards_honors?: string
+  career_option_1?: string
+  career_option_2?: string
+  career_option_3?: string
+  student_organizations?: string
+  course_choice_actor?: string
+  course_choice_actor_others?: string
+  course_choice_reason?: string
+  reasons_for_choosing_msuiit?: string
+  reasons_for_choosing_msuiit_others?: string
+  post_college_career_goal?: string
+  cocurricular_activities?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
+  is_academic_data_complete?: boolean
 }
 
 /**
@@ -123,6 +145,17 @@ async function apiRequest<T>(
   return response.json()
 }
 
+export async function getOnboardingStatus(): Promise<{ startTour: boolean }> {
+  try {
+    return await apiRequest<{ startTour: boolean }>(
+      "/api/students/profile/onboarding-status"
+    )
+  } catch (error) {
+    console.error("Error getting onboarding status:", error)
+    return { startTour: true }
+  }
+}
+
 export async function profileExists(): Promise<boolean> {
   try {
     const data = await apiRequest<{ exists: boolean }>(
@@ -155,10 +188,19 @@ export async function getProfileProgress(): Promise<{
 export async function getStudentSection(
   sectionIndex: SectionIndex,
   partIndex: PartIndex
-): Promise<Partial<PersonalDataFormData> | Partial<FamilyDataFormData> | null> {
+): Promise<
+  | Partial<PersonalDataFormData>
+  | Partial<FamilyDataFormData>
+  | Partial<AcademicDataFormData>
+  | null
+> {
   try {
     const data = await apiRequest<{
-      data: Partial<PersonalDataFormData> | Partial<FamilyDataFormData> | null
+      data:
+        | Partial<PersonalDataFormData>
+        | Partial<FamilyDataFormData>
+        | Partial<AcademicDataFormData>
+        | null
     }>(`/api/students/section?section=${sectionIndex}&part=${partIndex}`)
     return data.data
   } catch (error) {
@@ -168,7 +210,10 @@ export async function getStudentSection(
 }
 
 export async function saveStudentSection(
-  formData: Partial<PersonalDataFormData> | Partial<FamilyDataFormData>,
+  formData:
+    | Partial<PersonalDataFormData>
+    | Partial<FamilyDataFormData>
+    | Partial<AcademicDataFormData>,
   sectionIndex: SectionIndex,
   partIndex: PartIndex
 ): Promise<{ success: boolean; error?: string }> {

@@ -6,18 +6,69 @@ from app.models.student import (
     transform_personal_data_a,
     transform_personal_data_b,
     transform_personal_data_c,
+    transform_personal_data_d,
     transform_family_data_a,
     transform_family_data_b,
+    transform_family_data_c,
+    transform_academic_data_a,
+    transform_academic_data_b,
+    transform_academic_data_c,
     transform_from_personal_data_a,
     transform_from_personal_data_b,
     transform_from_personal_data_c,
+    transform_from_personal_data_d,
     transform_from_family_data_a,
     transform_from_family_data_b,
+    transform_from_family_data_c,
+    transform_from_academic_data_a,
+    transform_from_academic_data_b,
+    transform_from_academic_data_c,
     check_personal_data_complete,
     check_family_data_complete,
+    check_academic_data_complete,
 )
 
 students_bp = Blueprint("students", __name__, url_prefix="/api/students")
+
+@students_bp.route("/profile/onboarding-status", methods=["GET"])
+@require_auth
+def get_onboarding_status(user_id: str):
+    """
+    Check if user needs to start the welcome tour.
+    Returns { startTour: true/false }
+    """
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+        response = (
+            supabase.table("profiles")
+            .select("onboarding_completed")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+
+        if not response.data:
+            # Profile doesn't exist or error occurred, show tour (macheck sa db kay nullable mn)
+            #  print(f"User {user_id}: Profile not found or no data returned")
+            return jsonify({"startTour": True}), 200
+
+        profile = response.data
+        onboarding_completed = profile.get("onboarding_completed")
+        
+        if onboarding_completed is True:
+            start_tour = False
+        elif isinstance(onboarding_completed, str) and onboarding_completed.lower() == "true":
+            start_tour = False
+        else:
+            start_tour = True
+        
+        # print(f"User {user_id}: onboarding_completed={onboarding_completed} (type: {type(onboarding_completed).__name__}), start_tour={start_tour}")
+        
+        return jsonify({"startTour": start_tour}), 200
+
+    except Exception as e:
+        # print(f"Exception in get_onboarding_status: {e}")
+        return jsonify({"startTour": True}), 200
 
 
 @students_bp.route("/profile/exists", methods=["GET"])
@@ -51,9 +102,10 @@ def get_profile_progress(user_id: str):
         response = (
             supabase.table("students")
             .select(
-                "is_personal_data_complete, is_family_data_complete, "
+                "is_personal_data_complete, is_family_data_complete, is_academic_data_complete, "
                 "id_number, religious_affiliation, gender_identity, "
-                "father_name, guardian_name"
+                "father_name, guardian_name,"
+                "shs_gpa, career_option_1"
             )
             .eq("auth_user_id", user_id)
             .execute()
@@ -73,13 +125,21 @@ def get_profile_progress(user_id: str):
             completed_sections.append(0)
         if data.get("is_family_data_complete"):
             completed_sections.append(1)
+        if data.get("is_academic_data_complete"):
+            completed_sections.append(2)
         
         # determine last section/part based on what's filled
         last_section = None
         last_part = None
         
         # check from most recent to least recent
-        if data.get("guardian_name"):
+        if data.get("career_option_1"):
+            last_section = 3
+            last_part = 0
+        elif data.get("shs_gpa"):
+            last_section = 2
+            last_part = 1
+        elif data.get("guardian_name"):
             last_section = 2
             last_part = 0
         elif data.get("father_name"):
@@ -142,12 +202,23 @@ def get_student_section(user_id: str):
                 form_data = transform_from_personal_data_b(db_record)
             elif part_index == 2:
                 form_data = transform_from_personal_data_c(db_record)
+            elif part_index == 3:
+                form_data = transform_from_personal_data_d(db_record)
         
         elif section_index == 1:  # Family Data
             if part_index == 0:
                 form_data = transform_from_family_data_a(db_record)
             elif part_index == 1:
                 form_data = transform_from_family_data_b(db_record)
+            elif part_index == 2:
+                form_data = transform_from_family_data_c(db_record)
+        elif section_index == 2:  # Academic Data
+            if part_index == 0:
+                form_data = transform_from_academic_data_a(db_record)
+            if part_index == 1:
+                form_data = transform_from_academic_data_b(db_record)
+            if part_index == 2:
+                form_data = transform_from_academic_data_c(db_record)
         
         return jsonify({"data": form_data}), 200
     except Exception as e:
@@ -183,12 +254,23 @@ def save_student_section(user_id: str):
                 db_data = transform_personal_data_b(form_data)
             elif part_index == 2:
                 db_data = transform_personal_data_c(form_data)
+            elif part_index == 3:
+                db_data = transform_personal_data_d(form_data)
         
         elif section_index == 1:  # Family Data
             if part_index == 0:
                 db_data = transform_family_data_a(form_data)
             elif part_index == 1:
                 db_data = transform_family_data_b(form_data)
+            elif part_index == 2:
+                db_data = transform_family_data_c(form_data)
+        elif section_index == 2:  # Academic Data
+            if part_index == 0:
+                db_data = transform_academic_data_a(form_data)
+            if part_index == 1:
+                db_data = transform_academic_data_b(form_data)
+            if part_index == 2:
+                db_data = transform_academic_data_c(form_data)
         
         # always include auth_user_id
         db_data["auth_user_id"] = user_id
@@ -246,6 +328,9 @@ def save_student_section(user_id: str):
                 
                 if section_index == 1 and check_family_data_complete(full_record):
                     update_flags["is_family_data_complete"] = True
+                
+                if section_index == 2 and check_academic_data_complete(full_record):
+                    update_flags["is_academic_data_complete"] = True
                 
                 if update_flags:
                     supabase.table("students").update(update_flags).eq("auth_user_id", user_id).execute()

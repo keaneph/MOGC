@@ -72,8 +72,11 @@ export const studentIndividualDataSchema = z
     middleInitial: z
       .string("Middle initial must be valid")
       .trim()
-      .length(1, "Middle initial must be exactly 1 character")
-      .regex(/^[a-zA-Z\s]+$/, "Middle Initial contain only letters"),
+      .regex(
+        /^[a-zA-Z]?$/,
+        "Middle initial must contain only one letter or be left blank"
+      )
+      .optional(),
 
     studentStatus: z.enum(["New", "Transferee", "Returnee", "Shiftee"]),
 
@@ -275,10 +278,10 @@ export const familyDataSchema = z.object({
   fathersName: z
     .string()
     .trim()
-    .min(2, "Father's name must be at least 2 characters")
-    .max(50, "Father's name must be at most 50 characters")
+    .min(2, "Father's name must be at least 2 characters or N/A")
+    .max(50, "Father's name must be at most 50 characters or N/A")
     .regex(
-      /^[a-zA-Z\s'-]+$/,
+      /^[a-zA-Z\s'-/]+$/,
       "Father's name must contain only letters, spaces, hyphens, and apostrophes"
     ),
 
@@ -287,8 +290,8 @@ export const familyDataSchema = z.object({
   fathersOccupation: z
     .string()
     .trim()
-    .min(2, "Father's occupation must be at least 2 characters")
-    .max(50, "Father's occupation must be at most 50 characters")
+    .min(2, "Father's occupation must be at least 2 characters or N/A")
+    .max(50, "Father's occupation must be at most 50 characters or N/A")
     .refine(
       (val) => val === "N/A" || /^[a-zA-Z\s'-,]+$/.test(val),
       "Father's occupation must contain only letters, spaces, hyphens, and apostrophes or 'N/A'"
@@ -305,10 +308,10 @@ export const familyDataSchema = z.object({
   mothersName: z
     .string()
     .trim()
-    .min(2, "Mother's name must be at least 2 characters")
-    .max(50, "Mother's name must be at most 50 characters")
+    .min(2, "Mother's name must be at least 2 characters or N/A")
+    .max(50, "Mother's name must be at most 50 characters or N/A")
     .regex(
-      /^[a-zA-Z\s'-]+$/,
+      /^[a-zA-Z\s'-/]+$/,
       "Mother's name must contain only letters, spaces, hyphens, and apostrophes"
     ),
 
@@ -353,21 +356,21 @@ export const familyDataSchema = z.object({
   guardianName: z
     .string()
     .trim()
-    .min(2, "Guardian's name must be at least 2 characters")
-    .max(50, "Guardian's name must be at most 50 characters")
+    .min(2, "Guardian's name must be at least 2 characters or N/A")
+    .max(50, "Guardian's name must be at most 50 characters or N/A")
     .regex(
-      /^[a-zA-Z\s'-]+$/,
+      /^[a-zA-Z\s'-/]+$/,
       "Guardian's name must contain only letters, spaces, hyphens, and apostrophes"
     ),
 
   guardianOccupation: z
     .string()
     .trim()
-    .min(2, "Guardian's occupation must be at least 2 characters")
-    .max(50, "Guardian's occupation must be at most 50 characters")
+    .min(2, "Guardian's occupation must be at least 2 characters or N/A")
+    .max(50, "Guardian's occupation must be at most 50 characters or N/A")
     .regex(
-      /^[a-zA-Z\s'-,]+$/,
-      "Guardians's occupation must contain only letters, spaces, hyphens, and apostrophes"
+      /^[a-zA-Z\s'-/]+$/,
+      "Guardian's occupation must contain only letters, spaces, hyphens, and apostrophes"
     ),
 
   guardianContactNo: z
@@ -482,17 +485,11 @@ export const academicDataSchema = z
       "According to MSU-SASE score/slot",
       "Others",
     ]),
-    otherCourseChoiceActor: z.string().trim().optional(),
+    otherCourseChoiceActor: z.string().nullable().optional(),
 
-    reasonsForChoosingiit: z.enum([
-      "Quality education",
-      "Affordable tuition fees",
-      "Scholarships",
-      "Proximity",
-      "Only school offering my course",
-      "Prestigious Institution",
-      "Others",
-    ]),
+    reasonsForChoosingiit: z
+      .array(z.string())
+      .min(1, "Please select at least one reason for choosing IIT."),
     otherReasonForChoosingiit: z.string().trim().optional(),
 
     reasonForCourse: z
@@ -536,10 +533,11 @@ export const academicDataSchema = z
   )
   .refine(
     (data) =>
-      data.reasonsForChoosingiit !== "Others" ||
+      !data.reasonsForChoosingiit.includes("Others") ||
       !!data.otherReasonForChoosingiit?.trim(),
     {
-      message: "Please specify your reason for choosing IIT",
+      message:
+        "Please specify your reason for choosing IIT when 'Others' is selected.",
       path: ["otherReasonForChoosingiit"],
     }
   )
