@@ -1,8 +1,3 @@
-import { cookies } from "next/headers"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { AppHeader } from "@/components/app-header"
-import { Announcements } from "@/components/announcements"
 import { TooltipProvider } from "@radix-ui/react-tooltip"
 import { SiklabSheet } from "@/components/siklab-sheet"
 import { createClient } from "@/lib/server"

@@ -145,6 +145,17 @@ async function apiRequest<T>(
   return response.json()
 }
 
+export async function getOnboardingStatus(): Promise<{ startTour: boolean }> {
+  try {
+    return await apiRequest<{ startTour: boolean }>(
+      "/api/students/profile/onboarding-status"
+    )
+  } catch (error) {
+    console.error("Error getting onboarding status:", error)
+    return { startTour: true }
+  }
+}
+
 export async function profileExists(): Promise<boolean> {
   try {
     const data = await apiRequest<{ exists: boolean }>(

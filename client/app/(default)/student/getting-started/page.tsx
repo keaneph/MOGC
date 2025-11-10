@@ -20,6 +20,8 @@ import { toast } from "sonner"
 import CatImage from "@/components/happy-toast"
 import { CircleCheckIcon } from "lucide-react"
 import Confetti from "@/components/confetti"
+import { useNextStep } from "nextstepjs"
+import { getOnboardingStatus } from "@/lib/api/students"
 
 export default function GettingStartedPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -28,10 +30,32 @@ export default function GettingStartedPage() {
   const [hasHydrated, setHasHydrated] = useState(false)
   const [toastShown, setToastShown] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const { startNextStep } = useNextStep()
 
   useEffect(() => {
     setHasHydrated(true)
   }, [])
+
+  useEffect(() => {
+    if (!hasHydrated) return
+    ;(async () => {
+      try {
+        const result = await getOnboardingStatus()
+        console.log("Onboarding status result:", result)
+        const { startTour } = result
+
+        if (startTour) {
+          console.log("Starting welcome tour")
+          startNextStep("welcomeTour")
+        } else {
+          console.log("Onboarding completed, not starting tour")
+        }
+      } catch (error) {
+        console.error("Error getting onboarding status:", error)
+        startNextStep("welcomeTour")
+      }
+    })()
+  }, [hasHydrated, startNextStep])
 
   useEffect(() => {
     if (!hasHydrated || toastShown) return
@@ -66,68 +90,70 @@ export default function GettingStartedPage() {
     <div id="main-container" className="mt-12 flex w-full justify-center px-6">
       {/* main content container */}
       <div className="w-full max-w-5xl">
-        <div className="mb-10 text-3xl font-semibold tracking-wide">
-          Getting Started
-        </div>
-
-        <div className="mb-6 flex rounded-sm border p-3.5">
-          <div className="mr-3 flex justify-center">
-            <MegaphoneIcon
-              className="mx-2 h-5 w-5"
-              style={{ color: "var(--main)" }}
-            />
+        <div id="firstStepDIV">
+          <div className="mb-10 text-3xl font-semibold tracking-wide">
+            Getting Started
           </div>
-          <div className="text-sm font-medium tracking-wide">
-            New to MSU-IIT? Check out our onboarding guide to get started.&nbsp;
-            <TooltipThis label="Start the onboarding guide by Siklab!">
-              <Link
-                href="/onboarding"
-                className="underline"
-                style={{ color: "var(--link)" }}
-              >
-                Start the guide.
-              </Link>
-            </TooltipThis>
-          </div>
-        </div>
 
-        <div className="mb-6 text-lg font-semibold tracking-wide">
-          Start Profiling
-        </div>
-
-        <div className="mb-12 flex justify-center rounded-sm border pt-3 pl-3">
-          <div className="mt-5 ml-6 h-auto w-full flex-col">
-            <div className="mb-6 text-lg font-semibold tracking-wide">
-              Start Filling up Personal Demographic Form
+          <div className="mb-6 flex rounded-sm border p-3.5">
+            <div className="mr-3 flex justify-center">
+              <MegaphoneIcon
+                className="mx-2 h-5 w-5"
+                style={{ color: "var(--main)" }}
+              />
             </div>
-
-            <div className="text-md mb-6 font-medium tracking-wide">
-              Start filling up the personal demographic form <br />
-              or interact with Siklab Guide to get started in minutes.
-            </div>
-
-            <div className="mb-6 text-sm font-medium tracking-wide">
-              <Link href="/student/student-profiling">
-                <TooltipThis label="Fill up your personal demographic form now!">
-                  <PrimaryButton content="Create Profile" />
-                </TooltipThis>
-              </Link>
-              <TooltipThis label="Learn more about personal demographic forms">
+            <div className="text-sm font-medium tracking-wide">
+              New to MSU-IIT? Check out our onboarding guide to get
+              started.&nbsp;
+              <TooltipThis label="Start the onboarding guide by Siklab!">
                 <button
-                  onClick={() => {
-                    setAccordionValue("item-1")
-                    setSheetOpen(true)
-                  }}
-                  className="ml-4 cursor-pointer"
-                  style={{ color: "var(--link)" }}
+                  onClick={() => startNextStep("welcomeTour")}
+                  className="text-link cursor-pointer decoration-2 underline-offset-4 hover:underline"
                 >
-                  Learn more
+                  Start the guide.
                 </button>
               </TooltipThis>
             </div>
           </div>
-          <div className="flex w-full justify-end">
-            <Image src={love} alt="Love" className="mr-8 h-auto w-55" />
+        </div>
+
+        <div id="secondStepDIV">
+          <div className="mb-6 text-lg font-semibold tracking-wide">
+            Start Profiling
+          </div>
+          <div className="mb-12 flex justify-center rounded-sm border pt-3 pl-3">
+            <div className="mt-5 ml-6 h-auto w-full flex-col">
+              <div className="mb-6 text-lg font-semibold tracking-wide">
+                Start Filling up Personal Demographic Form
+              </div>
+
+              <div className="text-md mb-6 font-medium tracking-wide">
+                Start filling up the personal demographic form <br />
+                or interact with Siklab Guide to get started in minutes.
+              </div>
+
+              <div className="mb-6 text-sm font-medium tracking-wide">
+                <Link href="/student/student-profiling">
+                  <TooltipThis label="Fill up your personal demographic form now!">
+                    <PrimaryButton content="Create Profile" />
+                  </TooltipThis>
+                </Link>
+                <TooltipThis label="Learn more about personal demographic forms">
+                  <button
+                    onClick={() => {
+                      setAccordionValue("item-1")
+                      setSheetOpen(true)
+                    }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
+                  >
+                    Learn more
+                  </button>
+                </TooltipThis>
+              </div>
+            </div>
+            <div className="flex w-full justify-end">
+              <Image src={love} alt="Love" className="mr-8 h-auto w-55" />
+            </div>
           </div>
         </div>
 
@@ -135,8 +161,8 @@ export default function GettingStartedPage() {
           Next Steps
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex rounded-sm border p-6">
+        <div id="thirdStepDIV" className="grid grid-cols-2 gap-4">
+          <div id="fourthStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <MessagesSquareIcon
@@ -168,8 +194,7 @@ export default function GettingStartedPage() {
                       setAccordionValue("item-2")
                       setSheetOpen(true)
                     }}
-                    className="ml-4 cursor-pointer"
-                    style={{ color: "var(--link)" }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
                   >
                     Learn more
                   </button>
@@ -178,7 +203,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
 
-          <div className="flex rounded-sm border p-6">
+          <div id="fifthStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <BookOpenCheckIcon
@@ -210,8 +235,7 @@ export default function GettingStartedPage() {
                       setAccordionValue("item-3")
                       setSheetOpen(true)
                     }}
-                    className="ml-4 cursor-pointer"
-                    style={{ color: "var(--link)" }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
                   >
                     Learn more
                   </button>
@@ -220,7 +244,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
 
-          <div className="flex rounded-sm border p-6">
+          <div id="sixthStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <SpeechIcon
@@ -252,8 +276,7 @@ export default function GettingStartedPage() {
                       setAccordionValue("item-4")
                       setSheetOpen(true)
                     }}
-                    className="ml-4 cursor-pointer"
-                    style={{ color: "var(--link)" }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
                   >
                     Learn more
                   </button>
@@ -262,7 +285,7 @@ export default function GettingStartedPage() {
             </div>
           </div>
 
-          <div className="flex rounded-sm border p-6">
+          <div id="seventhStepDIV" className="flex rounded-sm border p-6">
             <div className="mr-4">
               <div className="bg-main/5 flex h-10 w-10 items-center justify-center rounded-sm">
                 <TelescopeIcon
@@ -294,8 +317,7 @@ export default function GettingStartedPage() {
                       setAccordionValue("item-5")
                       setSheetOpen(true)
                     }}
-                    className="ml-4 cursor-pointer"
-                    style={{ color: "var(--link)" }}
+                    className="text-link ml-4 cursor-pointer decoration-2 underline-offset-4 hover:underline"
                   >
                     Learn more
                   </button>
@@ -303,9 +325,8 @@ export default function GettingStartedPage() {
               </div>
             </div>
           </div>
-
-          <div className="h-15"></div>
         </div>
+        <div className="h-15"></div>
       </div>
       {/* Siklab sheet (controlled) */}
       <SiklabSheet
