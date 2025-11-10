@@ -68,7 +68,6 @@ import {
 } from "@/lib/schemas"
 import {
   saveStudentSection,
-  getStudentSection,
   profileExists,
   getProfileProgress,
   getStudentProfile,
