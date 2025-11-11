@@ -70,112 +70,116 @@ export const AcademicDataCSection = React.forwardRef<
             Academic Data
           </FieldLegend>
           <FieldGroup>
-            <Controller
-              name="reasonsForChoosingiit"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel className="text-foreground">
-                      Why choose IIT? (Select all that apply):
-                    </FieldLabel>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Controller
+                  name="reasonsForChoosingiit"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldContent>
+                        <FieldLabel className="text-foreground">
+                          Why choose IIT? (Select all that apply):
+                        </FieldLabel>
 
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
-                      {REASON_OPTIONS.map((option) => (
-                        <div
-                          key={option}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={option}
-                            className="hover:bg-secondary cursor-pointer"
-                            checked={field.value?.includes(option)}
-                            onCheckedChange={(checked) => {
-                              let newArray = Array.isArray(field.value)
-                                ? field.value
-                                : []
-                              if (checked) {
-                                newArray = [...newArray, option]
-                              } else {
-                                newArray = newArray.filter(
-                                  (val) => val !== option
-                                )
-                              }
-                              field.onChange(newArray)
-                            }}
-                          />
-                          <label
-                            htmlFor={option}
-                            className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        {REASON_OPTIONS.map((option) => (
+                          <div
+                            key={option}
+                            className="flex items-center space-y-1 space-x-4"
                           >
-                            {option}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        className="text-[12px]"
-                        errors={[fieldState.error]}
-                      />
-                    )}
-                  </FieldContent>
-                </Field>
-              )}
-            />
-            <Controller
-              name="otherReasonForChoosingiit"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel className="text-foreground">
-                      If others, specify:
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      placeholder={isOthersSelected ? "Specify reason" : "N/A"}
-                      value={field.value ?? ""}
-                      autoComplete="off"
-                      disabled={!isOthersSelected}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError
-                        className="text-[12px]"
-                        errors={[fieldState.error]}
-                      />
-                    )}
-                  </FieldContent>
-                </Field>
-              )}
-            />
+                            <Checkbox
+                              id={option}
+                              className="hover:bg-secondary cursor-pointer"
+                              checked={field.value?.includes(option)}
+                              onCheckedChange={(checked) => {
+                                let newArray = Array.isArray(field.value)
+                                  ? field.value
+                                  : []
+                                if (checked) {
+                                  newArray = [...newArray, option]
+                                } else {
+                                  newArray = newArray.filter(
+                                    (val) => val !== option
+                                  )
+                                }
+                                field.onChange(newArray)
+                              }}
+                            />
+                            <label
+                              htmlFor={option}
+                              className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                        {fieldState.invalid && (
+                          <FieldError
+                            className="text-[12px]"
+                            errors={[fieldState.error]}
+                          />
+                        )}
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="otherReasonForChoosingiit"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldContent className="mt-11">
+                        <FieldLabel className="text-foreground">
+                          If others, specify:
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          placeholder={
+                            isOthersSelected ? "Specify reason" : "N/A"
+                          }
+                          value={field.value ?? ""}
+                          autoComplete="off"
+                          disabled={!isOthersSelected}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError
+                            className="text-[12px]"
+                            errors={[fieldState.error]}
+                          />
+                        )}
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+              </div>
 
-            <Controller
-              name="coCurricularActivities"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldContent>
-                    <FieldLabel className="text-foreground">
-                      Co-Curricular Activities
-                    </FieldLabel>
-                    <Textarea
-                      {...field}
-                      value={field.value ?? ""}
-                      className="min-h-[35.5px]"
-                      placeholder="Basketball, Volunteering, Dance Club, etc."
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError
-                        className="text-[12px]"
-                        errors={[fieldState.error]}
+              <Controller
+                name="coCurricularActivities"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        Co-Curricular Activities
+                      </FieldLabel>
+                      <Textarea
+                        {...field}
+                        value={field.value ?? ""}
+                        className="min-h-[282px]"
+                        placeholder="Basketball, Volunteering, Dance Club, etc."
+                        autoComplete="off"
                       />
-                    )}
-                  </FieldContent>
-                </Field>
-              )}
-            />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+            </div>
           </FieldGroup>
         </FieldSet>
       </Field>

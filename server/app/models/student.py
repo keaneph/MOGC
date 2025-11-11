@@ -26,11 +26,11 @@ def convert_medical_condition_from_db(condition: Optional[str]) -> str:
     """Convert database medical condition to form format"""
     return "Existing" if condition == "Existing" else "None"
 
-def convert_scholar_status_to_boolean(status: str) -> bool:
+def convert_choice_to_boolean(status: str) -> bool:
     """Convert 'Yes'/'No' from form to boolean for DB"""
     return status == "Yes"
 
-def convert_scholar_boolean_to_status(value: Optional[bool]) -> str:
+def convert_boolean_to_choice(value: Optional[bool]) -> str:
     return "Yes" if value else "No"
 
 
@@ -126,7 +126,7 @@ def transform_academic_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform Academic Data Part A form data to database format"""
     return {
         "shs_gpa": form_data.get("generalPointAverage"),
-        "is_scholar": convert_scholar_status_to_boolean(form_data.get("scholar", "No")),
+        "is_scholar": convert_boolean_to_choice(form_data.get("scholar", "No")),
         "scholarship_type": form_data.get("scholarDetails"),
         "previous_school_name": form_data.get("lastSchoolAttended"),
         "previous_school_address": form_data.get("lastSchoolAddress"),
@@ -155,6 +155,23 @@ def transform_academic_data_c(form_data: Dict[str, Any]) -> Dict[str, Any]:
         "reasons_for_choosing_msuiit": form_data.get("reasonsForChoosingiit"),
         "reasons_for_choosing_msuiit_others": form_data.get("otherReasonForChoosingiit"),
         "cocurricular_activities": form_data.get("coCurricularActivities"),
+    }
+
+def transform_distance_learning_data_a(form_data:Dict[str, Any]) -> Dict[str,Any]:
+     """Transform Distance Learning Part A form data to database format"""
+     return {
+         "technology_gadgets": form_data.get("technologyGadgets"),
+         "technology_gadgets_other": form_data.get("otherOptionTechnologyGadgets"),
+         "internet_connectivity_means": form_data.get("meansOfInternet"),
+         "internet_connectivity_other": form_data.get("otherOptionMeansOfInternet"),
+    }
+
+def transform_distance_learning_data_b(form_data:Dict[str, Any]) -> Dict[str,Any]:
+     """Transform Distance Learning Part B form data to database format"""
+     return {
+         "internet_access": form_data.get("internetAccess"),
+         "distance_learning_readiness": form_data.get("learningReadiness"),
+         "learning_space_description": form_data.get("learningSpace"),
     }
 
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
@@ -255,7 +272,7 @@ def transform_from_academic_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
     """Convert database record to Academic Data Part A form format"""
     return {
         "generalPointAverage": db_record.get("shs_gpa"),
-        "scholar": convert_scholar_boolean_to_status(db_record.get("is_scholar")),
+        "scholar": convert_boolean_to_choice(db_record.get("is_scholar")),
         "scholarDetails": db_record.get("scholarship_type"),
         "lastSchoolAttended": db_record.get("previous_school_name"),
         "lastSchoolAddress": db_record.get("previous_school_address"),
@@ -292,6 +309,35 @@ def transform_from_academic_data_c(db_record: Dict[str, Any]) -> Dict[str, Any]:
         "coCurricularActivities": db_record.get("cocurricular_activities"),
     }
 
+def transform_from_distance_learning_data_a(db_record: Dict[str, Any]) -> Dict[str,Any]:
+    """Convert database record to Distance Learning Part A form format"""
+    db_gadget_option = db_record.get("technologyGadgets")
+    db_connectivity_option = db_record.get("meansOfInternet")
+
+    if not isinstance (db_gadget_option,list):
+        gadgets=[]
+    else:
+        gadgets=db_gadget_option
+
+    if not isinstance (db_connectivity_option,list):
+        connectivity=[]
+    else:
+        connectivity=db_connectivity_option
+    return{
+        "technologyGadgets": gadgets,
+        "otherOptionTechnologyGadgets": db_record.get("technology_gadgets_other"),
+        "meansOfInternet": connectivity,
+        "otherOptionMeansOfInternet": db_record.get("internet_connectivity_other"),
+    }
+
+def transform_from_distance_learning_data_b(db_record: Dict[str, Any]) -> Dict[str,Any]:
+    """Convert database record to Distance Learning Part B form format"""
+    return{
+        "internetAccess": db_record.get("internet_access"),
+        "learningReadiness": db_record.get("distance_learning_readiness"),
+        "learningSpace": db_record.get("learning_space_description"),
+    }
+
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
     part_a_complete = (
@@ -302,19 +348,22 @@ def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("family_name") and
         db_record.get("given_name") and
         db_record.get("middle_initial") and
-        db_record.get("student_status") and
+        db_record.get("student_status")
+    )
+    
+    part_b_complete = (
         db_record.get("nickname") and
         db_record.get("age") is not None and
         db_record.get("sex") and
         db_record.get("citizenship") and
         db_record.get("date_of_birth") and
-        db_record.get("place_of_birth")
+        db_record.get("place_of_birth") and
+        db_record.get("civil_status") and
+        (db_record.get("civil_status") != "Others" or db_record.get("civil_status_others"))
     )
     
-    part_b_complete = (
+    part_c_complete = (
         db_record.get("religious_affiliation") and
-        db_record.get("civil_status") and
-        (db_record.get("civil_status") != "Others" or db_record.get("civil_status_others")) and
         db_record.get("number_of_children") is not None and
         db_record.get("address_iligan") and
         db_record.get("contact_number") and
@@ -323,8 +372,8 @@ def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("working_student_status") and
         db_record.get("talents_skills")
     )
-    
-    part_c_complete = (
+
+    part_d_complete = (
         db_record.get("leisure_activities") and
         (db_record.get("medical_condition") != "Existing" or db_record.get("medical_condition_others")) and
         (db_record.get("physical_disability") != "Existing" or db_record.get("physical_disability_others")) and
@@ -332,7 +381,7 @@ def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("attraction")
     )
     
-    return part_a_complete and part_b_complete and part_c_complete
+    return part_a_complete and part_b_complete and part_c_complete and part_d_complete
 
 
 def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
@@ -345,9 +394,7 @@ def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("mother_name") and
         db_record.get("mother_deceased") is not None and
         db_record.get("mother_occupation") and
-        db_record.get("mother_contact_number") and
-        db_record.get("parents_marital_status") and
-        db_record.get("family_monthly_income")
+        db_record.get("mother_contact_number")
     )
     
     part_b_complete = (
@@ -357,15 +404,20 @@ def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("guardian_relationship") and
         db_record.get("ordinal_position") and
         db_record.get("number_of_siblings") is not None and
+        db_record.get("parents_marital_status") and
+        db_record.get("family_monthly_income")
+    )
+
+    part_c_complete = (
         db_record.get("home_environment_description")
     )
-    return part_a_complete and part_b_complete
+    return part_a_complete and part_b_complete and part_c_complete
     
 def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Academic Data section are complete"""
     part_a_complete = (
-        db_record.get("shs_gpa") is not None and
-        db_record.get("is_scholar") is not None and
+        db_record.get("shs_gpa") and
+        db_record.get("is_scholar") and
         (not db_record.get("is_scholar") or db_record.get("scholarship_type")) and
         db_record.get("previous_school_name") and
         db_record.get("previous_school_address") and
@@ -385,6 +437,25 @@ def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("post_college_career_goal")
     )
     part_c_complete = (
-        db_record.get("reasons_for_choosing_msuiit"))
+        db_record.get("reasons_for_choosing_msuiit") and
+        (db_record.get("reasons_for_choosing_msuiit") != "Others" or db_record.get("reasons_for_choosing_msuiit_others")) and
+        db_record.get("cocurricular_activities")
+    ) 
+
     return part_a_complete and part_b_complete and part_c_complete
 
+def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
+    """Check if all parts of Distance Learning Data section are complete"""
+    part_a_complete = (
+        db_record.get("technology_gadgets") and
+        (not db_record.get("technology_gadgets_other") or db_record.get("technology_gadgets_other")) and
+        db_record.get("internet_connectivity_means") and
+        (not db_record.get("internet_connectivity_other") or db_record.get("internet_connectivity_other"))    
+    )
+
+    part_b_complete = (
+        db_record.get("internet_access") and
+        db_record.get("distance_learning_readiness") and
+        db_record.get("learning_space_description") 
+    )
+    return part_a_complete and part_b_complete

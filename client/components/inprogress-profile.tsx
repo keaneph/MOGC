@@ -62,9 +62,20 @@ import {
 } from "./profiling-sections/academic-and-career-data/academic-data-c"
 
 import {
+  DistanceLearningASection,
+  DistanceLearningASectionRef,
+} from "./profiling-sections/distance-learning-resources/distance-learning-a"
+
+import {
+  DistanceLearningBSection,
+  DistanceLearningBSectionRef,
+} from "./profiling-sections/distance-learning-resources/distance-learning-b"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
+  distanceLearningSchema,
 } from "@/lib/schemas"
 import {
   saveStudentSection,
@@ -82,11 +93,13 @@ import { useRef } from "react"
 type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
 type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
+type DistanceLearningFormFields = keyof z.infer<typeof distanceLearningSchema>
 
 type FormFields =
   | PersonalDataFormFields
   | FamilyDataFormFields
   | AcademicDataFormFields
+  | DistanceLearningFormFields
 
 export function InProgressProfile() {
   // 0–5 (6 sections)
@@ -212,6 +225,35 @@ export function InProgressProfile() {
           )
         }
       }
+    } else if (currentSection === 3) {
+      // Distance Learning
+      if (currentPart === 0) {
+        const distanceA = transformFromDistanceLearningDataA(fullProfile)
+        if (
+          distanceA &&
+          distanceLearningARef.current &&
+          hasAnyData(distanceA)
+        ) {
+          distanceLearningARef.current.form.reset(
+            distanceA as Parameters<
+              typeof distanceLearningARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const distanceB = transformFromDistanceLearningDataB(fullProfile)
+        if (
+          distanceB &&
+          distanceLearningBRef.current &&
+          hasAnyData(distanceB)
+        ) {
+          distanceLearningBRef.current.form.reset(
+            distanceB as Parameters<
+              typeof distanceLearningBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
     }
   }
 
@@ -229,9 +271,6 @@ export function InProgressProfile() {
       (value) => value !== undefined && value !== null && value !== ""
     )
   }
-
-  // Helper to transform from database format (matching Flask backend transformations)
-  // We need to import these or recreate them here
   const transformFromPersonalDataA = (
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
@@ -382,6 +421,31 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromDistanceLearningDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbGadgetOptions = dbRecord.technology_gadgets
+    const dbConnectivityOptions = dbRecord.internet_connectivity_means
+    return {
+      technologyGadgets: Array.isArray(dbGadgetOptions) ? dbGadgetOptions : [],
+      otherOptionTechnologyGadgets: dbRecord.technology_gadgets_other,
+      meansOfInternet: Array.isArray(dbConnectivityOptions)
+        ? dbConnectivityOptions
+        : [],
+      otherOptionMeansOfInternet: dbRecord.internet_connectivity_other,
+    }
+  }
+
+  const transformFromDistanceLearningDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      internetAccess: dbRecord.internet_access,
+      learningReadiness: dbRecord.distance_learning_readiness,
+      learningSpace: dbRecord.learning_space_description,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -444,6 +508,8 @@ export function InProgressProfile() {
   const academicDataARef = useRef<AcademicDataASectionRef>(null)
   const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
   const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
+  const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
+  const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -475,6 +541,10 @@ export function InProgressProfile() {
       if (currentPart === 0) return academicDataARef
       if (currentPart === 1) return academicDataBRef
       if (currentPart === 2) return academicDataCRef
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0) return distanceLearningARef
+      if (currentPart === 1) return distanceLearningBRef
     }
     return null
   }
@@ -590,6 +660,19 @@ export function InProgressProfile() {
           "otherReasonForChoosingiit",
           "coCurricularActivities",
         ]
+      }
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0) {
+        return [
+          "technologyGadgets",
+          "otherOptionTechnologyGadgets",
+          "meansOfInternet",
+          "otherOptionMeansOfInternet",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["internetAccess", "learningReadiness", "learningSpace"]
       }
     }
     return []
@@ -813,6 +896,12 @@ export function InProgressProfile() {
         return <AcademicDataBSection ref={academicDataBRef} />
       if (currentPart === 2)
         return <AcademicDataCSection ref={academicDataCRef} />
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0)
+        return <DistanceLearningASection ref={distanceLearningARef} />
+      if (currentPart === 1)
+        return <DistanceLearningBSection ref={distanceLearningBRef} />
     }
 
     // placeholder muna
