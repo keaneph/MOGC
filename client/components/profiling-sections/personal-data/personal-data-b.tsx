@@ -23,7 +23,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
 import { studentIndividualDataSchema } from "@/lib/schemas"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 
 export interface PersonalDataBSectionRef {
   form: UseFormReturn<z.infer<typeof studentIndividualDataSchema>>

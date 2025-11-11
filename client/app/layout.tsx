@@ -4,7 +4,6 @@ import { Inter } from "next/font/google"
 import "@/styles/globals.css"
 import { NextStepProvider, NextStep, Tour } from "nextstepjs"
 import OnboardingWithPersistence from "@/components/onboarding/OnboardingWithPersistence"
-import { easeIn } from "motion/react"
 
 const inter = Inter({
   subsets: ["latin"],
