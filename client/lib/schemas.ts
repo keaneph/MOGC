@@ -490,7 +490,7 @@ export const academicDataSchema = z
     reasonsForChoosingiit: z
       .array(z.string())
       .min(1, "Please select at least one reason for choosing IIT."),
-    otherReasonForChoosingiit: z.string().trim().optional(),
+    otherReasonForChoosingiit: z.string().optional().nullable(),
 
     reasonForCourse: z
       .string()
