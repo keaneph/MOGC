@@ -166,6 +166,14 @@ def transform_distance_learning_data_a(form_data:Dict[str, Any]) -> Dict[str,Any
          "internet_connectivity_other": form_data.get("otherOptionMeansOfInternet"),
     }
 
+def transform_distance_learning_data_b(form_data:Dict[str, Any]) -> Dict[str,Any]:
+     """Transform Distance Learning Part B form data to database format"""
+     return {
+         "internet_access": form_data.get("internetAccess"),
+         "distance_learning_readiness": form_data.get("learningReadiness"),
+         "learning_space_description": form_data.get("learningSpace"),
+    }
+
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
     """Convert database record to Personal Data Part A form format"""
     return {
@@ -322,30 +330,41 @@ def transform_from_distance_learning_data_a(db_record: Dict[str, Any]) -> Dict[s
         "otherOptionMeansOfInternet": db_record.get("internet_connectivity_other"),
     }
 
+def transform_from_distance_learning_data_b(db_record: Dict[str, Any]) -> Dict[str,Any]:
+    """Convert database record to Distance Learning Part B form format"""
+    return{
+        "internetAccess": db_record.get("internet_access"),
+        "learningReadiness": db_record.get("distance_learning_readiness"),
+        "learningSpace": db_record.get("learning_space_description"),
+    }
+
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
     part_a_complete = (
         db_record.get("id_number") and
         db_record.get("course") and
-        db_record.get("msu_sase_score") and
+        db_record.get("msu_sase_score") is not None and
         db_record.get("academic_year") and
         db_record.get("family_name") and
         db_record.get("given_name") and
         db_record.get("middle_initial") and
-        db_record.get("student_status") and
-        db_record.get("nickname") and
-        db_record.get("age") and
-        db_record.get("sex") and
-        db_record.get("citizenship") and
-        db_record.get("date_of_birth") and
-        db_record.get("place_of_birth")
+        db_record.get("student_status")
     )
     
     part_b_complete = (
-        db_record.get("religious_affiliation") and
+        db_record.get("nickname") and
+        db_record.get("age") is not None and
+        db_record.get("sex") and
+        db_record.get("citizenship") and
+        db_record.get("date_of_birth") and
+        db_record.get("place_of_birth") and
         db_record.get("civil_status") and
-        (db_record.get("civil_status") != "Others" or db_record.get("civil_status_others")) and
-        db_record.get("number_of_children") and
+        (db_record.get("civil_status") != "Others" or db_record.get("civil_status_others"))
+    )
+    
+    part_c_complete = (
+        db_record.get("religious_affiliation") and
+        db_record.get("number_of_children") is not None and
         db_record.get("address_iligan") and
         db_record.get("contact_number") and
         db_record.get("home_address") and
@@ -353,8 +372,8 @@ def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("working_student_status") and
         db_record.get("talents_skills")
     )
-    
-    part_c_complete = (
+
+    part_d_complete = (
         db_record.get("leisure_activities") and
         (db_record.get("medical_condition") != "Existing" or db_record.get("medical_condition_others")) and
         (db_record.get("physical_disability") != "Existing" or db_record.get("physical_disability_others")) and
@@ -362,22 +381,20 @@ def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("attraction")
     )
     
-    return part_a_complete and part_b_complete and part_c_complete
+    return part_a_complete and part_b_complete and part_c_complete and part_d_complete
 
 
 def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Family Data section are complete"""
     part_a_complete = (
         db_record.get("father_name") and
-        db_record.get("father_deceased") and
+        db_record.get("father_deceased") is not None and
         db_record.get("father_occupation") and
         db_record.get("father_contact_number") and
         db_record.get("mother_name") and
-        db_record.get("mother_deceased")  and
+        db_record.get("mother_deceased") is not None and
         db_record.get("mother_occupation") and
-        db_record.get("mother_contact_number") and
-        db_record.get("parents_marital_status") and
-        db_record.get("family_monthly_income")
+        db_record.get("mother_contact_number")
     )
     
     part_b_complete = (
@@ -386,10 +403,15 @@ def check_family_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("guardian_contact_number") and
         db_record.get("guardian_relationship") and
         db_record.get("ordinal_position") and
-        db_record.get("number_of_siblings")  and
+        db_record.get("number_of_siblings") is not None and
+        db_record.get("parents_marital_status") and
+        db_record.get("family_monthly_income")
+    )
+
+    part_c_complete = (
         db_record.get("home_environment_description")
     )
-    return part_a_complete and part_b_complete
+    return part_a_complete and part_b_complete and part_c_complete
     
 def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Academic Data section are complete"""
@@ -415,7 +437,11 @@ def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("post_college_career_goal")
     )
     part_c_complete = (
-        db_record.get("reasons_for_choosing_msuiit"))
+        db_record.get("reasons_for_choosing_msuiit") and
+        (db_record.get("reasons_for_choosing_msuiit") != "Others" or db_record.get("reasons_for_choosing_msuiit_others")) and
+        db_record.get("cocurricular_activities")
+    ) 
+
     return part_a_complete and part_b_complete and part_c_complete
 
 def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
@@ -426,4 +452,10 @@ def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("internet_connectivity_means") and
         (not db_record.get("internet_connectivity_other") or db_record.get("internet_connectivity_other"))    
     )
-    return part_a_complete
+
+    part_b_complete = (
+        db_record.get("internet_access") and
+        db_record.get("distance_learning_readiness") and
+        db_record.get("learning_space_description") 
+    )
+    return part_a_complete and part_b_complete

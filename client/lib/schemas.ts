@@ -543,11 +543,6 @@ export const academicDataSchema = z
   )
 
 export const distanceLearningSchema = z.object({
-  internetAccess: z.enum([
-    "No internet access",
-    "Limited internet access",
-    "Full internet access",
-  ]),
   technologyGadgets: z
     .array(z.string())
     .min(1, "Please select at least one gadget available."),
@@ -559,6 +554,12 @@ export const distanceLearningSchema = z.object({
     .min(1, "Please select at least one means of connectivity."),
 
   otherOptionMeansOfInternet: z.string().nullable().optional(),
+
+  internetAccess: z.enum([
+    "No internet access",
+    "Limited internet access",
+    "Full internet access",
+  ]),
 
   learningReadiness: z.enum([
     "Fully ready",

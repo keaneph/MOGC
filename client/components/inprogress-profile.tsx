@@ -67,6 +67,11 @@ import {
 } from "./profiling-sections/distance-learning-resources/distance-learning-a"
 
 import {
+  DistanceLearningBSection,
+  DistanceLearningBSectionRef,
+} from "./profiling-sections/distance-learning-resources/distance-learning-b"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
@@ -232,6 +237,19 @@ export function InProgressProfile() {
           distanceLearningARef.current.form.reset(
             distanceA as Parameters<
               typeof distanceLearningARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const distanceB = transformFromDistanceLearningDataB(fullProfile)
+        if (
+          distanceB &&
+          distanceLearningBRef.current &&
+          hasAnyData(distanceB)
+        ) {
+          distanceLearningBRef.current.form.reset(
+            distanceB as Parameters<
+              typeof distanceLearningBRef.current.form.reset
             >[0]
           )
         }
@@ -418,6 +436,16 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromDistanceLearningDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      internetAccess: dbRecord.internet_access,
+      learningReadiness: dbRecord.distance_learning_readiness,
+      learningSpace: dbRecord.learning_space_description,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -481,6 +509,7 @@ export function InProgressProfile() {
   const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
   const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
   const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
+  const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -515,6 +544,7 @@ export function InProgressProfile() {
     }
     if (currentSection === 3) {
       if (currentPart === 0) return distanceLearningARef
+      if (currentPart === 1) return distanceLearningBRef
     }
     return null
   }
@@ -640,6 +670,9 @@ export function InProgressProfile() {
           "meansOfInternet",
           "otherOptionMeansOfInternet",
         ]
+      }
+      if (currentPart === 1) {
+        return ["internetAccess", "learningReadiness", "learningSpace"]
       }
     }
     return []
@@ -867,6 +900,8 @@ export function InProgressProfile() {
     if (currentSection === 3) {
       if (currentPart === 0)
         return <DistanceLearningASection ref={distanceLearningARef} />
+      if (currentPart === 1)
+        return <DistanceLearningBSection ref={distanceLearningBRef} />
     }
 
     // placeholder muna

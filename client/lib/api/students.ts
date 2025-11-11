@@ -97,6 +97,9 @@ type StudentRecord = {
   technology_gadgets_other?: string
   internet_connectivity_means?: string
   internet_connectivity_other?: string
+  internet_access?: string
+  distance_learning_readiness?: string
+  learning_space_description?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
