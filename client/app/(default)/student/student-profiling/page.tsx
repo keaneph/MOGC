@@ -4,15 +4,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import EmptyProfile from "@/components/empty-profile"
 import { InProgressProfile } from "@/components/inprogress-profile"
 import { PrimaryButton } from "@/components/primary-button"
-import { profileExists } from "@/lib/api/students"
-import * as React from "react"
-import { isStudentProfileComplete } from "@/lib/api/students"
+import { profileExists, isStudentProfileComplete } from "@/lib/api/students"
 import StudentSummaryPage from "@/components/student-summary/student-summary"
+import * as React from "react"
 
 export default function StudentProfilingPage() {
   const [profileStatus, setProfileStatus] = React.useState<
     "none" | "in-progress" | "complete" | null
   >(null)
+  const [isEditing, setIsEditing] = React.useState(false)
 
   React.useEffect(() => {
     async function checkProfile() {
@@ -30,7 +30,13 @@ export default function StudentProfilingPage() {
   }, [])
 
   const handleCreateProfile = () => {
+    setIsEditing(false)
     setProfileStatus("in-progress")
+  }
+
+  const handleEditProfile = () => {
+    setIsEditing(true)
+    setProfileStatus("complete")
   }
 
   return (
@@ -47,10 +53,10 @@ export default function StudentProfilingPage() {
                 onClick={handleCreateProfile}
               />
             )}
-            {profileStatus === "complete" && (
+            {profileStatus === "complete" && !isEditing && (
               <PrimaryButton
                 content="Edit Profile"
-                onClick={handleCreateProfile}
+                onClick={handleEditProfile}
               />
             )}
           </div>
@@ -63,6 +69,11 @@ export default function StudentProfilingPage() {
             <EmptyProfile onCreateProfile={handleCreateProfile} />
           ) : profileStatus === "in-progress" ? (
             <InProgressProfile />
+          ) : profileStatus === "complete" && isEditing ? (
+            <InProgressProfile
+              isEditing
+              onBackToSummary={() => setIsEditing(false)}
+            />
           ) : (
             <StudentSummaryPage />
           )}

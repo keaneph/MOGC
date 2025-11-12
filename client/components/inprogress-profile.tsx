@@ -126,7 +126,6 @@ import MSULove from "@/public/msu iit love.png"
 import * as z from "zod"
 
 import { useRef } from "react"
-import { useRouter } from "next/navigation"
 
 type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
@@ -143,7 +142,15 @@ type FormFields =
   | PsychosocialDataFormFields
   | NeedsAssessmentDataFormFields
 
-export function InProgressProfile() {
+type InProgressProfileProps = {
+  isEditing?: boolean
+  onBackToSummary?: () => void
+}
+
+export function InProgressProfile({
+  isEditing,
+  onBackToSummary,
+}: InProgressProfileProps) {
   // 0–5 (6 sections)
   const [currentSection, setCurrentSection] = useState(0)
   const [currentPart, setCurrentPart] = useState(0)
@@ -163,7 +170,6 @@ export function InProgressProfile() {
   >(new Map()) // Track last part visited per section
   const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const circleRefs = useRef<(HTMLDivElement | null)[]>([])
-  const router = useRouter()
 
   // cleanup timeout on unmount
   useEffect(() => {
@@ -1610,10 +1616,19 @@ export function InProgressProfile() {
             </div>
           </div>
         </div>
-        <div className="text-main mt-4 ml-185 text-xs italic">
+        <div className="mt-3 flex">
+          {isEditing && onBackToSummary && (
+            <Button
+              variant="outline"
+              onClick={onBackToSummary}
+              className="cursor-pointer rounded-sm px-4 py-2 text-sm tracking-wide"
+            >
+              Back to Profile
+            </Button>
+          )}
           <HoverCard>
-            <HoverCardTrigger className="">
-              <CircleAlertIcon className="text-main2/50 hover:text-main mr-1 mb-0.5 inline h-4 w-4" />
+            <HoverCardTrigger className="ml-auto">
+              <CircleAlertIcon className="text-main2/50 hover:text-main h-4 w-4" />
             </HoverCardTrigger>
             <HoverCardContent className="text-center text-xs italic">
               Information will only be saved/updated upon clicking the
