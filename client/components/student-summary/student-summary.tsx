@@ -101,7 +101,7 @@ export default function StudentSummaryPage() {
                 setShowMore(false)
                 setSectionClicked(true)
               }}
-              className={`ml-10 h-10 w-10 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${
+              className={`ml-10 h-10 w-10 cursor-pointer rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${
                 activeSection === key
                   ? "bg-main hover:bg-main"
                   : "bg-main2 hover:bg-main-dark"
