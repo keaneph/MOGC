@@ -384,9 +384,9 @@ export const familyDataSchema = z.object({
   relationshipWithGuardian: z
     .string()
     .trim()
-    .min(2, "Guardian's relationship must be at least 2 characters")
-    .max(50, "Guardian's relationship must be at most 50 characters")
-    .regex(/^[a-zA-Z\s]+$/, "Must contain only letters, and spaces"),
+    .min(2, "Guardian's relationship must be at least 2 characters or N/A")
+    .max(50, "Guardian's relationship must be at most 50 characters or N/A")
+    .regex(/^[a-zA-Z\s'-/]+$/, "Must contain only letters, and spaces or N/A"),
 
   ordinalPosition: z.enum(["Only Child", "Eldest", "Middle", "Youngest"]),
 
@@ -573,4 +573,42 @@ export const distanceLearningSchema = z.object({
     .trim()
     .min(2, "Learning space must be at least 2 characters")
     .max(50, "Learning space activities must be at most 50 characters"),
+})
+
+export const psychosocialDataSchema = z.object({
+  personalCharacteristics: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(100, "Must be at most 100 characters"),
+
+  copingMechanismBadDay: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
+
+  hadCounseling: z.enum(["Yes", "No"]),
+
+  seekProfessionalHelp: z.enum(["Yes", "No"]),
+
+  perceiveMentalHealth: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
+
+  problemSharers: z
+    .array(z.string())
+    .min(1, "Please select at least one to share your problem with."),
+
+  otherOptionProblemSharer: z.string().nullable().optional(),
+
+  needsImmediateCounseling: z.enum(["Yes", "No"]),
+
+  concernsToDiscuss: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
 })
