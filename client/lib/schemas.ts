@@ -574,3 +574,41 @@ export const distanceLearningSchema = z.object({
     .min(2, "Learning space must be at least 2 characters")
     .max(50, "Learning space activities must be at most 50 characters"),
 })
+
+export const psychosocialDataSchema = z.object({
+  personalCharacteristics: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(100, "Must be at most 100 characters"),
+
+  copingMechanismBadDay: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(500, "Must be at most 500 characters"),
+
+  hadCounseling: z.enum(["Yes", "No"]),
+
+  seekProfessionalHelp: z.enum(["Yes", "No"]),
+
+  perceiveMentalHealth: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(500, "Must be at most 500 characters"),
+
+  problemSharers: z
+    .array(z.string())
+    .min(1, "Please select at least one to share your problem with."),
+
+  otherOptionProlemSharer: z.string().nullable().optional(),
+
+  needsImmediateCounseling: z.enum(["Yes", "No"]),
+
+  concernsToDiscuss: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(100, "Must be at most 100 characters"),
+})

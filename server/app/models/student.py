@@ -126,7 +126,7 @@ def transform_academic_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform Academic Data Part A form data to database format"""
     return {
         "shs_gpa": form_data.get("generalPointAverage"),
-        "is_scholar": convert_boolean_to_choice(form_data.get("scholar", "No")),
+        "is_scholar": convert_choice_to_boolean(form_data.get("scholar", "No")),
         "scholarship_type": form_data.get("scholarDetails"),
         "previous_school_name": form_data.get("lastSchoolAttended"),
         "previous_school_address": form_data.get("lastSchoolAddress"),
@@ -172,6 +172,16 @@ def transform_distance_learning_data_b(form_data:Dict[str, Any]) -> Dict[str,Any
          "internet_access": form_data.get("internetAccess"),
          "distance_learning_readiness": form_data.get("learningReadiness"),
          "learning_space_description": form_data.get("learningSpace"),
+    }
+
+def transform_psychosocial_data_a(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Psychosocial Part A form data to database format"""
+    return {
+        "personality_characteristics": form_data.get("personalCharacteristics"),
+        "coping_mechanism_bad_day": form_data.get("copingMechanismBadDay"),
+        "had_counseling_before": convert_choice_to_boolean(form_data.get("hadCounseling")),
+        "seeking_professional_help": convert_choice_to_boolean(form_data.get("seekProfessionalHelp")),
+        "perceived_mental_health": form_data.get("perceiveMentalHealth"),
     }
 
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
@@ -338,6 +348,16 @@ def transform_from_distance_learning_data_b(db_record: Dict[str, Any]) -> Dict[s
         "learningSpace": db_record.get("learning_space_description"),
     }
 
+def transform_from_psychosocial_data_a(db_record: Dict[str, Any]) -> Dict[str,Any]:
+    """Convert database record to psychosocial data Part A form format"""
+    return{
+        "personalCharacteristics": db_record.get("personality_characteristics"),
+        "copingMechanismBadDay": db_record.get("coping_mechanism_bad_day"),
+        "hadCounseling": convert_boolean_to_choice(db_record.get("had_counseling_before")),
+        "seekProfessionalHelp": convert_boolean_to_choice(db_record.get("seeking_professional_help")),
+        "perceiveMentalHealth": db_record.get("perceived_mental_health"),
+    }
+
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
     part_a_complete = (
@@ -459,3 +479,16 @@ def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("learning_space_description") 
     )
     return part_a_complete and part_b_complete
+
+
+def check_psychosocial_data_complete(db_record: Dict[str, Any]) -> bool:
+    """Check if all parts of Distance Learning Data section are complete"""
+    part_a_complete = (
+        db_record.get("personality_characteristics") and
+        db_record.get("coping_mechanism_bad_day") and
+        db_record.get("had_counseling_before") and
+        db_record.get("seeking_professional_help") and
+        db_record.get("perceived_mental_health") 
+    )
+
+    return part_a_complete 
