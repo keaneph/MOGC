@@ -72,10 +72,21 @@ import {
 } from "./profiling-sections/distance-learning-resources/distance-learning-b"
 
 import {
+  PsychosocialDataASection,
+  PsychosocialDataASectionRef,
+} from "./profiling-sections/psychosocial-data/psychosocial-data-a"
+
+import {
+  PsychosocialDataBSection,
+  PsychosocialDataBSectionRef,
+} from "./profiling-sections/psychosocial-data/psychosocial-data-b"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
   distanceLearningSchema,
+  psychosocialDataSchema,
 } from "@/lib/schemas"
 import {
   saveStudentSection,
@@ -94,12 +105,14 @@ type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
 type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
 type DistanceLearningFormFields = keyof z.infer<typeof distanceLearningSchema>
+type PsychosocialDataFormFields = keyof z.infer<typeof psychosocialDataSchema>
 
 type FormFields =
   | PersonalDataFormFields
   | FamilyDataFormFields
   | AcademicDataFormFields
   | DistanceLearningFormFields
+  | PsychosocialDataFormFields
 
 export function InProgressProfile() {
   // 0–5 (6 sections)
@@ -250,6 +263,35 @@ export function InProgressProfile() {
           distanceLearningBRef.current.form.reset(
             distanceB as Parameters<
               typeof distanceLearningBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 4) {
+      // Psychosocial Data
+      if (currentPart === 0) {
+        const psychosocialA = transformFromPsychosocialDataA(fullProfile)
+        if (
+          psychosocialA &&
+          psychosocialDataARef.current &&
+          hasAnyData(psychosocialA)
+        ) {
+          psychosocialDataARef.current.form.reset(
+            psychosocialA as Parameters<
+              typeof psychosocialDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const psychosocialB = transformFromPsychosocialDataB(fullProfile)
+        if (
+          psychosocialB &&
+          psychosocialDataBRef.current &&
+          hasAnyData(psychosocialB)
+        ) {
+          psychosocialDataBRef.current.form.reset(
+            psychosocialB as Parameters<
+              typeof psychosocialDataBRef.current.form.reset
             >[0]
           )
         }
@@ -446,6 +488,32 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromPsychosocialDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      personalCharacteristics: dbRecord.personality_characteristics,
+      copingMechanismBadDay: dbRecord.coping_mechanism_bad_day,
+      hadCounseling: dbRecord.had_counseling_before === true ? "Yes" : "No",
+      seekProfessionalHelp:
+        dbRecord.seeking_professional_help === true ? "Yes" : "No",
+      perceiveMentalHealth: dbRecord.perceived_mental_health,
+    }
+  }
+
+  const transformFromPsychosocialDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.problem_sharers
+    return {
+      problemSharers: Array.isArray(dbOptions) ? dbOptions : [],
+      otherOptionProblemSharer: dbRecord.problem_sharers_others,
+      needsImmediateCounseling:
+        dbRecord.needs_immediate_counseling === true ? "Yes" : "No",
+      concernsToDiscuss: dbRecord.concerns_to_discuss,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -510,6 +578,8 @@ export function InProgressProfile() {
   const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
   const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
   const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
+  const psychosocialDataARef = useRef<PsychosocialDataASectionRef>(null)
+  const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -545,6 +615,10 @@ export function InProgressProfile() {
     if (currentSection === 3) {
       if (currentPart === 0) return distanceLearningARef
       if (currentPart === 1) return distanceLearningBRef
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0) return psychosocialDataARef
+      if (currentPart === 1) return psychosocialDataBRef
     }
     return null
   }
@@ -675,6 +749,25 @@ export function InProgressProfile() {
         return ["internetAccess", "learningReadiness", "learningSpace"]
       }
     }
+    if (currentSection === 4) {
+      if (currentPart === 0) {
+        return [
+          "personalCharacteristics",
+          "copingMechanismBadDay",
+          "hadCounseling",
+          "seekProfessionalHelp",
+          "perceiveMentalHealth",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "problemSharers",
+          "otherOptionProblemSharer",
+          "needsImmediateCounseling",
+          "concernsToDiscuss",
+        ]
+      }
+    }
     return []
   }
 
@@ -745,6 +838,10 @@ export function InProgressProfile() {
         if (updatedProfile) {
           setLoadedProfileData(updatedProfile)
         }
+
+        // should refresh not just on initial mount, but every after save
+        const progress = await getProfileProgress()
+        setCompletedSections(new Set(progress.completedSections || []))
       } catch (error) {
         console.error("Error saving section:", error)
         toast.error(
@@ -902,6 +999,12 @@ export function InProgressProfile() {
         return <DistanceLearningASection ref={distanceLearningARef} />
       if (currentPart === 1)
         return <DistanceLearningBSection ref={distanceLearningBRef} />
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0)
+        return <PsychosocialDataASection ref={psychosocialDataARef} />
+      if (currentPart === 1)
+        return <PsychosocialDataBSection ref={psychosocialDataBRef} />
     }
 
     // placeholder muna

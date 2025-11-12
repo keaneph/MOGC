@@ -23,24 +23,25 @@ import * as React from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
-import { distanceLearningSchema } from "@/lib/schemas"
+import { psychosocialDataSchema } from "@/lib/schemas"
 
-export interface DistanceLearningBSectionRef {
-  form: UseFormReturn<z.infer<typeof distanceLearningSchema>>
+export interface PsychosocialDataASectionRef {
+  form: UseFormReturn<z.infer<typeof psychosocialDataSchema>>
 }
 
-export const DistanceLearningBSection = React.forwardRef<
-  DistanceLearningBSectionRef,
+export const PsychosocialDataASection = React.forwardRef<
+  PsychosocialDataASectionRef,
   object
 >((props, ref) => {
-  const form = useForm<z.infer<typeof distanceLearningSchema>>({
-    resolver: zodResolver(distanceLearningSchema),
+  const form = useForm<z.infer<typeof psychosocialDataSchema>>({
+    resolver: zodResolver(psychosocialDataSchema),
     mode: "onChange",
     defaultValues: {
-      meansOfInternet: [],
-      otherOptionMeansOfInternet: "",
-      learningReadiness: undefined,
-      learningSpace: "",
+      personalCharacteristics: "",
+      copingMechanismBadDay: "",
+      hadCounseling: undefined,
+      seekProfessionalHelp: undefined,
+      perceiveMentalHealth: "",
     },
   })
 
@@ -53,36 +54,54 @@ export const DistanceLearningBSection = React.forwardRef<
       <Field>
         <FieldSet>
           <FieldLegend className="text-foreground font-semibold tracking-wide">
-            Distance Learning Resources
+            Data on Psychosocial Well-Being
           </FieldLegend>
           <FieldGroup>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="-mb-2 grid grid-cols-3 gap-4">
               <Controller
-                name="internetAccess"
+                name="personalCharacteristics"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Internet Access and Resources:
+                        What are some characteristics of your personality?:
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        placeholder="List all characteristics"
+                        value={field.value ?? ""}
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError
+                          className="text-[12px]"
+                          errors={[fieldState.error]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Controller
+                name="hadCounseling"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldContent>
+                      <FieldLabel className="text-foreground">
+                        Have you ever had Counseling before?
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select Internet Access" />
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="No internet access">
-                            No internet access
-                          </SelectItem>
-                          <SelectItem value="Limited internet access">
-                            Limited internet access
-                          </SelectItem>
-                          <SelectItem value="Full internet access">
-                            Full internet access
-                          </SelectItem>
+                          <SelectItem value="Yes">Yes</SelectItem>
+                          <SelectItem value="No">No</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -95,32 +114,25 @@ export const DistanceLearningBSection = React.forwardRef<
                   </Field>
                 )}
               />
-
               <Controller
-                name="learningReadiness"
+                name="seekProfessionalHelp"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Distance Learning Readiness:
+                        Seeking help from a psychologist/psychiatrist?
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value ?? ""}
                       >
                         <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue placeholder="Select Readiness" />
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Fully ready">
-                            Fully ready
-                          </SelectItem>
-                          <SelectItem value="Ready">Ready</SelectItem>
-                          <SelectItem value="A little ready">
-                            A little ready
-                          </SelectItem>
-                          <SelectItem value="Not ready">Not ready</SelectItem>
+                          <SelectItem value="Yes">Yes</SelectItem>
+                          <SelectItem value="No">No</SelectItem>
                         </SelectContent>
                       </Select>
                       {fieldState.invalid && (
@@ -135,19 +147,45 @@ export const DistanceLearningBSection = React.forwardRef<
               />
             </div>
             <Controller
-              name="learningSpace"
+              name="perceiveMentalHealth"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldContent>
                     <FieldLabel className="text-foreground">
-                      Learning Space:
+                      How do you perceive your mental health at present?
                     </FieldLabel>
                     <Textarea
+                      className="min-h-[63px]"
                       {...field}
-                      placeholder="Describe your primary learning space (e.g., 'A dedicated, quiet corner in my room with a desk,etc)."
                       value={field.value ?? ""}
-                      className="min-h-[190px]"
+                      placeholder="Describe your current state (e.g., 'Very well,' 'Neutral,' or 'Struggling') and briefly explain why."
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError
+                        className="text-[12px]"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
+              name="copingMechanismBadDay"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel className="text-foreground">
+                      How do you usually deal with a bad day?
+                    </FieldLabel>
+                    <Textarea
+                      className="min-h-[63px]"
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="List your coping mechanism during bad day"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (
@@ -167,4 +205,4 @@ export const DistanceLearningBSection = React.forwardRef<
   )
 })
 
-DistanceLearningBSection.displayName = "DistanceLearningBSection"
+PsychosocialDataASection.displayName = "PsychosocialDataASection"
