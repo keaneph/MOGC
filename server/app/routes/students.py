@@ -147,7 +147,10 @@ def get_profile_progress(user_id: str):
         
         
         # check from most recent to least recent
-        if data.get("internet_access"):
+        if data.get("personality_characteristics"):
+            last_section = 4
+            last_part = 1
+        elif data.get("internet_access"):
             last_section = 4
             last_part = 0
         elif data.get("internet_connectivity_means"):
