@@ -92,6 +92,21 @@ import {
 } from "./profiling-sections/needs-assessment/needs-assessment-b"
 
 import {
+  NeedsAssessmentCSection,
+  NeedsAssessmentCSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-c"
+
+import {
+  NeedsAssessmentDSection,
+  NeedsAssessmentDSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-d"
+
+import {
+  NeedsAssessmentESection,
+  NeedsAssessmentESectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-e"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
@@ -334,6 +349,45 @@ export function InProgressProfile() {
           needsAssessmentDataBRef.current.form.reset(
             needsAssessmentB as Parameters<
               typeof needsAssessmentDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const needsAssessmentC = transformFromNeedsAssessmentDataC(fullProfile)
+        if (
+          needsAssessmentC &&
+          needsAssessmentDataCRef.current &&
+          hasAnyData(needsAssessmentC)
+        ) {
+          needsAssessmentDataCRef.current.form.reset(
+            needsAssessmentC as Parameters<
+              typeof needsAssessmentDataCRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 3) {
+        const needsAssessmentD = transformFromNeedsAssessmentDataD(fullProfile)
+        if (
+          needsAssessmentD &&
+          needsAssessmentDataDRef.current &&
+          hasAnyData(needsAssessmentD)
+        ) {
+          needsAssessmentDataDRef.current.form.reset(
+            needsAssessmentD as Parameters<
+              typeof needsAssessmentDataDRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 4) {
+        const needsAssessmentE = transformFromNeedsAssessmentDataE(fullProfile)
+        if (
+          needsAssessmentE &&
+          needsAssessmentDataERef.current &&
+          hasAnyData(needsAssessmentE)
+        ) {
+          needsAssessmentDataERef.current.form.reset(
+            needsAssessmentE as Parameters<
+              typeof needsAssessmentDataERef.current.form.reset
             >[0]
           )
         }
@@ -582,6 +636,38 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromNeedsAssessmentDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.upset_responses
+    return {
+      upsetResponses: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionUpsetResponses: dbRecord.upset_responses_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataD = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.primary_problem_sharer
+    return {
+      primaryProblemSharer: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPrimaryProblemSharer: dbRecord.primary_problem_sharer_others,
+      firstQuestion: dbRecord.experience_counseling_willfully,
+      secondQuestion: dbRecord.experience_counseling_referral,
+      thirdQuestion: dbRecord.know_guidance_center_help,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataE = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      fourthQuestion: dbRecord.afraid_of_guidance_center,
+      fifthQuestion: dbRecord.shy_to_ask_counselor,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -650,6 +736,9 @@ export function InProgressProfile() {
   const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
   const needsAssessmentDataARef = useRef<NeedsAssessmentASectionRef>(null)
   const needsAssessmentDataBRef = useRef<NeedsAssessmentBSectionRef>(null)
+  const needsAssessmentDataCRef = useRef<NeedsAssessmentCSectionRef>(null)
+  const needsAssessmentDataDRef = useRef<NeedsAssessmentDSectionRef>(null)
+  const needsAssessmentDataERef = useRef<NeedsAssessmentESectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -657,7 +746,7 @@ export function InProgressProfile() {
     { name: "Academic Data", parts: 3 },
     { name: "Distance Learning", parts: 2 },
     { name: "Psychosocial", parts: 2 },
-    { name: "Needs Assessment", parts: 4 },
+    { name: "Needs Assessment", parts: 5 },
   ]
 
   // calculate progress for the current section
@@ -693,6 +782,9 @@ export function InProgressProfile() {
     if (currentSection === 5) {
       if (currentPart === 0) return needsAssessmentDataARef
       if (currentPart === 1) return needsAssessmentDataBRef
+      if (currentPart === 2) return needsAssessmentDataCRef
+      if (currentPart === 3) return needsAssessmentDataDRef
+      if (currentPart === 4) return needsAssessmentDataERef
     }
     return null
   }
@@ -854,6 +946,21 @@ export function InProgressProfile() {
       if (currentPart === 1) {
         return ["personalSocialNeeds", "othersOptionPersonalSocialNeeds"]
       }
+      if (currentPart === 2) {
+        return ["upsetResponses", "othersOptionUpsetResponses"]
+      }
+      if (currentPart === 3) {
+        return [
+          "primaryProblemSharer",
+          "othersOptionPrimaryProblemSharer",
+          "firstQuestion",
+          "secondQuestion",
+          "thirdQuestion",
+        ]
+      }
+      if (currentPart === 4) {
+        return ["fourthQuestion", "fifthQuestion"]
+      }
     }
     return []
   }
@@ -898,7 +1005,7 @@ export function InProgressProfile() {
         const result = await saveStudentSection(
           formData,
           currentSection as 0 | 1 | 2 | 3 | 4 | 5,
-          currentPart as 0 | 1 | 2 | 3
+          currentPart as 0 | 1 | 2 | 3 | 4
         )
 
         if (!result.success) {
@@ -1098,6 +1205,12 @@ export function InProgressProfile() {
         return <NeedsAssessmentASection ref={needsAssessmentDataARef} />
       if (currentPart === 1)
         return <NeedsAssessmentBSection ref={needsAssessmentDataBRef} />
+      if (currentPart === 2)
+        return <NeedsAssessmentCSection ref={needsAssessmentDataCRef} />
+      if (currentPart === 3)
+        return <NeedsAssessmentDSection ref={needsAssessmentDataDRef} />
+      if (currentPart === 4)
+        return <NeedsAssessmentESection ref={needsAssessmentDataERef} />
     }
 
     // placeholder muna

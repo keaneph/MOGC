@@ -19,6 +19,9 @@ from app.models.student import (
     transform_psychosocial_data_b,
     transform_needs_assessment_data_a,
     transform_needs_assessment_data_b,
+    transform_needs_assessment_data_c,
+    transform_needs_assessment_data_d,
+    transform_needs_assessment_data_e,
     transform_from_personal_data_a,
     transform_from_personal_data_b,
     transform_from_personal_data_c,
@@ -35,6 +38,9 @@ from app.models.student import (
     transform_from_psychosocial_data_b,
     transform_from_needs_assessment_data_a,
     transform_from_needs_assessment_data_b,
+    transform_from_needs_assessment_data_c,
+    transform_from_needs_assessment_data_d,
+    transform_from_needs_assessment_data_e,
     check_personal_data_complete,
     check_family_data_complete,
     check_academic_data_complete,
@@ -123,7 +129,7 @@ def get_profile_progress(user_id: str):
                 "shs_gpa, career_option_1, cocurricular_activities, "
                 "internet_access, internet_connectivity_means,"
                 "personality_characteristics, problem_sharers,"
-                "improvement_needs, financial_assistance_needs, personal_social_needs"
+                "improvement_needs, financial_assistance_needs, personal_social_needs, upset_responses, primary_problem_sharer"
             )
             .eq("auth_user_id", user_id)
             .execute()
@@ -139,10 +145,8 @@ def get_profile_progress(user_id: str):
         data = response.data[0]
         
         completed_sections = []
-        if data.get("financial_assistance_needs"):
-            last_section = 5
-            last_part = 2
-        elif data.get("is_personal_data_complete"):
+
+        if data.get("is_personal_data_complete"):
             completed_sections.append(0)
         if data.get("is_family_data_complete"):
             completed_sections.append(1)
@@ -161,7 +165,13 @@ def get_profile_progress(user_id: str):
         
         
         # check from most recent to least recent
-        if data.get("personal_social_needs"):
+        if data.get("primary_problem_sharer"):
+            last_section = 5
+            last_part = 4
+        elif data.get("upset_responses"):
+            last_section = 5
+            last_part = 3
+        elif data.get("personal_social_needs"):
             last_section = 5
             last_part = 2
         elif data.get("improvement_needs"):
@@ -293,6 +303,12 @@ def get_student_section(user_id: str):
                 form_data = transform_from_needs_assessment_data_a(db_record)
             if part_index == 1:
                 form_data = transform_from_needs_assessment_data_b(db_record)
+            if part_index == 2:
+                form_data = transform_from_needs_assessment_data_c(db_record)
+            if part_index == 3:
+                form_data = transform_from_needs_assessment_data_d(db_record)
+            if part_index == 4:
+                form_data = transform_from_needs_assessment_data_e(db_record)
 
         if form_data is None:
             return jsonify({"error": "Invalid section or part index"}), 400
@@ -367,6 +383,12 @@ def save_student_section(user_id: str):
                 db_data = transform_needs_assessment_data_a(form_data)
             if part_index == 1:
                 db_data = transform_needs_assessment_data_b(form_data)
+            if part_index == 2:
+                db_data = transform_needs_assessment_data_c(form_data)
+            if part_index == 3:
+                db_data = transform_needs_assessment_data_d(form_data)
+            if part_index == 4:
+                db_data = transform_needs_assessment_data_e(form_data)                
 
         # always include auth_user_id
         db_data["auth_user_id"] = user_id

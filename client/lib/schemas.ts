@@ -636,4 +636,14 @@ export const needsAssessmentSchema = z.object({
     .array(z.string())
     .min(1, "Please select at least one that apply to you."),
   othersOptionPrimaryProblemSharer: z.string().nullable().optional(),
+
+  firstQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  secondQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  thirdQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  fourthQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  fifthQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
 })

@@ -203,10 +203,34 @@ def transform_needs_assessment_data_a(form_data:Dict[str, Any]) -> Dict[str,Any]
     }
 
 def transform_needs_assessment_data_b(form_data:Dict[str, Any]) -> Dict[str,Any]:
-    """Transform Needs Assessment Part C form data to database format"""
+    """Transform Needs Assessment Part B form data to database format"""
     return{
         "personal_social_needs": form_data.get("personalSocialNeeds"),
         "personal_social_needs_others": form_data.get("othersOptionPersonalSocialNeeds")
+    }
+
+def transform_needs_assessment_data_c(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Needs Assessment Part C form data to database format"""
+    return{
+        "upset_responses": form_data.get("upsetResponses"),
+        "upset_responses_others": form_data.get("othersOptionUpsetResponses")
+    }
+
+def transform_needs_assessment_data_d(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Needs Assessment Part D form data to database format"""
+    return{
+        "primary_problem_sharer": form_data.get("primaryProblemSharer"),
+        "primary_problem_sharer_others": form_data.get("othersOptionPrimaryProblemSharer"),
+        "experience_counseling_willfully": form_data.get("firstQuestion"),
+        "experience_counseling_referral": form_data.get("secondQuestion"),
+        "know_guidance_center_help": form_data.get("thirdQuestion")
+    }
+
+def transform_needs_assessment_data_e(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Needs Assessment Part D form data to database format"""
+    return{
+        "afraid_of_guidance_center": form_data.get("fourthQuestion"),
+        "shy_to_ask_counselor": form_data.get("fifthQuestion")
     }
 
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
@@ -423,6 +447,43 @@ def transform_from_needs_assessment_data_b(db_record: Dict[str, Any]) -> Dict[st
         "othersOptionPersonalSocialNeeds": db_record.get("personal_social_needs_others"),
         }
 
+def transform_from_needs_assessment_data_c(db_record: Dict[str, Any]) -> Dict[str,Any]:
+        """Convert database record to needs assessment part C form format"""
+        db_option = db_record.get("upset_responses")
+        if not isinstance(db_option,list):
+            needs = []
+        else:
+            needs = db_option
+        return{
+        "upsetResponses": needs,
+        "othersOptionUpsetResponses": db_record.get("upset_responses_others"),
+        }
+
+def transform_from_needs_assessment_data_d(db_record: Dict[str, Any]) -> Dict[str,Any]:
+        """Convert database record to needs assessment part D form format"""
+        db_option = db_record.get("primary_problem_sharer")
+        if not isinstance(db_option,list):
+            needs = []
+        else:
+            needs = db_option
+        return{
+        "primaryProblemSharer": needs,
+        "othersOptionPrimaryProblemSharer": db_record.get("primary_problem_sharer_others"),
+        "firstQuestion": db_record.get("experience_counseling_willfully"),
+        "secondQuestion": db_record.get("experience_counseling_referral"),
+        "thirdQuestion": db_record.get("know_guidance_center_help"),
+
+        }
+
+def transform_from_needs_assessment_data_e(db_record: Dict[str, Any]) -> Dict[str,Any]:
+        """Convert database record to needs assessment part E form format"""
+        return{
+        "fourthQuestion": db_record.get("afraid_of_guidance_center"),
+        "fifthQuestion": db_record.get("shy_to_ask_counselor"),
+        
+    }
+
+
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
     part_a_complete = (
@@ -607,4 +668,20 @@ def check_needs_assessment_data_complete(db_record: Dict[str, Any]) -> bool:
         social_list and len(social_list) > 0 and
         ("Others" not in social_list or db_record.get("personal_social_needs_others"))
     )
-    return part_a_complete and part_b_complete
+
+    upset_array = db_record.get("upset_responses")
+    upset_list = upset_array if isinstance(upset_array, list) else []
+    
+    part_c_complete = (
+        upset_list and len(upset_list) > 0 and
+        ("Others" not in upset_list or db_record.get("upset_responses_others"))
+    )
+
+    primary_sharer_array = db_record.get("primary_problem_sharer")
+    primary_sharer_list = primary_sharer_array if isinstance(primary_sharer_array, list) else []
+    
+    part_d_complete = (
+        primary_sharer_list and len(primary_sharer_list) > 0 and
+        ("Others" not in primary_sharer_list or db_record.get("primary_problem_sharer_others"))
+    )
+    return part_a_complete and part_b_complete and part_c_complete and part_d_complete

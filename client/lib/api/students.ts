@@ -24,7 +24,7 @@ type DistanceLearningFormData = z.infer<typeof distanceLearningSchema>
 type PsychosocialFormData = z.infer<typeof psychosocialDataSchema>
 type NeedsAssessmentFormData = z.infer<typeof needsAssessmentSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
-type PartIndex = 0 | 1 | 2 | 3
+type PartIndex = 0 | 1 | 2 | 3 | 4
 
 // database record type (dapat ni imatch sa Supabase)
 type StudentRecord = {
@@ -119,6 +119,15 @@ type StudentRecord = {
   financial_assistance_needs_others?: string
   personal_social_needs?: string[]
   personal_social_needs_others?: string
+  upset_responses?: string
+  upset_responses_others?: string
+  primary_problem_sharer?: string
+  primary_problem_sharer_others?: string
+  experience_counseling_willfully?: string
+  experience_counseling_referral?: string
+  know_guidance_center_help?: string
+  afraid_of_guidance_center?: string
+  shy_to_ask_counselor?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
