@@ -10,10 +10,11 @@ import type {
   academicDataSchema,
   distanceLearningSchema,
   psychosocialDataSchema,
+  needsAssessmentSchema,
 } from "@/lib/schemas"
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_FLASK_API_URL || "http://localhost:5000"
+  process.env.NEXT_PUBLIC_FLASK_API_URL || "http://localhost:5001"
 
 // type definitions
 type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
@@ -21,6 +22,7 @@ type FamilyDataFormData = z.infer<typeof familyDataSchema>
 type AcademicDataFormData = z.infer<typeof academicDataSchema>
 type DistanceLearningFormData = z.infer<typeof distanceLearningSchema>
 type PsychosocialFormData = z.infer<typeof psychosocialDataSchema>
+type NeedsAssessmentFormData = z.infer<typeof needsAssessmentSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
 type PartIndex = 0 | 1 | 2 | 3
 
@@ -91,13 +93,13 @@ type StudentRecord = {
   course_choice_actor?: string
   course_choice_actor_others?: string
   course_choice_reason?: string
-  reasons_for_choosing_msuiit?: string
+  reasons_for_choosing_msuiit?: string[]
   reasons_for_choosing_msuiit_others?: string
   post_college_career_goal?: string
   cocurricular_activities?: string
-  technology_gadgets?: string
+  technology_gadgets?: string[]
   technology_gadgets_other?: string
-  internet_connectivity_means?: string
+  internet_connectivity_means?: string[]
   internet_connectivity_other?: string
   internet_access?: string
   distance_learning_readiness?: string
@@ -107,15 +109,22 @@ type StudentRecord = {
   had_counseling_before?: boolean
   seeking_professional_help?: boolean
   perceived_mental_health?: string
-  problem_sharers?: string
+  problem_sharers?: string[]
   problem_sharers_others?: string
   needs_immediate_counseling?: boolean
   concerns_to_discuss?: string
+  improvement_needs?: string[]
+  improvement_needs_others?: string
+  financial_assistance_needs?: string[]
+  financial_assistance_needs_others?: string
+  personal_social_needs?: string[]
+  personal_social_needs_others?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
   is_distance_learning_data_complete?: boolean
   is_psychosocial_data_complete?: boolean
+  is_needs_assessment_data_complete?: boolean
 }
 
 /**
@@ -216,6 +225,7 @@ export async function getStudentSection(
   | Partial<AcademicDataFormData>
   | Partial<DistanceLearningFormData>
   | Partial<PsychosocialFormData>
+  | Partial<NeedsAssessmentFormData>
   | null
 > {
   try {
@@ -226,6 +236,7 @@ export async function getStudentSection(
         | Partial<AcademicDataFormData>
         | Partial<DistanceLearningFormData>
         | Partial<PsychosocialFormData>
+        | Partial<NeedsAssessmentFormData>
         | null
     }>(`/api/students/section?section=${sectionIndex}&part=${partIndex}`)
     return data.data
@@ -241,7 +252,8 @@ export async function saveStudentSection(
     | Partial<FamilyDataFormData>
     | Partial<AcademicDataFormData>
     | Partial<DistanceLearningFormData>
-    | Partial<PsychosocialFormData>,
+    | Partial<PsychosocialFormData>
+    | Partial<NeedsAssessmentFormData>,
   sectionIndex: SectionIndex,
   partIndex: PartIndex
 ): Promise<{ success: boolean; error?: string }> {

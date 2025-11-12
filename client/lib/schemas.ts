@@ -249,7 +249,9 @@ export const studentIndividualDataSchema = z
     ]),
   })
   .refine(
-    (data) => data.civilStatus !== "Others" || !!data.otherCivilStatus?.trim(),
+    (data) =>
+      data.civilStatus !== "Others" ||
+      (data.otherCivilStatus && data.otherCivilStatus.trim().length >= 2),
     {
       message: "Please specify your civil status",
       path: ["otherCivilStatus"],
@@ -611,4 +613,27 @@ export const psychosocialDataSchema = z.object({
     .trim()
     .min(2, "Must be at least 2 characters")
     .max(200, "Must be at most 200 characters"),
+})
+
+export const needsAssessmentSchema = z.object({
+  improvementNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionImprovementNeeds: z.string().nullable().optional(),
+  financialAssistanceNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionfinancialAssistanceNeeds: z.string().nullable().optional(),
+  personalSocialNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionPersonalSocialNeeds: z.string().nullable().optional(),
+  upsetResponses: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionUpsetResponses: z.string().nullable().optional(),
+  primaryProblemSharer: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionPrimaryProblemSharer: z.string().nullable().optional(),
 })

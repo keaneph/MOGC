@@ -82,11 +82,22 @@ import {
 } from "./profiling-sections/psychosocial-data/psychosocial-data-b"
 
 import {
+  NeedsAssessmentASection,
+  NeedsAssessmentASectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-a"
+
+import {
+  NeedsAssessmentBSection,
+  NeedsAssessmentBSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-b"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
   distanceLearningSchema,
   psychosocialDataSchema,
+  needsAssessmentSchema,
 } from "@/lib/schemas"
 import {
   saveStudentSection,
@@ -106,6 +117,7 @@ type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
 type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
 type DistanceLearningFormFields = keyof z.infer<typeof distanceLearningSchema>
 type PsychosocialDataFormFields = keyof z.infer<typeof psychosocialDataSchema>
+type NeedsAssessmentDataFormFields = keyof z.infer<typeof needsAssessmentSchema>
 
 type FormFields =
   | PersonalDataFormFields
@@ -113,6 +125,7 @@ type FormFields =
   | AcademicDataFormFields
   | DistanceLearningFormFields
   | PsychosocialDataFormFields
+  | NeedsAssessmentDataFormFields
 
 export function InProgressProfile() {
   // 0–5 (6 sections)
@@ -292,6 +305,35 @@ export function InProgressProfile() {
           psychosocialDataBRef.current.form.reset(
             psychosocialB as Parameters<
               typeof psychosocialDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 5) {
+      // Needs Assessment
+      if (currentPart === 0) {
+        const needsAssessmentA = transformFromNeedsAssessmentDataA(fullProfile)
+        if (
+          needsAssessmentA &&
+          needsAssessmentDataARef.current &&
+          hasAnyData(needsAssessmentA)
+        ) {
+          needsAssessmentDataARef.current.form.reset(
+            needsAssessmentA as Parameters<
+              typeof needsAssessmentDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const needsAssessmentB = transformFromNeedsAssessmentDataB(fullProfile)
+        if (
+          needsAssessmentB &&
+          needsAssessmentDataBRef.current &&
+          hasAnyData(needsAssessmentB)
+        ) {
+          needsAssessmentDataBRef.current.form.reset(
+            needsAssessmentB as Parameters<
+              typeof needsAssessmentDataBRef.current.form.reset
             >[0]
           )
         }
@@ -514,6 +556,32 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromNeedsAssessmentDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbNeedsOptions = dbRecord.improvement_needs
+    const dbFinancialOptions = dbRecord.financial_assistance_needs
+    return {
+      improvementNeeds: Array.isArray(dbNeedsOptions) ? dbNeedsOptions : [],
+      othersOptionImprovementNeeds: dbRecord.improvement_needs_others,
+      financialAssistanceNeeds: Array.isArray(dbFinancialOptions)
+        ? dbFinancialOptions
+        : [],
+      othersOptionfinancialAssistanceNeeds:
+        dbRecord.financial_assistance_needs_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.personal_social_needs
+    return {
+      personalSocialNeeds: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPersonalSocialNeeds: dbRecord.personal_social_needs_others,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -580,6 +648,8 @@ export function InProgressProfile() {
   const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
   const psychosocialDataARef = useRef<PsychosocialDataASectionRef>(null)
   const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
+  const needsAssessmentDataARef = useRef<NeedsAssessmentASectionRef>(null)
+  const needsAssessmentDataBRef = useRef<NeedsAssessmentBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -587,7 +657,7 @@ export function InProgressProfile() {
     { name: "Academic Data", parts: 3 },
     { name: "Distance Learning", parts: 2 },
     { name: "Psychosocial", parts: 2 },
-    { name: "Needs Assessment", parts: 2 },
+    { name: "Needs Assessment", parts: 4 },
   ]
 
   // calculate progress for the current section
@@ -619,6 +689,10 @@ export function InProgressProfile() {
     if (currentSection === 4) {
       if (currentPart === 0) return psychosocialDataARef
       if (currentPart === 1) return psychosocialDataBRef
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) return needsAssessmentDataARef
+      if (currentPart === 1) return needsAssessmentDataBRef
     }
     return null
   }
@@ -766,6 +840,19 @@ export function InProgressProfile() {
           "needsImmediateCounseling",
           "concernsToDiscuss",
         ]
+      }
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) {
+        return [
+          "improvementNeeds",
+          "othersOptionImprovementNeeds",
+          "financialAssistanceNeeds",
+          "othersOptionfinancialAssistanceNeeds",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["personalSocialNeeds", "othersOptionPersonalSocialNeeds"]
       }
     }
     return []
@@ -1005,6 +1092,12 @@ export function InProgressProfile() {
         return <PsychosocialDataASection ref={psychosocialDataARef} />
       if (currentPart === 1)
         return <PsychosocialDataBSection ref={psychosocialDataBRef} />
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0)
+        return <NeedsAssessmentASection ref={needsAssessmentDataARef} />
+      if (currentPart === 1)
+        return <NeedsAssessmentBSection ref={needsAssessmentDataBRef} />
     }
 
     // placeholder muna
