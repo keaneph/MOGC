@@ -17,6 +17,11 @@ from app.models.student import (
     transform_distance_learning_data_b,
     transform_psychosocial_data_a,
     transform_psychosocial_data_b,
+    transform_needs_assessment_data_a,
+    transform_needs_assessment_data_b,
+    transform_needs_assessment_data_c,
+    transform_needs_assessment_data_d,
+    transform_needs_assessment_data_e,
     transform_from_personal_data_a,
     transform_from_personal_data_b,
     transform_from_personal_data_c,
@@ -31,11 +36,17 @@ from app.models.student import (
     transform_from_distance_learning_data_b,
     transform_from_psychosocial_data_a,
     transform_from_psychosocial_data_b,
+    transform_from_needs_assessment_data_a,
+    transform_from_needs_assessment_data_b,
+    transform_from_needs_assessment_data_c,
+    transform_from_needs_assessment_data_d,
+    transform_from_needs_assessment_data_e,
     check_personal_data_complete,
     check_family_data_complete,
     check_academic_data_complete,
     check_distance_learning_data_complete,
-    check_psychosocial_data_complete
+    check_psychosocial_data_complete,
+    check_needs_assessment_data_complete
 )
 
 students_bp = Blueprint("students", __name__, url_prefix="/api/students")
@@ -112,12 +123,13 @@ def get_profile_progress(user_id: str):
         response = (
             supabase.table("students")
             .select(
-                "is_personal_data_complete, is_family_data_complete, is_academic_data_complete, is_distance_learning_data_complete, is_psychosocial_data_complete,"
+                "is_personal_data_complete, is_family_data_complete, is_academic_data_complete, is_distance_learning_data_complete, is_psychosocial_data_complete, is_needs_assessment_data_complete,"
                 "id_number, religious_affiliation, gender_identity, nickname, "
                 "father_name, guardian_name, home_environment_description,"
                 "shs_gpa, career_option_1, cocurricular_activities, "
                 "internet_access, internet_connectivity_means,"
-                "personality_characteristics, problem_sharers"
+                "personality_characteristics, problem_sharers,"
+                "improvement_needs, financial_assistance_needs, personal_social_needs, upset_responses, primary_problem_sharer"
             )
             .eq("auth_user_id", user_id)
             .execute()
@@ -133,6 +145,7 @@ def get_profile_progress(user_id: str):
         data = response.data[0]
         
         completed_sections = []
+
         if data.get("is_personal_data_complete"):
             completed_sections.append(0)
         if data.get("is_family_data_complete"):
@@ -143,6 +156,8 @@ def get_profile_progress(user_id: str):
             completed_sections.append(3)
         if data.get("is_psychosocial_data_complete"):
             completed_sections.append(4)
+        if data.get("is_needs_assessment_data_complete"):
+            completed_sections.append(5)
         
         # determine last section/part based on what's filled
         last_section = None
@@ -150,7 +165,19 @@ def get_profile_progress(user_id: str):
         
         
         # check from most recent to least recent
-        if data.get("problem_sharers"):
+        if data.get("primary_problem_sharer"):
+            last_section = 5
+            last_part = 4
+        elif data.get("upset_responses"):
+            last_section = 5
+            last_part = 3
+        elif data.get("personal_social_needs"):
+            last_section = 5
+            last_part = 2
+        elif data.get("improvement_needs"):
+            last_section = 5
+            last_part = 1
+        elif data.get("problem_sharers"):
             last_section = 5
             last_part = 0
         elif data.get("personality_characteristics"):
@@ -254,22 +281,37 @@ def get_student_section(user_id: str):
         elif section_index == 2:  # Academic Data
             if part_index == 0:
                 form_data = transform_from_academic_data_a(db_record)
-            if part_index == 1:
+            elif part_index == 1:
                 form_data = transform_from_academic_data_b(db_record)
-            if part_index == 2:
+            elif part_index == 2:
                 form_data = transform_from_academic_data_c(db_record)
 
         elif section_index == 3:  # Distance Learning Data
             if part_index == 0:
                 form_data = transform_from_distance_learning_data_a(db_record)
-            if part_index == 1:
+            elif part_index == 1:
                 form_data = transform_from_distance_learning_data_b(db_record)
                 
         elif section_index == 4: # Psychosocial Data
             if part_index == 0:
                 form_data = transform_from_psychosocial_data_a(db_record)
-            if part_index == 1:
+            elif part_index == 1:
                 form_data = transform_from_psychosocial_data_b(db_record)
+
+        elif section_index == 5: # Needs Assessment Data
+            if part_index == 0:
+                form_data = transform_from_needs_assessment_data_a(db_record)
+            if part_index == 1:
+                form_data = transform_from_needs_assessment_data_b(db_record)
+            if part_index == 2:
+                form_data = transform_from_needs_assessment_data_c(db_record)
+            if part_index == 3:
+                form_data = transform_from_needs_assessment_data_d(db_record)
+            if part_index == 4:
+                form_data = transform_from_needs_assessment_data_e(db_record)
+
+        if form_data is None:
+            return jsonify({"error": "Invalid section or part index"}), 400
 
         return jsonify({"data": form_data}), 200
     except Exception as e:
@@ -319,23 +361,35 @@ def save_student_section(user_id: str):
         elif section_index == 2:  # Academic Data
             if part_index == 0:
                 db_data = transform_academic_data_a(form_data)
-            if part_index == 1:
+            elif part_index == 1:
                 db_data = transform_academic_data_b(form_data)
-            if part_index == 2:
+            elif part_index == 2:
                 db_data = transform_academic_data_c(form_data)
 
         elif section_index == 3:  # Distance Learning Data
             if part_index == 0:
                 db_data = transform_distance_learning_data_a(form_data)
-            if part_index == 1:
+            elif part_index == 1:
                 db_data = transform_distance_learning_data_b(form_data)
 
-        elif section_index == 4:
+        elif section_index == 4: # Psychosocial Data
             if part_index == 0:
                 db_data = transform_psychosocial_data_a(form_data)
-            if part_index == 1:
+            elif part_index == 1:
                 db_data = transform_psychosocial_data_b(form_data)
         
+        elif section_index == 5: # Needs Assessment Data
+            if part_index == 0:
+                db_data = transform_needs_assessment_data_a(form_data)
+            if part_index == 1:
+                db_data = transform_needs_assessment_data_b(form_data)
+            if part_index == 2:
+                db_data = transform_needs_assessment_data_c(form_data)
+            if part_index == 3:
+                db_data = transform_needs_assessment_data_d(form_data)
+            if part_index == 4:
+                db_data = transform_needs_assessment_data_e(form_data)                
+
         # always include auth_user_id
         db_data["auth_user_id"] = user_id
         
@@ -401,6 +455,9 @@ def save_student_section(user_id: str):
 
                 if section_index == 4 and check_psychosocial_data_complete(full_record):
                     update_flags["is_psychosocial_data_complete"] = True
+                
+                if section_index == 5 and check_needs_assessment_data_complete(full_record):
+                    update_flags["is_needs_assessment_data_complete"] = True
                 
                 if update_flags:
                     supabase.table("students").update(update_flags).eq("auth_user_id", user_id).execute()
