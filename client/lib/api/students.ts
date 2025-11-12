@@ -9,6 +9,7 @@ import type {
   familyDataSchema,
   academicDataSchema,
   distanceLearningSchema,
+  psychosocialDataSchema,
 } from "@/lib/schemas"
 
 const API_BASE_URL =
@@ -19,6 +20,7 @@ type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormData = z.infer<typeof familyDataSchema>
 type AcademicDataFormData = z.infer<typeof academicDataSchema>
 type DistanceLearningFormData = z.infer<typeof distanceLearningSchema>
+type PsychosocialFormData = z.infer<typeof psychosocialDataSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
 type PartIndex = 0 | 1 | 2 | 3
 
@@ -100,10 +102,20 @@ type StudentRecord = {
   internet_access?: string
   distance_learning_readiness?: string
   learning_space_description?: string
+  personality_characteristics?: string
+  coping_mechanism_bad_day?: string
+  had_counseling_before?: boolean
+  seeking_professional_help?: boolean
+  perceived_mental_health?: string
+  problem_sharers?: string
+  problem_sharers_others?: string
+  needs_immediate_counseling?: boolean
+  concerns_to_discuss?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
   is_distance_learning_data_complete?: boolean
+  is_psychosocial_data_complete?: boolean
 }
 
 /**
@@ -203,6 +215,7 @@ export async function getStudentSection(
   | Partial<FamilyDataFormData>
   | Partial<AcademicDataFormData>
   | Partial<DistanceLearningFormData>
+  | Partial<PsychosocialFormData>
   | null
 > {
   try {
@@ -212,6 +225,7 @@ export async function getStudentSection(
         | Partial<FamilyDataFormData>
         | Partial<AcademicDataFormData>
         | Partial<DistanceLearningFormData>
+        | Partial<PsychosocialFormData>
         | null
     }>(`/api/students/section?section=${sectionIndex}&part=${partIndex}`)
     return data.data
@@ -226,7 +240,8 @@ export async function saveStudentSection(
     | Partial<PersonalDataFormData>
     | Partial<FamilyDataFormData>
     | Partial<AcademicDataFormData>
-    | Partial<DistanceLearningFormData>,
+    | Partial<DistanceLearningFormData>
+    | Partial<PsychosocialFormData>,
   sectionIndex: SectionIndex,
   partIndex: PartIndex
 ): Promise<{ success: boolean; error?: string }> {

@@ -126,7 +126,7 @@ def transform_academic_data_a(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform Academic Data Part A form data to database format"""
     return {
         "shs_gpa": form_data.get("generalPointAverage"),
-        "is_scholar": convert_boolean_to_choice(form_data.get("scholar", "No")),
+        "is_scholar": convert_choice_to_boolean(form_data.get("scholar", "No")),
         "scholarship_type": form_data.get("scholarDetails"),
         "previous_school_name": form_data.get("lastSchoolAttended"),
         "previous_school_address": form_data.get("lastSchoolAddress"),
@@ -172,6 +172,25 @@ def transform_distance_learning_data_b(form_data:Dict[str, Any]) -> Dict[str,Any
          "internet_access": form_data.get("internetAccess"),
          "distance_learning_readiness": form_data.get("learningReadiness"),
          "learning_space_description": form_data.get("learningSpace"),
+    }
+
+def transform_psychosocial_data_a(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Psychosocial Part A form data to database format"""
+    return {
+        "personality_characteristics": form_data.get("personalCharacteristics"),
+        "coping_mechanism_bad_day": form_data.get("copingMechanismBadDay"),
+        "had_counseling_before": convert_choice_to_boolean(form_data.get("hadCounseling")),
+        "seeking_professional_help": convert_choice_to_boolean(form_data.get("seekProfessionalHelp")),
+        "perceived_mental_health": form_data.get("perceiveMentalHealth"),
+    }
+
+def transform_psychosocial_data_b(form_data:Dict[str, Any]) -> Dict[str,Any]:
+    """Transform Psychosocial Part B form data to database format"""
+    return{
+        "problem_sharers": form_data.get("problemSharers"),
+        "problem_sharers_others": form_data.get("otherOptionProblemSharer"),
+        "needs_immediate_counseling": convert_choice_to_boolean(form_data.get("needsImmediateCounseling")),
+        "concerns_to_discuss": form_data.get("concernsToDiscuss")
     }
 
 def transform_from_personal_data_a(db_record: Dict[str, Any]) -> Dict[str, Any]:
@@ -338,6 +357,30 @@ def transform_from_distance_learning_data_b(db_record: Dict[str, Any]) -> Dict[s
         "learningSpace": db_record.get("learning_space_description"),
     }
 
+def transform_from_psychosocial_data_a(db_record: Dict[str, Any]) -> Dict[str,Any]:
+    """Convert database record to psychosocial data Part A form format"""
+    return{
+        "personalCharacteristics": db_record.get("personality_characteristics"),
+        "copingMechanismBadDay": db_record.get("coping_mechanism_bad_day"),
+        "hadCounseling": convert_boolean_to_choice(db_record.get("had_counseling_before")),
+        "seekProfessionalHelp": convert_boolean_to_choice(db_record.get("seeking_professional_help")),
+        "perceiveMentalHealth": db_record.get("perceived_mental_health"),
+    }
+
+def transform_from_psychosocial_data_b(db_record: Dict[str, Any]) -> Dict[str,Any]:
+        """Convert database record to psychosocial data Part B form format"""
+        db_share_option = db_record.get("problem_sharers")
+        if not isinstance(db_share_option,list):
+            sharer = []
+        else:
+            sharer = db_share_option
+        return{
+        "problemSharers": sharer,
+        "otherOptionProblemSharer": db_record.get("problem_sharers_others"),
+        "needsImmediateCounseling": convert_boolean_to_choice(db_record.get("needs_immediate_counseling")),
+        "concernsToDiscuss": db_record.get("concerns_to_discuss")
+    }
+
 def check_personal_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Personal Data section are complete"""
     part_a_complete = (
@@ -417,7 +460,7 @@ def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Academic Data section are complete"""
     part_a_complete = (
         db_record.get("shs_gpa") and
-        db_record.get("is_scholar") and
+        db_record.get("is_scholar") is not None and
         (not db_record.get("is_scholar") or db_record.get("scholarship_type")) and
         db_record.get("previous_school_name") and
         db_record.get("previous_school_address") and
@@ -436,21 +479,33 @@ def check_academic_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("course_choice_reason") and
         db_record.get("post_college_career_goal")
     )
+
+    reasons_array = db_record.get("reasons_for_choosing_msuiit")
+    reasons_list = reasons_array if isinstance(reasons_array, list) else []
+
     part_c_complete = (
-        db_record.get("reasons_for_choosing_msuiit") and
-        (db_record.get("reasons_for_choosing_msuiit") != "Others" or db_record.get("reasons_for_choosing_msuiit_others")) and
-        db_record.get("cocurricular_activities")
-    ) 
+        reasons_list
+        and len(reasons_list) > 0
+        and ("Others" not in reasons_list or db_record.get("reasons_for_choosing_msuiit_others"))
+        and db_record.get("cocurricular_activities")
+    )
 
     return part_a_complete and part_b_complete and part_c_complete
 
 def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
     """Check if all parts of Distance Learning Data section are complete"""
+
+    technology_gadgets_array = db_record.get("technology_gadgets")
+    technology_gadgets_list = technology_gadgets_array if isinstance(technology_gadgets_array, list) else []
+
+    internet_connectivity_array = db_record.get("internet_connectivity_means")
+    internet_connectivity_list = internet_connectivity_array if isinstance(internet_connectivity_array, list) else []
+
     part_a_complete = (
-        db_record.get("technology_gadgets") and
-        (not db_record.get("technology_gadgets_other") or db_record.get("technology_gadgets_other")) and
-        db_record.get("internet_connectivity_means") and
-        (not db_record.get("internet_connectivity_other") or db_record.get("internet_connectivity_other"))    
+        technology_gadgets_list and len(technology_gadgets_list) > 0 and
+        ("Others" not in technology_gadgets_list or db_record.get("technology_gadgets_other")) and 
+        internet_connectivity_list and len(internet_connectivity_list) > 0 and
+        ("Others" not in internet_connectivity_list or db_record.get("internet_connectivity_other")) 
     )
 
     part_b_complete = (
@@ -458,4 +513,28 @@ def check_distance_learning_data_complete(db_record: Dict[str, Any]) -> bool:
         db_record.get("distance_learning_readiness") and
         db_record.get("learning_space_description") 
     )
+    return part_a_complete and part_b_complete
+
+
+def check_psychosocial_data_complete(db_record: Dict[str, Any]) -> bool:
+    """Check if all parts of Distance Learning Data section are complete"""
+    part_a_complete = (
+        db_record.get("personality_characteristics") and
+        db_record.get("coping_mechanism_bad_day") and
+        db_record.get("had_counseling_before") is not None and
+        db_record.get("seeking_professional_help") is not None and
+        db_record.get("perceived_mental_health") 
+    )
+
+    problem_sharers_array = db_record.get("problem_sharers")
+    problem_sharers_list = problem_sharers_array if isinstance(problem_sharers_array, list) else []
+
+    part_b_complete = (
+
+        problem_sharers_list and len(problem_sharers_list) > 0 and
+        ("Others" not in problem_sharers_list or db_record.get("problem_sharers_other")) and 
+        db_record.get("needs_immediate_counseling") is not None and
+        db_record.get("concerns_to_discuss")
+    )
+
     return part_a_complete and part_b_complete

@@ -560,7 +560,7 @@ export const AcademicDataBSection = React.forwardRef<
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Course was choosen by:
+                        Course was chosen by:
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}

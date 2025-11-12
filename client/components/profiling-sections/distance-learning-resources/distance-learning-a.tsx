@@ -117,37 +117,40 @@ export const DistanceLearningASection = React.forwardRef<
                         <FieldLabel className="text-foreground">
                           Technology Gadgets (Select all that apply):
                         </FieldLabel>
-                        {GADGET_OPTIONS.map((option) => (
-                          <div
-                            key={option}
-                            className="flex items-center space-y-1 space-x-4"
-                          >
-                            <Checkbox
-                              id={option}
-                              className="hover:bg-secondary cursor-pointer"
-                              checked={field.value?.includes(option)}
-                              onCheckedChange={(checked) => {
-                                let newArray = Array.isArray(field.value)
-                                  ? field.value
-                                  : []
-                                if (checked) {
-                                  newArray = [...newArray, option]
-                                } else {
-                                  newArray = newArray.filter(
-                                    (val) => val !== option
-                                  )
-                                }
-                                field.onChange(newArray)
-                              }}
-                            />
-                            <label
-                              htmlFor={option}
-                              className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        {GADGET_OPTIONS.map((optionGadgets) => {
+                          const uniqueId = `gadget-${optionGadgets}`
+                          return (
+                            <div
+                              key={optionGadgets}
+                              className="flex items-center space-y-1 space-x-4"
                             >
-                              {option}
-                            </label>
-                          </div>
-                        ))}
+                              <Checkbox
+                                id={uniqueId}
+                                className="hover:bg-secondary cursor-pointer"
+                                checked={field.value?.includes(optionGadgets)}
+                                onCheckedChange={(checked) => {
+                                  let newArray = Array.isArray(field.value)
+                                    ? field.value
+                                    : []
+                                  if (checked) {
+                                    newArray = [...newArray, optionGadgets]
+                                  } else {
+                                    newArray = newArray.filter(
+                                      (val) => val !== optionGadgets
+                                    )
+                                  }
+                                  field.onChange(newArray)
+                                }}
+                              />
+                              <label
+                                htmlFor={uniqueId}
+                                className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {optionGadgets}
+                              </label>
+                            </div>
+                          )
+                        })}
                         {fieldState.invalid && (
                           <FieldError
                             className="text-[12px]"
@@ -199,34 +202,36 @@ export const DistanceLearningASection = React.forwardRef<
                           apply):
                         </FieldLabel>
 
-                        {INTERNET_CONNECTIVITY.map((option) => (
+                        {INTERNET_CONNECTIVITY.map((connectivityOption) => (
                           <div
-                            key={option}
+                            key={connectivityOption}
                             className="flex items-center space-y-1 space-x-4"
                           >
                             <Checkbox
-                              id={option}
+                              id={connectivityOption}
                               className="hover:bg-secondary cursor-pointer"
-                              checked={field.value?.includes(option)}
+                              checked={field.value?.includes(
+                                connectivityOption
+                              )}
                               onCheckedChange={(checked) => {
                                 let newArray = Array.isArray(field.value)
                                   ? field.value
                                   : []
                                 if (checked) {
-                                  newArray = [...newArray, option]
+                                  newArray = [...newArray, connectivityOption]
                                 } else {
                                   newArray = newArray.filter(
-                                    (val) => val !== option
+                                    (val) => val !== connectivityOption
                                   )
                                 }
                                 field.onChange(newArray)
                               }}
                             />
                             <label
-                              htmlFor={option}
+                              htmlFor={connectivityOption}
                               className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                              {option}
+                              {connectivityOption}
                             </label>
                           </div>
                         ))}
