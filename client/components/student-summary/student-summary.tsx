@@ -103,7 +103,7 @@ export default function StudentSummaryPage() {
               }}
               className={`ml-10 h-10 w-10 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${
                 activeSection === key
-                  ? "bg-main"
+                  ? "bg-main hover:bg-main"
                   : "bg-main2 hover:bg-main-dark"
               }`}
             >

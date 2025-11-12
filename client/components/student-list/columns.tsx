@@ -13,7 +13,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select" // adjust path if needed
+} from "@/components/ui/select"
 
 export type CounselorStudentListItem = {
   idNumber: string
