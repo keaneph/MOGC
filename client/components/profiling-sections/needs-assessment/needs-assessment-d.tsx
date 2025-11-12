@@ -89,8 +89,8 @@ export const NeedsAssessmentDSection = React.forwardRef<
                     <Field data-invalid={fieldState.invalid}>
                       <FieldContent>
                         <FieldLabel className="text-foreground">
-                          When upset or pushed to the limit in the past, how did
-                          you react?(Please check all that apply to you.):
+                          I can easily discuss my problems with my (Please check
+                          all that apply to you.):
                         </FieldLabel>
 
                         {PRIMARY_OPTIONS.map((option) => (

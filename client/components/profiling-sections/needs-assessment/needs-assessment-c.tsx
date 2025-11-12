@@ -114,7 +114,7 @@ export const NeedsAssessmentCSection = React.forwardRef<
                   <FieldContent>
                     <FieldLabel className="text-foreground">
                       When upset or pushed to the limit in the past, how did you
-                      react?(Please check all that apply to you.):
+                      react? (Please check all that apply to you.):
                     </FieldLabel>
 
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
