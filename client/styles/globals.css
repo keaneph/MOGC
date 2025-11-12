@@ -90,6 +90,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --status-green: oklch(0.5606 0.2684 146.75);
+  --status-yellow: oklch(0.9076 0.219 108.64);
+  --status-red: oklch(0.5047 0.2363 27.11);
+  --status-blue: oklch(0.4518 0.3078 255.81);
+  --status-peach: oklch(0.75 0.18 30);
 }
 
 .dark {

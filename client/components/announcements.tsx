@@ -18,7 +18,7 @@ export function Announcements() {
         application! This is a work in progress and you can&nbsp;
         <TooltipThis label="See what features are coming next!">
           <Link
-            href="/roadmap"
+            href="/documentation"
             className="text-link decoration-2 underline-offset-4 hover:underline"
           >
             view the roadmap here.
