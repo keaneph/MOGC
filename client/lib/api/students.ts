@@ -8,6 +8,7 @@ import type {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
+  distanceLearningSchema,
 } from "@/lib/schemas"
 
 const API_BASE_URL =
@@ -17,6 +18,7 @@ const API_BASE_URL =
 type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormData = z.infer<typeof familyDataSchema>
 type AcademicDataFormData = z.infer<typeof academicDataSchema>
+type DistanceLearningFormData = z.infer<typeof distanceLearningSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
 type PartIndex = 0 | 1 | 2 | 3
 
@@ -91,9 +93,17 @@ type StudentRecord = {
   reasons_for_choosing_msuiit_others?: string
   post_college_career_goal?: string
   cocurricular_activities?: string
+  technology_gadgets?: string
+  technology_gadgets_other?: string
+  internet_connectivity_means?: string
+  internet_connectivity_other?: string
+  internet_access?: string
+  distance_learning_readiness?: string
+  learning_space_description?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
+  is_distance_learning_data_complete?: boolean
 }
 
 /**
@@ -192,6 +202,7 @@ export async function getStudentSection(
   | Partial<PersonalDataFormData>
   | Partial<FamilyDataFormData>
   | Partial<AcademicDataFormData>
+  | Partial<DistanceLearningFormData>
   | null
 > {
   try {
@@ -200,6 +211,7 @@ export async function getStudentSection(
         | Partial<PersonalDataFormData>
         | Partial<FamilyDataFormData>
         | Partial<AcademicDataFormData>
+        | Partial<DistanceLearningFormData>
         | null
     }>(`/api/students/section?section=${sectionIndex}&part=${partIndex}`)
     return data.data
@@ -213,7 +225,8 @@ export async function saveStudentSection(
   formData:
     | Partial<PersonalDataFormData>
     | Partial<FamilyDataFormData>
-    | Partial<AcademicDataFormData>,
+    | Partial<AcademicDataFormData>
+    | Partial<DistanceLearningFormData>,
   sectionIndex: SectionIndex,
   partIndex: PartIndex
 ): Promise<{ success: boolean; error?: string }> {

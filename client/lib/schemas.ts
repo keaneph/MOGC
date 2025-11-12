@@ -398,7 +398,7 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Description must be at least 2 characters")
-    .max(50, "Description must be at most 50 characters"),
+    .max(150, "Description must be at most 150 characters"),
 })
 
 export const academicDataSchema = z
@@ -490,7 +490,7 @@ export const academicDataSchema = z
     reasonsForChoosingiit: z
       .array(z.string())
       .min(1, "Please select at least one reason for choosing IIT."),
-    otherReasonForChoosingiit: z.string().trim().optional(),
+    otherReasonForChoosingiit: z.string().optional().nullable(),
 
     reasonForCourse: z
       .string()
@@ -541,3 +541,36 @@ export const academicDataSchema = z
       path: ["otherReasonForChoosingiit"],
     }
   )
+
+export const distanceLearningSchema = z.object({
+  technologyGadgets: z
+    .array(z.string())
+    .min(1, "Please select at least one gadget available."),
+
+  otherOptionTechnologyGadgets: z.string().nullable().optional(),
+
+  meansOfInternet: z
+    .array(z.string())
+    .min(1, "Please select at least one means of connectivity."),
+
+  otherOptionMeansOfInternet: z.string().nullable().optional(),
+
+  internetAccess: z.enum([
+    "No internet access",
+    "Limited internet access",
+    "Full internet access",
+  ]),
+
+  learningReadiness: z.enum([
+    "Fully ready",
+    "Ready",
+    "A little ready",
+    "Not ready",
+  ]),
+
+  learningSpace: z
+    .string()
+    .trim()
+    .min(2, "Learning space must be at least 2 characters")
+    .max(50, "Learning space activities must be at most 50 characters"),
+})
