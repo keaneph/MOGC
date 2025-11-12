@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/pagination"
 import { SearchInput } from "@/components/student-list/search-input"
 import { SortingState } from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+import { RefreshCcw } from "lucide-react"
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<CounselorStudentListItem[]>([])
@@ -56,19 +58,20 @@ export default function StudentsPage() {
     (page - 1) * pageSize,
     page * pageSize
   )
+  const fetchStudents = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getCounselorStudentList()
+      setStudents(data)
+    } catch (err) {
+      setError("Failed to load student list.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchStudents() {
-      try {
-        const data = await getCounselorStudentList()
-        setStudents(data)
-      } catch (err) {
-        setError("Failed to load student list.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchStudents()
   }, [])
 
@@ -103,7 +106,18 @@ export default function StudentsPage() {
                 setSorting={setSorting}
               />
             </div>
-            <div className="mt-2 flex justify-center">
+            <div className="mt-2 flex flex-row justify-center">
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={fetchStudents}
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Refresh
+                </Button>
+              </div>
               <Pagination className="justify-end">
                 <PaginationContent>
                   <PaginationItem>

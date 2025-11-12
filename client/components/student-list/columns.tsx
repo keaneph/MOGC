@@ -146,7 +146,7 @@ export const columns = (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
             <SelectTrigger
-              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
             >
               <SelectValue />
             </SelectTrigger>
@@ -155,7 +155,7 @@ export const columns = (
                 <SelectItem
                   key={option}
                   value={option}
-                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
                 >
                   {option.toUpperCase()}
                 </SelectItem>
@@ -230,7 +230,7 @@ export const columns = (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
             <SelectTrigger
-              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
             >
               <SelectValue />
             </SelectTrigger>
@@ -239,7 +239,7 @@ export const columns = (
                 <SelectItem
                   key={option}
                   value={option}
-                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
                 >
                   {option.toUpperCase()}
                 </SelectItem>
@@ -307,7 +307,7 @@ export const columns = (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
             <SelectTrigger
-              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
             >
               <SelectValue />
             </SelectTrigger>
@@ -316,7 +316,7 @@ export const columns = (
                 <SelectItem
                   key={option}
                   value={option}
-                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
                 >
                   {option.toUpperCase()}
                 </SelectItem>
