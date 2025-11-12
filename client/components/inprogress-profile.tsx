@@ -77,6 +77,11 @@ import {
 } from "./profiling-sections/psychosocial-data/psychosocial-data-a"
 
 import {
+  PsychosocialDataBSection,
+  PsychosocialDataBSectionRef,
+} from "./profiling-sections/psychosocial-data/psychosocial-data-b"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
@@ -274,6 +279,19 @@ export function InProgressProfile() {
           psychosocialDataARef.current.form.reset(
             psychosocialA as Parameters<
               typeof psychosocialDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const psychosocialB = transformFromPsychosocialDataB(fullProfile)
+        if (
+          psychosocialB &&
+          psychosocialDataBRef.current &&
+          hasAnyData(psychosocialB)
+        ) {
+          psychosocialDataBRef.current.form.reset(
+            psychosocialB as Parameters<
+              typeof psychosocialDataBRef.current.form.reset
             >[0]
           )
         }
@@ -483,6 +501,19 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromPsychosocialDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.problem_sharers
+    return {
+      problemSharers: Array.isArray(dbOptions) ? dbOptions : [],
+      otherOptionProblemSharer: dbRecord.problem_sharers_others,
+      needsImmediateCounseling:
+        dbRecord.needs_immediate_counseling === true ? "Yes" : "No",
+      concernsToDiscuss: dbRecord.concerns_to_discuss,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -548,6 +579,7 @@ export function InProgressProfile() {
   const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
   const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
   const psychosocialDataARef = useRef<PsychosocialDataASectionRef>(null)
+  const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -586,6 +618,7 @@ export function InProgressProfile() {
     }
     if (currentSection === 4) {
       if (currentPart === 0) return psychosocialDataARef
+      if (currentPart === 1) return psychosocialDataBRef
     }
     return null
   }
@@ -726,6 +759,14 @@ export function InProgressProfile() {
           "perceiveMentalHealth",
         ]
       }
+      if (currentPart === 1) {
+        return [
+          "problemSharers",
+          "otherOptionProblemSharer",
+          "needsImmediateCounseling",
+          "concernsToDiscuss",
+        ]
+      }
     }
     return []
   }
@@ -797,6 +838,10 @@ export function InProgressProfile() {
         if (updatedProfile) {
           setLoadedProfileData(updatedProfile)
         }
+
+        // should refresh not just on initial mount, but every after save
+        const progress = await getProfileProgress()
+        setCompletedSections(new Set(progress.completedSections || []))
       } catch (error) {
         console.error("Error saving section:", error)
         toast.error(
@@ -958,6 +1003,8 @@ export function InProgressProfile() {
     if (currentSection === 4) {
       if (currentPart === 0)
         return <PsychosocialDataASection ref={psychosocialDataARef} />
+      if (currentPart === 1)
+        return <PsychosocialDataBSection ref={psychosocialDataBRef} />
     }
 
     // placeholder muna

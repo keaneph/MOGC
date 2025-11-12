@@ -586,7 +586,7 @@ export const psychosocialDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Must be at least 2 characters")
-    .max(500, "Must be at most 500 characters"),
+    .max(200, "Must be at most 200 characters"),
 
   hadCounseling: z.enum(["Yes", "No"]),
 
@@ -596,13 +596,13 @@ export const psychosocialDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Must be at least 2 characters")
-    .max(500, "Must be at most 500 characters"),
+    .max(200, "Must be at most 200 characters"),
 
   problemSharers: z
     .array(z.string())
     .min(1, "Please select at least one to share your problem with."),
 
-  otherOptionProlemSharer: z.string().nullable().optional(),
+  otherOptionProblemSharer: z.string().nullable().optional(),
 
   needsImmediateCounseling: z.enum(["Yes", "No"]),
 
@@ -610,5 +610,5 @@ export const psychosocialDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Must be at least 2 characters")
-    .max(100, "Must be at most 100 characters"),
+    .max(200, "Must be at most 200 characters"),
 })

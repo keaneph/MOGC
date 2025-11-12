@@ -13,7 +13,7 @@ import type {
 } from "@/lib/schemas"
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_FLASK_API_URL || "http://localhost:5001"
+  process.env.NEXT_PUBLIC_FLASK_API_URL || "http://localhost:5000"
 
 // type definitions
 type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
@@ -107,6 +107,10 @@ type StudentRecord = {
   had_counseling_before?: boolean
   seeking_professional_help?: boolean
   perceived_mental_health?: string
+  problem_sharers?: string
+  problem_sharers_others?: string
+  needs_immediate_counseling?: boolean
+  concerns_to_discuss?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean

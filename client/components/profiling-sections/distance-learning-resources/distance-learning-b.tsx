@@ -145,7 +145,7 @@ export const DistanceLearningBSection = React.forwardRef<
                     </FieldLabel>
                     <Textarea
                       {...field}
-                      placeholder="AIM"
+                      placeholder="Describe your primary learning space (e.g., 'A dedicated, quiet corner in my room with a desk,etc)."
                       value={field.value ?? ""}
                       className="min-h-[190px]"
                       autoComplete="off"

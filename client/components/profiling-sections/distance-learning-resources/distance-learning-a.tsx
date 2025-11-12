@@ -49,9 +49,9 @@ const INTERNET_CONNECTIVITY = [
   "Piso Net",
   "Internet Cafe",
   "No Internet",
-  "Other",
+  "Others",
 ]
-const OTHERS_CONNECTIVITY_OPTIONS = "Other"
+const OTHERS_CONNECTIVITY_OPTIONS = "Others"
 
 export const DistanceLearningASection = React.forwardRef<
   DistanceLearningASectionRef,
@@ -117,37 +117,40 @@ export const DistanceLearningASection = React.forwardRef<
                         <FieldLabel className="text-foreground">
                           Technology Gadgets (Select all that apply):
                         </FieldLabel>
-                        {GADGET_OPTIONS.map((optionGadgets) => (
-                          <div
-                            key={optionGadgets}
-                            className="flex items-center space-y-1 space-x-4"
-                          >
-                            <Checkbox
-                              id={optionGadgets}
-                              className="cursor-pointer hover:bg-red-800"
-                              checked={field.value?.includes(optionGadgets)}
-                              onCheckedChange={(checked) => {
-                                let newArray = Array.isArray(field.value)
-                                  ? field.value
-                                  : []
-                                if (checked) {
-                                  newArray = [...newArray, optionGadgets]
-                                } else {
-                                  newArray = newArray.filter(
-                                    (val) => val !== optionGadgets
-                                  )
-                                }
-                                field.onChange(newArray)
-                              }}
-                            />
-                            <label
-                              htmlFor={optionGadgets}
-                              className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        {GADGET_OPTIONS.map((optionGadgets) => {
+                          const uniqueId = `gadget-${optionGadgets}`
+                          return (
+                            <div
+                              key={optionGadgets}
+                              className="flex items-center space-y-1 space-x-4"
                             >
-                              {optionGadgets}
-                            </label>
-                          </div>
-                        ))}
+                              <Checkbox
+                                id={uniqueId}
+                                className="hover:bg-secondary cursor-pointer"
+                                checked={field.value?.includes(optionGadgets)}
+                                onCheckedChange={(checked) => {
+                                  let newArray = Array.isArray(field.value)
+                                    ? field.value
+                                    : []
+                                  if (checked) {
+                                    newArray = [...newArray, optionGadgets]
+                                  } else {
+                                    newArray = newArray.filter(
+                                      (val) => val !== optionGadgets
+                                    )
+                                  }
+                                  field.onChange(newArray)
+                                }}
+                              />
+                              <label
+                                htmlFor={uniqueId}
+                                className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {optionGadgets}
+                              </label>
+                            </div>
+                          )
+                        })}
                         {fieldState.invalid && (
                           <FieldError
                             className="text-[12px]"

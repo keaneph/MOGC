@@ -57,7 +57,7 @@ export const PsychosocialDataASection = React.forwardRef<
             Data on Psychosocial Well-Being
           </FieldLegend>
           <FieldGroup>
-            <div className="-mb-2 grid grid-cols-2 gap-4">
+            <div className="-mb-2 grid grid-cols-3 gap-4">
               <Controller
                 name="personalCharacteristics"
                 control={form.control}
@@ -84,44 +84,13 @@ export const PsychosocialDataASection = React.forwardRef<
                 )}
               />
               <Controller
-                name="copingMechanismBadDay"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        How do you usually deal with a bad day?
-                      </FieldLabel>
-                      <Textarea
-                        className="min-h-[35.5px]"
-                        {...field}
-                        value={field.value ?? ""}
-                        placeholder="List your coping mechanism during bad day"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
-                        />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
-            </div>
-            <FieldLegend className="text-foreground font-semibold tracking-wide">
-              Have you experienced:
-            </FieldLegend>
-            <div className="-mt-10 -mb-2 grid grid-cols-2 gap-4">
-              <Controller
                 name="hadCounseling"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldContent>
                       <FieldLabel className="text-foreground">
-                        Counseling before?
+                        Have you ever had Counseling before?
                       </FieldLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -187,10 +156,36 @@ export const PsychosocialDataASection = React.forwardRef<
                       How do you perceive your mental health at present?
                     </FieldLabel>
                     <Textarea
-                      className="min-h-[80px]"
+                      className="min-h-[63px]"
                       {...field}
                       value={field.value ?? ""}
                       placeholder="Describe your current state (e.g., 'Very well,' 'Neutral,' or 'Struggling') and briefly explain why."
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError
+                        className="text-[12px]"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
+              name="copingMechanismBadDay"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldContent>
+                    <FieldLabel className="text-foreground">
+                      How do you usually deal with a bad day?
+                    </FieldLabel>
+                    <Textarea
+                      className="min-h-[63px]"
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="List your coping mechanism during bad day"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (

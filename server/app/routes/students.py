@@ -16,6 +16,7 @@ from app.models.student import (
     transform_distance_learning_data_a,
     transform_distance_learning_data_b,
     transform_psychosocial_data_a,
+    transform_psychosocial_data_b,
     transform_from_personal_data_a,
     transform_from_personal_data_b,
     transform_from_personal_data_c,
@@ -29,10 +30,12 @@ from app.models.student import (
     transform_from_distance_learning_data_a,
     transform_from_distance_learning_data_b,
     transform_from_psychosocial_data_a,
+    transform_from_psychosocial_data_b,
     check_personal_data_complete,
     check_family_data_complete,
     check_academic_data_complete,
-    check_distance_learning_data_complete
+    check_distance_learning_data_complete,
+    check_psychosocial_data_complete
 )
 
 students_bp = Blueprint("students", __name__, url_prefix="/api/students")
@@ -110,11 +113,11 @@ def get_profile_progress(user_id: str):
             supabase.table("students")
             .select(
                 "is_personal_data_complete, is_family_data_complete, is_academic_data_complete, is_distance_learning_data_complete, is_psychosocial_data_complete,"
-                "id_number, religious_affiliation, gender_identity, "
+                "id_number, religious_affiliation, gender_identity, nickname, "
                 "father_name, guardian_name, home_environment_description,"
                 "shs_gpa, career_option_1, cocurricular_activities, "
                 "internet_access, internet_connectivity_means,"
-                "personality_characteristics"
+                "personality_characteristics, problem_sharers"
             )
             .eq("auth_user_id", user_id)
             .execute()
@@ -147,7 +150,10 @@ def get_profile_progress(user_id: str):
         
         
         # check from most recent to least recent
-        if data.get("personality_characteristics"):
+        if data.get("problem_sharers"):
+            last_section = 5
+            last_part = 0
+        elif data.get("personality_characteristics"):
             last_section = 4
             last_part = 1
         elif data.get("internet_access"):
@@ -262,6 +268,8 @@ def get_student_section(user_id: str):
         elif section_index == 4: # Psychosocial Data
             if part_index == 0:
                 form_data = transform_from_psychosocial_data_a(db_record)
+            if part_index == 1:
+                form_data = transform_from_psychosocial_data_b(db_record)
 
         return jsonify({"data": form_data}), 200
     except Exception as e:
@@ -325,6 +333,8 @@ def save_student_section(user_id: str):
         elif section_index == 4:
             if part_index == 0:
                 db_data = transform_psychosocial_data_a(form_data)
+            if part_index == 1:
+                db_data = transform_psychosocial_data_b(form_data)
         
         # always include auth_user_id
         db_data["auth_user_id"] = user_id
@@ -388,6 +398,9 @@ def save_student_section(user_id: str):
 
                 if section_index == 3 and check_distance_learning_data_complete(full_record):
                     update_flags["is_distance_learning_data_complete"] = True
+
+                if section_index == 4 and check_psychosocial_data_complete(full_record):
+                    update_flags["is_psychosocial_data_complete"] = True
                 
                 if update_flags:
                     supabase.table("students").update(update_flags).eq("auth_user_id", user_id).execute()
