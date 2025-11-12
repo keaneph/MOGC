@@ -3,6 +3,18 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { EyeIcon, NotepadText } from "lucide-react"
 import { Badge } from "../ui/badge"
+import {
+  updateStudentAssessment,
+  updateStudentCounseling,
+  updateStudentInterview,
+} from "@/lib/api/counselors"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select" // adjust path if needed
 
 export type CounselorStudentListItem = {
   idNumber: string
@@ -14,12 +26,15 @@ export type CounselorStudentListItem = {
   counselingStatus: "no record" | "ongoing" | "closed"
 }
 
-export const columns: ColumnDef<CounselorStudentListItem>[] = [
+export const columns = (
+  setStudents: React.Dispatch<React.SetStateAction<CounselorStudentListItem[]>>
+): ColumnDef<CounselorStudentListItem>[] => [
   {
     accessorKey: "idNumber",
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         ID Number
         {column.getIsSorted() === "asc"}
@@ -33,6 +48,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Student Name
         {column.getIsSorted() === "asc"}
@@ -46,6 +62,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Course
         {column.getIsSorted() === "asc"}
@@ -59,6 +76,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Year Level
         {column.getIsSorted() === "asc"}
@@ -75,6 +93,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Assessment
         {column.getIsSorted() === "asc"}
@@ -82,28 +101,67 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
       </button>
     ),
     size: 100,
-    cell: ({ getValue }) => {
-      const value = getValue<string>()
-      const formattedValue = value.toUpperCase()
-      const bgColor =
-        value === "high risk"
-          ? "bg-[var(--status-red)]"
-          : value === "low risk"
-            ? "bg-[var(--status-green)]"
-            : "bg-[var(--status-yellow)]"
-      const textColor =
-        value === "high risk" || value === "low risk"
-          ? "text-white"
-          : "text-main2"
+    cell: ({ row, getValue }) => {
+      const value = getValue<string>() || "pending"
+      const id = row.original.idNumber
+
+      const handleChange = async (newValue: string) => {
+        const casted = newValue as "pending" | "high risk" | "low risk"
+        setStudents((prev) =>
+          prev.map((student) =>
+            student.idNumber === id
+              ? { ...student, assessment: casted }
+              : student
+          )
+        )
+        updateStudentAssessment(id, casted).catch((err) =>
+          console.error("Failed to update assessment:", err)
+        )
+      }
+
+      const getBgColor = (val: string) => {
+        switch (val) {
+          case "high risk":
+            return "bg-[var(--status-red)]"
+          case "low risk":
+            return "bg-[var(--status-green)]"
+          case "pending":
+          default:
+            return "bg-[var(--status-yellow)]"
+        }
+      }
+
+      const getTextColor = (val: string) => {
+        switch (val) {
+          case "high risk":
+          case "low risk":
+            return "text-white"
+          case "pending":
+          default:
+            return "text-main2"
+        }
+      }
 
       return (
         <div className="flex justify-center">
-          <Badge
-            variant="secondary"
-            className={`text-[10px] ${bgColor} ${textColor}`}
-          >
-            {formattedValue}
-          </Badge>
+          <Select value={value} onValueChange={handleChange}>
+            <SelectTrigger
+              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+              {["pending", "high risk", "low risk"].map((option) => (
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                >
+                  {option.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )
     },
@@ -113,6 +171,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Initial Interview
         {column.getIsSorted() === "asc"}
@@ -120,30 +179,73 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
       </button>
     ),
     size: 104,
-    cell: ({ getValue }) => {
-      const value = getValue() as string
-      const formattedValue = value.toUpperCase()
-      const bgColor =
-        value === "done"
-          ? "bg-[var(--status-green)]"
-          : value === "scheduled"
-            ? "bg-[var(--status-peach)]"
-            : value === "rescheduled"
-              ? "bg-[var(--status-blue)]"
-              : "bg-[var(--status-yellow)]"
-      const textColor =
-        value === "done" || value === "scheduled" || value === "rescheduled"
-          ? "text-white"
-          : "text-main2"
+    cell: ({ row, getValue }) => {
+      const value = (getValue() as string) || "pending"
+      const id = row.original.idNumber
+
+      const handleChange = async (newValue: string) => {
+        const casted = newValue as
+          | "pending"
+          | "scheduled"
+          | "rescheduled"
+          | "done"
+        setStudents((prev) =>
+          prev.map((student) =>
+            student.idNumber === id
+              ? { ...student, initialInterview: casted }
+              : student
+          )
+        )
+        updateStudentInterview(id, casted).catch((err) =>
+          console.error("Failed to update interview:", err)
+        )
+      }
+
+      const getBgColor = (val: string) => {
+        switch (val) {
+          case "done":
+            return "bg-[var(--status-green)]"
+          case "scheduled":
+            return "bg-[var(--status-peach)]"
+          case "rescheduled":
+            return "bg-[var(--status-blue)]"
+          default:
+            return "bg-[var(--status-yellow)]"
+        }
+      }
+
+      const getTextColor = (val: string) => {
+        switch (val) {
+          case "done":
+          case "scheduled":
+          case "rescheduled":
+            return "text-white"
+          case "pending":
+          default:
+            return "text-main2"
+        }
+      }
 
       return (
         <div className="flex justify-center">
-          <Badge
-            variant="secondary"
-            className={`text-[10px] ${bgColor} ${textColor}`}
-          >
-            {formattedValue}
-          </Badge>
+          <Select value={value} onValueChange={handleChange}>
+            <SelectTrigger
+              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+              {["pending", "scheduled", "rescheduled", "done"].map((option) => (
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                >
+                  {option.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )
     },
@@ -153,6 +255,7 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
     header: ({ column }) => (
       <button
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
       >
         Counseling Status
         {column.getIsSorted() === "asc"}
@@ -160,26 +263,66 @@ export const columns: ColumnDef<CounselorStudentListItem>[] = [
       </button>
     ),
     size: 120,
-    cell: ({ getValue }) => {
-      const value = getValue() as string
-      const formattedValue = value.toUpperCase()
-      const bgColor =
-        value === "ongoing"
-          ? "bg-[var(--status-blue)]"
-          : value === "closed"
-            ? "bg-[var(--status-green)]"
-            : "bg-[var(--status-yellow)]"
-      const textColor =
-        value === "ongoing" || value === "closed" ? "text-white" : "text-main2"
+    cell: ({ row, getValue }) => {
+      const value = (getValue() as string) || "no record"
+      const id = row.original.idNumber
+
+      const handleChange = async (newValue: string) => {
+        const casted = newValue as "no record" | "ongoing" | "closed"
+        setStudents((prev) =>
+          prev.map((student) =>
+            student.idNumber === id
+              ? { ...student, counselingStatus: casted }
+              : student
+          )
+        )
+        updateStudentCounseling(id, casted).catch((err) =>
+          console.error("Failed to update status:", err)
+        )
+      }
+
+      const getBgColor = (val: string) => {
+        switch (val) {
+          case "ongoing":
+            return "bg-[var(--status-blue)]"
+          case "closed":
+            return "bg-[var(--status-green)]"
+          default:
+            return "bg-[var(--status-yellow)]"
+        }
+      }
+
+      const getTextColor = (val: string) => {
+        switch (val) {
+          case "ongoing":
+          case "closed":
+            return "text-white"
+          case "no record":
+          default:
+            return "text-main2"
+        }
+      }
 
       return (
         <div className="flex justify-center">
-          <Badge
-            variant="secondary"
-            className={`text-[10px] ${bgColor} ${textColor}`}
-          >
-            {formattedValue}
-          </Badge>
+          <Select value={value} onValueChange={handleChange}>
+            <SelectTrigger
+              className={`rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+              {["no record", "ongoing", "closed"].map((option) => (
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className={`mb-2 rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
+                >
+                  {option.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )
     },

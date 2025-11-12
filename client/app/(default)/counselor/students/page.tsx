@@ -97,7 +97,7 @@ export default function StudentsPage() {
           <div className="container h-[500px] w-full overflow-y-auto">
             <div className="overflow-y-auto rounded-md border shadow-sm">
               <DataTable
-                columns={columns}
+                columns={columns(setStudents)}
                 data={paginatedData}
                 sorting={sorting}
                 setSorting={setSorting}

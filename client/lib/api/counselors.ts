@@ -80,3 +80,60 @@ export async function getCounselorStudentList(): Promise<
     return []
   }
 }
+
+export async function updateStudentAssessment(
+  idNumber: string,
+  newAssessment: "pending" | "high risk" | "low risk"
+): Promise<void> {
+  try {
+    console.log(
+      "Calling:",
+      `${API_BASE_URL}/api/counselors/student/${idNumber}/assessment`
+    )
+
+    await apiRequest(`/api/counselors/student/${idNumber}/assessment`, {
+      method: "PUT",
+      body: JSON.stringify({ assessment: newAssessment }),
+    })
+  } catch (error) {
+    console.error("Failed to update assessment:", error)
+  }
+}
+
+export async function updateStudentInterview(
+  idNumber: string,
+  newInterview: "pending" | "scheduled" | "rescheduled" | "done"
+): Promise<void> {
+  try {
+    console.log(
+      "Calling:",
+      `${API_BASE_URL}/api/counselors/student/${idNumber}/initial_interview`
+    )
+
+    await apiRequest(`/api/counselors/student/${idNumber}/initial_interview`, {
+      method: "PUT",
+      body: JSON.stringify({ initial_interview: newInterview }),
+    })
+  } catch (error) {
+    console.error("Failed to update interview:", error)
+  }
+}
+
+export async function updateStudentCounseling(
+  idNumber: string,
+  newStatus: "no record" | "ongoing" | "closed"
+): Promise<void> {
+  try {
+    console.log(
+      "Calling:",
+      `${API_BASE_URL}/api/counselors/student/${idNumber}/counseling_status`
+    )
+
+    await apiRequest(`/api/counselors/student/${idNumber}/counseling_status`, {
+      method: "PUT",
+      body: JSON.stringify({ counseling_status: newStatus }),
+    })
+  } catch (error) {
+    console.error("Failed to update interview:", error)
+  }
+}

@@ -56,3 +56,137 @@ def get_student_list(user_id: str):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/assessment", methods=["PUT"])
+@require_auth
+def update_student_assessment(user_id: str, id_number: str):
+    """Update assessment status for a student"""
+    try:
+        data = request.get_json()
+        new_assessment = data.get("assessment")
+
+        if new_assessment not in ["pending", "high risk", "low risk"]:
+            return jsonify({"error": "Invalid assessment value"}), 400
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_list")
+            .update({"assessment": new_assessment})
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if response.data is None or len(response.data) == 0:
+            return jsonify({"error": "Failed to update assessment"}), 500
+
+        return jsonify({
+            "message": "Assessment updated successfully",
+            "updated": response.data[0]
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@counselors_bp.route("/student/<string:id_number>/initial_interview", methods=["PUT"])
+@require_auth
+def update_student_interview(user_id: str, id_number: str):
+    """Update assessment status for a student"""
+    try:
+        data = request.get_json()
+        new_interview = data.get("initial_interview")
+
+        if new_interview not in ["pending", "scheduled", "rescheduled", "done"]:
+            return jsonify({"error": "Invalid interview value"}), 400
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_list")
+            .update({"initial_interview": new_interview})
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if response.data is None or len(response.data) == 0:
+            return jsonify({"error": "Failed to update interview"}), 500
+
+        return jsonify({
+            "message": "Initial interview updated successfully",
+            "updated": response.data[0]
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/counseling_status", methods=["PUT"])
+@require_auth
+def update_student_counselingstatus(user_id: str, id_number: str):
+    """Update assessment status for a student"""
+    try:
+        data = request.get_json()
+        new_status = data.get("counseling_status")
+
+        if new_status not in ["no record", "ongoing", "closed"]:
+            return jsonify({"error": "Invalid counseling status"}), 400
+
+        supabase = get_supabase_client(use_service_role=True)
+
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_list")
+            .update({"counseling_status": new_status})
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if response.data is None or len(response.data) == 0:
+            return jsonify({"error": "Failed to update status"}), 500
+
+        return jsonify({
+            "message": "Counseling status updated successfully",
+            "updated": response.data[0]
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
