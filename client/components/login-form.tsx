@@ -9,10 +9,7 @@ import { toast } from "sonner"
 import { CircleCheckIcon } from "lucide-react"
 import CatImageSad from "./sad-toast"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm({ ...props }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [hasHydrated, setHasHydrated] = useState(false)

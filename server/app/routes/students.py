@@ -488,3 +488,52 @@ def get_student_profile(user_id: str):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@students_bp.route("/profile/summary", methods=["GET"])
+@require_auth
+def get_student_profile_summary(user_id: str):
+    try:
+        supabase = get_supabase_client()
+        result = supabase.table("students").select("*").eq("auth_user_id", user_id).single().execute()
+
+        if not result.data:
+            return jsonify({"error": "Student profile not found"}), 404
+
+        return jsonify({"data": result.data}), 200
+    except Exception as e:
+        print("Unexpected error in /profile/summary:", e)
+        return jsonify({"error": str(e)}), 500
+
+@students_bp.route("/profile/completion-status", methods=["GET"])
+@require_auth
+def get_student_profile_completion_status(user_id: str):
+    try:
+        supabase = get_supabase_client()
+        result = (
+            supabase.table("students")
+            .select(
+                "is_personal_data_complete, is_family_data_complete, is_academic_data_complete, "
+                "is_distance_learning_data_complete, is_psychosocial_data_complete, is_needs_assessment_data_complete"
+            )
+            .eq("auth_user_id", user_id)
+            .single()
+            .execute()
+        )
+
+        if not result.data:
+            return jsonify({"error": "Student profile not found"}), 404
+
+        data = result.data
+        complete = all([
+            data.get("is_personal_data_complete"),
+            data.get("is_family_data_complete"),
+            data.get("is_academic_data_complete"),
+            data.get("is_distance_learning_data_complete"),
+            data.get("is_psychosocial_data_complete"),
+            data.get("is_needs_assessment_data_complete"),
+        ])
+
+        return jsonify({"complete": complete}), 200
+
+    except Exception as e:
+        print("Unexpected error in /profile/completion-status:", e)
+        return jsonify({"error": str(e)}), 500

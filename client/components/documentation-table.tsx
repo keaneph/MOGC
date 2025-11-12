@@ -33,7 +33,7 @@ export function DocumentationTable() {
           <TableCell className="font-medium"></TableCell>
           <TableCell>Getting Started</TableCell>
           <TableCell>
-            Includes onboarding flow and "Guide Me" walkthroughs.
+            Includes onboarding flow and &apos;Guide Me&apos; walkthroughs.
           </TableCell>
         </TableRow>
         <TableRow>

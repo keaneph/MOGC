@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EyeIcon, NotepadText } from "lucide-react"
-import { Badge } from "../ui/badge"
 import {
   updateStudentAssessment,
   updateStudentCounseling,

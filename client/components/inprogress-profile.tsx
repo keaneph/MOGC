@@ -126,6 +126,7 @@ import MSULove from "@/public/msu iit love.png"
 import * as z from "zod"
 
 import { useRef } from "react"
+import { useRouter } from "next/navigation"
 
 type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
@@ -162,6 +163,7 @@ export function InProgressProfile() {
   >(new Map()) // Track last part visited per section
   const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const circleRefs = useRef<(HTMLDivElement | null)[]>([])
+  const router = useRouter()
 
   // cleanup timeout on unmount
   useEffect(() => {
@@ -1071,6 +1073,8 @@ export function InProgressProfile() {
       const nextSection = currentSection + 1
       setCurrentSection(nextSection)
       setCurrentPart(0)
+    } else {
+      window.location.reload()
     }
   }
 
