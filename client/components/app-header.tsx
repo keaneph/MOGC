@@ -71,7 +71,7 @@ export function AppHeader({ role }: { role: string }) {
 
         <TooltipThis label="View the documentation">
           <div className="cursor-pointer decoration-white decoration-2 underline-offset-4 hover:underline">
-            Documentation
+            <Link href="/documentation">Documentation</Link>
           </div>
         </TooltipThis>
 

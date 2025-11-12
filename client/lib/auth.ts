@@ -56,3 +56,26 @@ export async function requireRole(
 
   return userRole
 }
+
+/**
+ * Verifies that the user has one of the allowed roles, redirects if not
+ * @param allowedRoles Array of allowed roles (e.g., ["student", "counselor"])
+ * @param redirectPath Optional path to redirect to if role doesn't match
+ */
+export async function requireAnyRole(
+  allowedRoles: ("student" | "counselor")[],
+  redirectPath?: string
+): Promise<"student" | "counselor"> {
+  const userRole = await getUserRole()
+
+  if (!userRole) {
+    redirect("/auth/login")
+  }
+
+  if (!allowedRoles.includes(userRole)) {
+    const targetPath = redirectPath || `/${userRole}/getting-started`
+    redirect(targetPath)
+  }
+
+  return userRole
+}
