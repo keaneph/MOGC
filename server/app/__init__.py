@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Enable CORS for Next.js frontend
-CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(app, origins=["http://localhost:3000", "https://mogc.vercel.app"], supports_credentials=True)
 
 # register blueprints
 from app.routes.check import check_bp
