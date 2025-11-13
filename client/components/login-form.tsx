@@ -46,7 +46,9 @@ export function LoginForm({ ...props }: React.ComponentProps<"div">) {
 
     try {
       const appOrigin =
-        process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+        (typeof window !== "undefined" && window.location?.origin) ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        "https://mogc.vercel.app"
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
