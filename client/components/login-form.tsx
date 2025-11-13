@@ -45,11 +45,13 @@ export function LoginForm({ ...props }: React.ComponentProps<"div">) {
     setError(null)
 
     try {
+      const appOrigin =
+        process.env.NEXT_PUBLIC_APP_URL || window.location.origin
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           queryParams: { prompt: "select_account" },
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${appOrigin}/auth/callback`,
         },
       })
 
