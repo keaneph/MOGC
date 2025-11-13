@@ -14,6 +14,7 @@ CORS(
 		"http://localhost:3000",
 		"https://mogc.vercel.app",
 		"https://mogc.onrender.com",
+        "mogc-git-bugfix-mogc-76-verc-bee40a-nearpharelle-7322s-projects.vercel.app",
 	],
 	supports_credentials=True,
 )
