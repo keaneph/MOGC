@@ -10,6 +10,7 @@ python-dotenv = "*"
 supabase = "*"
 pyjwt = "*"
 cryptography = "*"
+gunicorn = "*"
 
 [dev-packages]
 
