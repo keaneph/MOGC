@@ -8,6 +8,9 @@ import type {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
+  distanceLearningSchema,
+  psychosocialDataSchema,
+  needsAssessmentSchema,
 } from "@/lib/schemas"
 
 const API_BASE_URL =
@@ -17,11 +20,14 @@ const API_BASE_URL =
 type PersonalDataFormData = z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormData = z.infer<typeof familyDataSchema>
 type AcademicDataFormData = z.infer<typeof academicDataSchema>
+type DistanceLearningFormData = z.infer<typeof distanceLearningSchema>
+type PsychosocialFormData = z.infer<typeof psychosocialDataSchema>
+type NeedsAssessmentFormData = z.infer<typeof needsAssessmentSchema>
 type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
-type PartIndex = 0 | 1 | 2 | 3
+type PartIndex = 0 | 1 | 2 | 3 | 4
 
 // database record type (dapat ni imatch sa Supabase)
-type StudentRecord = {
+export type StudentRecord = {
   id?: string
   auth_user_id?: string
   id_number?: string
@@ -87,13 +93,47 @@ type StudentRecord = {
   course_choice_actor?: string
   course_choice_actor_others?: string
   course_choice_reason?: string
-  reasons_for_choosing_msuiit?: string
+  reasons_for_choosing_msuiit?: string[]
   reasons_for_choosing_msuiit_others?: string
   post_college_career_goal?: string
   cocurricular_activities?: string
+  technology_gadgets?: string[]
+  technology_gadgets_other?: string
+  internet_connectivity_means?: string[]
+  internet_connectivity_other?: string
+  internet_access?: string
+  distance_learning_readiness?: string
+  learning_space_description?: string
+  personality_characteristics?: string
+  coping_mechanism_bad_day?: string
+  had_counseling_before?: boolean
+  seeking_professional_help?: boolean
+  perceived_mental_health?: string
+  problem_sharers?: string[]
+  problem_sharers_others?: string
+  needs_immediate_counseling?: boolean
+  concerns_to_discuss?: string
+  improvement_needs?: string[]
+  improvement_needs_others?: string
+  financial_assistance_needs?: string[]
+  financial_assistance_needs_others?: string
+  personal_social_needs?: string[]
+  personal_social_needs_others?: string
+  upset_responses?: string
+  upset_responses_others?: string
+  primary_problem_sharer?: string
+  primary_problem_sharer_others?: string
+  experience_counseling_willfully?: string
+  experience_counseling_referral?: string
+  know_guidance_center_help?: string
+  afraid_of_guidance_center?: string
+  shy_to_ask_counselor?: string
   is_personal_data_complete?: boolean
   is_family_data_complete?: boolean
   is_academic_data_complete?: boolean
+  is_distance_learning_data_complete?: boolean
+  is_psychosocial_data_complete?: boolean
+  is_needs_assessment_data_complete?: boolean
 }
 
 /**
@@ -192,6 +232,9 @@ export async function getStudentSection(
   | Partial<PersonalDataFormData>
   | Partial<FamilyDataFormData>
   | Partial<AcademicDataFormData>
+  | Partial<DistanceLearningFormData>
+  | Partial<PsychosocialFormData>
+  | Partial<NeedsAssessmentFormData>
   | null
 > {
   try {
@@ -200,6 +243,9 @@ export async function getStudentSection(
         | Partial<PersonalDataFormData>
         | Partial<FamilyDataFormData>
         | Partial<AcademicDataFormData>
+        | Partial<DistanceLearningFormData>
+        | Partial<PsychosocialFormData>
+        | Partial<NeedsAssessmentFormData>
         | null
     }>(`/api/students/section?section=${sectionIndex}&part=${partIndex}`)
     return data.data
@@ -213,7 +259,10 @@ export async function saveStudentSection(
   formData:
     | Partial<PersonalDataFormData>
     | Partial<FamilyDataFormData>
-    | Partial<AcademicDataFormData>,
+    | Partial<AcademicDataFormData>
+    | Partial<DistanceLearningFormData>
+    | Partial<PsychosocialFormData>
+    | Partial<NeedsAssessmentFormData>,
   sectionIndex: SectionIndex,
   partIndex: PartIndex
 ): Promise<{ success: boolean; error?: string }> {
@@ -248,5 +297,29 @@ export async function getStudentProfile(): Promise<StudentRecord | null> {
   } catch (error) {
     console.error("Error getting student profile:", error)
     return null
+  }
+}
+
+export async function getStudentProfileSummary(): Promise<StudentRecord | null> {
+  try {
+    const data = await apiRequest<{ data: StudentRecord | null }>(
+      "/api/students/profile/summary"
+    )
+    return data.data
+  } catch (error) {
+    console.error("Error getting student profile summary:", error)
+    return null
+  }
+}
+
+export async function isStudentProfileComplete(): Promise<boolean> {
+  try {
+    const data = await apiRequest<{ complete: boolean }>(
+      "/api/students/profile/completion-status"
+    )
+    return data.complete
+  } catch (error) {
+    console.error("Error checking profile completion:", error)
+    return false
   }
 }

@@ -9,50 +9,57 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 import * as React from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
-import { academicDataSchema } from "@/lib/schemas"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { psychosocialDataSchema } from "@/lib/schemas"
 
-export interface AcademicDataCSectionRef {
-  form: UseFormReturn<z.infer<typeof academicDataSchema>>
+export interface PsychosocialDataBSectionRef {
+  form: UseFormReturn<z.infer<typeof psychosocialDataSchema>>
 }
 
-const REASON_OPTIONS = [
-  "Quality education",
-  "Affordable tuition fees",
-  "Scholarships",
-  "Proximity",
-  "Only school offering my course",
-  "Prestigious Institution",
+const PROBLEM_SHARERS = [
+  "Mother",
+  "Father",
+  "Brother/Sister",
+  "Friends",
+  "Counselor",
   "Others",
 ]
 const OTHERS_OPTION = "Others"
 
-export const AcademicDataCSection = React.forwardRef<
-  AcademicDataCSectionRef,
+export const PsychosocialDataBSection = React.forwardRef<
+  PsychosocialDataBSectionRef,
   object
 >((props, ref) => {
-  const form = useForm<z.infer<typeof academicDataSchema>>({
-    resolver: zodResolver(academicDataSchema),
+  const form = useForm<z.infer<typeof psychosocialDataSchema>>({
+    resolver: zodResolver(psychosocialDataSchema),
     mode: "onChange",
     defaultValues: {
-      reasonsForChoosingiit: [],
-      otherReasonForChoosingiit: "",
-      coCurricularActivities: "",
+      problemSharers: [],
+      otherOptionProblemSharer: "",
+      needsImmediateCounseling: undefined,
+      concernsToDiscuss: "",
     },
   })
 
-  const reasonsForChoosingiitArray = form.watch("reasonsForChoosingiit")
-  const isOthersSelected = reasonsForChoosingiitArray?.includes(OTHERS_OPTION)
+  const optionsForProblemSharer = form.watch("problemSharers")
+  const isOthersSelected = optionsForProblemSharer?.includes(OTHERS_OPTION)
 
   React.useEffect(() => {
     if (!isOthersSelected) {
-      form.setValue("otherReasonForChoosingiit", "", {
+      form.setValue("otherOptionProblemSharer", "", {
         shouldValidate: false,
       })
     }
@@ -67,22 +74,23 @@ export const AcademicDataCSection = React.forwardRef<
       <Field>
         <FieldSet>
           <FieldLegend className="text-foreground font-semibold tracking-wide">
-            Academic Data
+            Data on Psychosocial Well-Being
           </FieldLegend>
           <FieldGroup>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Controller
-                  name="reasonsForChoosingiit"
+                  name="problemSharers"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldContent>
                         <FieldLabel className="text-foreground">
-                          Why choose IIT? (Select all that apply):
+                          To whom do you share your problems with? (Select all
+                          that apply):
                         </FieldLabel>
 
-                        {REASON_OPTIONS.map((option) => (
+                        {PROBLEM_SHARERS.map((option) => (
                           <div
                             key={option}
                             className="flex items-center space-y-1 space-x-4"
@@ -124,11 +132,11 @@ export const AcademicDataCSection = React.forwardRef<
                   )}
                 />
                 <Controller
-                  name="otherReasonForChoosingiit"
+                  name="otherOptionProblemSharer"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldContent className="mt-11">
+                      <FieldContent className="mt-12">
                         <FieldLabel className="text-foreground">
                           If others, specify:
                         </FieldLabel>
@@ -152,33 +160,65 @@ export const AcademicDataCSection = React.forwardRef<
                   )}
                 />
               </div>
-
-              <Controller
-                name="coCurricularActivities"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldContent>
-                      <FieldLabel className="text-foreground">
-                        Co-Curricular Activities
-                      </FieldLabel>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        className="min-h-[282px]"
-                        placeholder="Basketball, Volunteering, Dance Club, etc."
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError
-                          className="text-[12px]"
-                          errors={[fieldState.error]}
+              <div>
+                <Controller
+                  name="needsImmediateCounseling"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldContent>
+                        <FieldLabel className="text-foreground">
+                          Need immediate counseling?
+                        </FieldLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value ?? ""}
+                        >
+                          <SelectTrigger className="w-full cursor-pointer">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Yes">Yes</SelectItem>
+                            <SelectItem value="No">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {fieldState.invalid && (
+                          <FieldError
+                            className="text-[12px]"
+                            errors={[fieldState.error]}
+                          />
+                        )}
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="concernsToDiscuss"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldContent className="mt-4">
+                        <FieldLabel className="text-foreground">
+                          Future Concerns for Counselor Discussion
+                        </FieldLabel>
+                        <Textarea
+                          className="min-h-[201px]"
+                          {...field}
+                          value={field.value ?? ""}
+                          placeholder="List specific difficulties you want to address."
+                          autoComplete="off"
                         />
-                      )}
-                    </FieldContent>
-                  </Field>
-                )}
-              />
+                        {fieldState.invalid && (
+                          <FieldError
+                            className="text-[12px]"
+                            errors={[fieldState.error]}
+                          />
+                        )}
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+              </div>
             </div>
           </FieldGroup>
         </FieldSet>
@@ -187,4 +227,4 @@ export const AcademicDataCSection = React.forwardRef<
   )
 })
 
-AcademicDataCSection.displayName = "AcademicDataCSection"
+PsychosocialDataBSection.displayName = "PsychosocialDataBSection"

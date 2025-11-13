@@ -9,6 +9,7 @@ import {
   RibbonIcon,
   RoseIcon,
   CircleAlertIcon,
+  ArrowLeftToLineIcon,
 } from "lucide-react"
 import { Progress } from "./ui/progress"
 import CatImage from "@/components/happy-toast"
@@ -62,9 +63,57 @@ import {
 } from "./profiling-sections/academic-and-career-data/academic-data-c"
 
 import {
+  DistanceLearningASection,
+  DistanceLearningASectionRef,
+} from "./profiling-sections/distance-learning-resources/distance-learning-a"
+
+import {
+  DistanceLearningBSection,
+  DistanceLearningBSectionRef,
+} from "./profiling-sections/distance-learning-resources/distance-learning-b"
+
+import {
+  PsychosocialDataASection,
+  PsychosocialDataASectionRef,
+} from "./profiling-sections/psychosocial-data/psychosocial-data-a"
+
+import {
+  PsychosocialDataBSection,
+  PsychosocialDataBSectionRef,
+} from "./profiling-sections/psychosocial-data/psychosocial-data-b"
+
+import {
+  NeedsAssessmentASection,
+  NeedsAssessmentASectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-a"
+
+import {
+  NeedsAssessmentBSection,
+  NeedsAssessmentBSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-b"
+
+import {
+  NeedsAssessmentCSection,
+  NeedsAssessmentCSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-c"
+
+import {
+  NeedsAssessmentDSection,
+  NeedsAssessmentDSectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-d"
+
+import {
+  NeedsAssessmentESection,
+  NeedsAssessmentESectionRef,
+} from "./profiling-sections/needs-assessment/needs-assessment-e"
+
+import {
   studentIndividualDataSchema,
   familyDataSchema,
   academicDataSchema,
+  distanceLearningSchema,
+  psychosocialDataSchema,
+  needsAssessmentSchema,
 } from "@/lib/schemas"
 import {
   saveStudentSection,
@@ -78,17 +127,32 @@ import MSULove from "@/public/msu iit love.png"
 import * as z from "zod"
 
 import { useRef } from "react"
+import { TooltipThis } from "./tooltip-this"
 
 type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
 type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
 type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
+type DistanceLearningFormFields = keyof z.infer<typeof distanceLearningSchema>
+type PsychosocialDataFormFields = keyof z.infer<typeof psychosocialDataSchema>
+type NeedsAssessmentDataFormFields = keyof z.infer<typeof needsAssessmentSchema>
 
 type FormFields =
   | PersonalDataFormFields
   | FamilyDataFormFields
   | AcademicDataFormFields
+  | DistanceLearningFormFields
+  | PsychosocialDataFormFields
+  | NeedsAssessmentDataFormFields
 
-export function InProgressProfile() {
+type InProgressProfileProps = {
+  isEditing?: boolean
+  onBackToSummary?: () => void
+}
+
+export function InProgressProfile({
+  isEditing,
+  onBackToSummary,
+}: InProgressProfileProps) {
   // 0–5 (6 sections)
   const [currentSection, setCurrentSection] = useState(0)
   const [currentPart, setCurrentPart] = useState(0)
@@ -212,6 +276,132 @@ export function InProgressProfile() {
           )
         }
       }
+    } else if (currentSection === 3) {
+      // Distance Learning
+      if (currentPart === 0) {
+        const distanceA = transformFromDistanceLearningDataA(fullProfile)
+        if (
+          distanceA &&
+          distanceLearningARef.current &&
+          hasAnyData(distanceA)
+        ) {
+          distanceLearningARef.current.form.reset(
+            distanceA as Parameters<
+              typeof distanceLearningARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const distanceB = transformFromDistanceLearningDataB(fullProfile)
+        if (
+          distanceB &&
+          distanceLearningBRef.current &&
+          hasAnyData(distanceB)
+        ) {
+          distanceLearningBRef.current.form.reset(
+            distanceB as Parameters<
+              typeof distanceLearningBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 4) {
+      // Psychosocial Data
+      if (currentPart === 0) {
+        const psychosocialA = transformFromPsychosocialDataA(fullProfile)
+        if (
+          psychosocialA &&
+          psychosocialDataARef.current &&
+          hasAnyData(psychosocialA)
+        ) {
+          psychosocialDataARef.current.form.reset(
+            psychosocialA as Parameters<
+              typeof psychosocialDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const psychosocialB = transformFromPsychosocialDataB(fullProfile)
+        if (
+          psychosocialB &&
+          psychosocialDataBRef.current &&
+          hasAnyData(psychosocialB)
+        ) {
+          psychosocialDataBRef.current.form.reset(
+            psychosocialB as Parameters<
+              typeof psychosocialDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 5) {
+      // Needs Assessment
+      if (currentPart === 0) {
+        const needsAssessmentA = transformFromNeedsAssessmentDataA(fullProfile)
+        if (
+          needsAssessmentA &&
+          needsAssessmentDataARef.current &&
+          hasAnyData(needsAssessmentA)
+        ) {
+          needsAssessmentDataARef.current.form.reset(
+            needsAssessmentA as Parameters<
+              typeof needsAssessmentDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const needsAssessmentB = transformFromNeedsAssessmentDataB(fullProfile)
+        if (
+          needsAssessmentB &&
+          needsAssessmentDataBRef.current &&
+          hasAnyData(needsAssessmentB)
+        ) {
+          needsAssessmentDataBRef.current.form.reset(
+            needsAssessmentB as Parameters<
+              typeof needsAssessmentDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const needsAssessmentC = transformFromNeedsAssessmentDataC(fullProfile)
+        if (
+          needsAssessmentC &&
+          needsAssessmentDataCRef.current &&
+          hasAnyData(needsAssessmentC)
+        ) {
+          needsAssessmentDataCRef.current.form.reset(
+            needsAssessmentC as Parameters<
+              typeof needsAssessmentDataCRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 3) {
+        const needsAssessmentD = transformFromNeedsAssessmentDataD(fullProfile)
+        if (
+          needsAssessmentD &&
+          needsAssessmentDataDRef.current &&
+          hasAnyData(needsAssessmentD)
+        ) {
+          needsAssessmentDataDRef.current.form.reset(
+            needsAssessmentD as Parameters<
+              typeof needsAssessmentDataDRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 4) {
+        const needsAssessmentE = transformFromNeedsAssessmentDataE(fullProfile)
+        if (
+          needsAssessmentE &&
+          needsAssessmentDataERef.current &&
+          hasAnyData(needsAssessmentE)
+        ) {
+          needsAssessmentDataERef.current.form.reset(
+            needsAssessmentE as Parameters<
+              typeof needsAssessmentDataERef.current.form.reset
+            >[0]
+          )
+        }
+      }
     }
   }
 
@@ -229,9 +419,6 @@ export function InProgressProfile() {
       (value) => value !== undefined && value !== null && value !== ""
     )
   }
-
-  // Helper to transform from database format (matching Flask backend transformations)
-  // We need to import these or recreate them here
   const transformFromPersonalDataA = (
     dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
   ) => {
@@ -382,6 +569,115 @@ export function InProgressProfile() {
     }
   }
 
+  const transformFromDistanceLearningDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbGadgetOptions = dbRecord.technology_gadgets
+    const dbConnectivityOptions = dbRecord.internet_connectivity_means
+    return {
+      technologyGadgets: Array.isArray(dbGadgetOptions) ? dbGadgetOptions : [],
+      otherOptionTechnologyGadgets: dbRecord.technology_gadgets_other,
+      meansOfInternet: Array.isArray(dbConnectivityOptions)
+        ? dbConnectivityOptions
+        : [],
+      otherOptionMeansOfInternet: dbRecord.internet_connectivity_other,
+    }
+  }
+
+  const transformFromDistanceLearningDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      internetAccess: dbRecord.internet_access,
+      learningReadiness: dbRecord.distance_learning_readiness,
+      learningSpace: dbRecord.learning_space_description,
+    }
+  }
+
+  const transformFromPsychosocialDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      personalCharacteristics: dbRecord.personality_characteristics,
+      copingMechanismBadDay: dbRecord.coping_mechanism_bad_day,
+      hadCounseling: dbRecord.had_counseling_before === true ? "Yes" : "No",
+      seekProfessionalHelp:
+        dbRecord.seeking_professional_help === true ? "Yes" : "No",
+      perceiveMentalHealth: dbRecord.perceived_mental_health,
+    }
+  }
+
+  const transformFromPsychosocialDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.problem_sharers
+    return {
+      problemSharers: Array.isArray(dbOptions) ? dbOptions : [],
+      otherOptionProblemSharer: dbRecord.problem_sharers_others,
+      needsImmediateCounseling:
+        dbRecord.needs_immediate_counseling === true ? "Yes" : "No",
+      concernsToDiscuss: dbRecord.concerns_to_discuss,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbNeedsOptions = dbRecord.improvement_needs
+    const dbFinancialOptions = dbRecord.financial_assistance_needs
+    return {
+      improvementNeeds: Array.isArray(dbNeedsOptions) ? dbNeedsOptions : [],
+      othersOptionImprovementNeeds: dbRecord.improvement_needs_others,
+      financialAssistanceNeeds: Array.isArray(dbFinancialOptions)
+        ? dbFinancialOptions
+        : [],
+      othersOptionfinancialAssistanceNeeds:
+        dbRecord.financial_assistance_needs_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.personal_social_needs
+    return {
+      personalSocialNeeds: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPersonalSocialNeeds: dbRecord.personal_social_needs_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.upset_responses
+    return {
+      upsetResponses: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionUpsetResponses: dbRecord.upset_responses_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataD = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.primary_problem_sharer
+    return {
+      primaryProblemSharer: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPrimaryProblemSharer: dbRecord.primary_problem_sharer_others,
+      firstQuestion: dbRecord.experience_counseling_willfully,
+      secondQuestion: dbRecord.experience_counseling_referral,
+      thirdQuestion: dbRecord.know_guidance_center_help,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataE = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      fourthQuestion: dbRecord.afraid_of_guidance_center,
+      fifthQuestion: dbRecord.shy_to_ask_counselor,
+    }
+  }
+
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
     async function loadInitialProfile() {
@@ -444,6 +740,15 @@ export function InProgressProfile() {
   const academicDataARef = useRef<AcademicDataASectionRef>(null)
   const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
   const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
+  const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
+  const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
+  const psychosocialDataARef = useRef<PsychosocialDataASectionRef>(null)
+  const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
+  const needsAssessmentDataARef = useRef<NeedsAssessmentASectionRef>(null)
+  const needsAssessmentDataBRef = useRef<NeedsAssessmentBSectionRef>(null)
+  const needsAssessmentDataCRef = useRef<NeedsAssessmentCSectionRef>(null)
+  const needsAssessmentDataDRef = useRef<NeedsAssessmentDSectionRef>(null)
+  const needsAssessmentDataERef = useRef<NeedsAssessmentESectionRef>(null)
 
   const sections = [
     { name: "Personal Data", parts: 4 },
@@ -451,7 +756,7 @@ export function InProgressProfile() {
     { name: "Academic Data", parts: 3 },
     { name: "Distance Learning", parts: 2 },
     { name: "Psychosocial", parts: 2 },
-    { name: "Needs Assessment", parts: 2 },
+    { name: "Needs Assessment", parts: 5 },
   ]
 
   // calculate progress for the current section
@@ -475,6 +780,21 @@ export function InProgressProfile() {
       if (currentPart === 0) return academicDataARef
       if (currentPart === 1) return academicDataBRef
       if (currentPart === 2) return academicDataCRef
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0) return distanceLearningARef
+      if (currentPart === 1) return distanceLearningBRef
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0) return psychosocialDataARef
+      if (currentPart === 1) return psychosocialDataBRef
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) return needsAssessmentDataARef
+      if (currentPart === 1) return needsAssessmentDataBRef
+      if (currentPart === 2) return needsAssessmentDataCRef
+      if (currentPart === 3) return needsAssessmentDataDRef
+      if (currentPart === 4) return needsAssessmentDataERef
     }
     return null
   }
@@ -592,6 +912,66 @@ export function InProgressProfile() {
         ]
       }
     }
+    if (currentSection === 3) {
+      if (currentPart === 0) {
+        return [
+          "technologyGadgets",
+          "otherOptionTechnologyGadgets",
+          "meansOfInternet",
+          "otherOptionMeansOfInternet",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["internetAccess", "learningReadiness", "learningSpace"]
+      }
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0) {
+        return [
+          "personalCharacteristics",
+          "copingMechanismBadDay",
+          "hadCounseling",
+          "seekProfessionalHelp",
+          "perceiveMentalHealth",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "problemSharers",
+          "otherOptionProblemSharer",
+          "needsImmediateCounseling",
+          "concernsToDiscuss",
+        ]
+      }
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) {
+        return [
+          "improvementNeeds",
+          "othersOptionImprovementNeeds",
+          "financialAssistanceNeeds",
+          "othersOptionfinancialAssistanceNeeds",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["personalSocialNeeds", "othersOptionPersonalSocialNeeds"]
+      }
+      if (currentPart === 2) {
+        return ["upsetResponses", "othersOptionUpsetResponses"]
+      }
+      if (currentPart === 3) {
+        return [
+          "primaryProblemSharer",
+          "othersOptionPrimaryProblemSharer",
+          "firstQuestion",
+          "secondQuestion",
+          "thirdQuestion",
+        ]
+      }
+      if (currentPart === 4) {
+        return ["fourthQuestion", "fifthQuestion"]
+      }
+    }
     return []
   }
 
@@ -635,7 +1015,7 @@ export function InProgressProfile() {
         const result = await saveStudentSection(
           formData,
           currentSection as 0 | 1 | 2 | 3 | 4 | 5,
-          currentPart as 0 | 1 | 2 | 3
+          currentPart as 0 | 1 | 2 | 3 | 4
         )
 
         if (!result.success) {
@@ -662,6 +1042,10 @@ export function InProgressProfile() {
         if (updatedProfile) {
           setLoadedProfileData(updatedProfile)
         }
+
+        // should refresh not just on initial mount, but every after save
+        const progress = await getProfileProgress()
+        setCompletedSections(new Set(progress.completedSections || []))
       } catch (error) {
         console.error("Error saving section:", error)
         toast.error(
@@ -697,6 +1081,8 @@ export function InProgressProfile() {
       const nextSection = currentSection + 1
       setCurrentSection(nextSection)
       setCurrentPart(0)
+    } else {
+      window.location.reload()
     }
   }
 
@@ -813,6 +1199,30 @@ export function InProgressProfile() {
         return <AcademicDataBSection ref={academicDataBRef} />
       if (currentPart === 2)
         return <AcademicDataCSection ref={academicDataCRef} />
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0)
+        return <DistanceLearningASection ref={distanceLearningARef} />
+      if (currentPart === 1)
+        return <DistanceLearningBSection ref={distanceLearningBRef} />
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0)
+        return <PsychosocialDataASection ref={psychosocialDataARef} />
+      if (currentPart === 1)
+        return <PsychosocialDataBSection ref={psychosocialDataBRef} />
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0)
+        return <NeedsAssessmentASection ref={needsAssessmentDataARef} />
+      if (currentPart === 1)
+        return <NeedsAssessmentBSection ref={needsAssessmentDataBRef} />
+      if (currentPart === 2)
+        return <NeedsAssessmentCSection ref={needsAssessmentDataCRef} />
+      if (currentPart === 3)
+        return <NeedsAssessmentDSection ref={needsAssessmentDataDRef} />
+      if (currentPart === 4)
+        return <NeedsAssessmentESection ref={needsAssessmentDataERef} />
     }
 
     // placeholder muna
@@ -1208,10 +1618,21 @@ export function InProgressProfile() {
             </div>
           </div>
         </div>
-        <div className="text-main mt-4 ml-185 text-xs italic">
+        <div className="mt-3 flex">
+          {isEditing && onBackToSummary && (
+            <TooltipThis label="Go Back to Profile">
+              <Button
+                variant="outline"
+                onClick={onBackToSummary}
+                className="cursor-pointer rounded-sm px-4 py-2 text-sm tracking-wide"
+              >
+                <ArrowLeftToLineIcon />
+              </Button>
+            </TooltipThis>
+          )}
           <HoverCard>
-            <HoverCardTrigger className="">
-              <CircleAlertIcon className="text-main2/50 hover:text-main mr-1 mb-0.5 inline h-4 w-4" />
+            <HoverCardTrigger className="ml-auto">
+              <CircleAlertIcon className="text-main2/50 hover:text-main h-4 w-4" />
             </HoverCardTrigger>
             <HoverCardContent className="text-center text-xs italic">
               Information will only be saved/updated upon clicking the

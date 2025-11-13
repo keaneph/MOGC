@@ -249,7 +249,9 @@ export const studentIndividualDataSchema = z
     ]),
   })
   .refine(
-    (data) => data.civilStatus !== "Others" || !!data.otherCivilStatus?.trim(),
+    (data) =>
+      data.civilStatus !== "Others" ||
+      (data.otherCivilStatus && data.otherCivilStatus.trim().length >= 2),
     {
       message: "Please specify your civil status",
       path: ["otherCivilStatus"],
@@ -384,9 +386,9 @@ export const familyDataSchema = z.object({
   relationshipWithGuardian: z
     .string()
     .trim()
-    .min(2, "Guardian's relationship must be at least 2 characters")
-    .max(50, "Guardian's relationship must be at most 50 characters")
-    .regex(/^[a-zA-Z\s]+$/, "Must contain only letters, and spaces"),
+    .min(2, "Guardian's relationship must be at least 2 characters or N/A")
+    .max(50, "Guardian's relationship must be at most 50 characters or N/A")
+    .regex(/^[a-zA-Z\s'-/]+$/, "Must contain only letters, and spaces or N/A"),
 
   ordinalPosition: z.enum(["Only Child", "Eldest", "Middle", "Youngest"]),
 
@@ -398,7 +400,7 @@ export const familyDataSchema = z.object({
     .string()
     .trim()
     .min(2, "Description must be at least 2 characters")
-    .max(50, "Description must be at most 50 characters"),
+    .max(150, "Description must be at most 150 characters"),
 })
 
 export const academicDataSchema = z
@@ -490,7 +492,7 @@ export const academicDataSchema = z
     reasonsForChoosingiit: z
       .array(z.string())
       .min(1, "Please select at least one reason for choosing IIT."),
-    otherReasonForChoosingiit: z.string().trim().optional(),
+    otherReasonForChoosingiit: z.string().optional().nullable(),
 
     reasonForCourse: z
       .string()
@@ -541,3 +543,107 @@ export const academicDataSchema = z
       path: ["otherReasonForChoosingiit"],
     }
   )
+
+export const distanceLearningSchema = z.object({
+  technologyGadgets: z
+    .array(z.string())
+    .min(1, "Please select at least one gadget available."),
+
+  otherOptionTechnologyGadgets: z.string().nullable().optional(),
+
+  meansOfInternet: z
+    .array(z.string())
+    .min(1, "Please select at least one means of connectivity."),
+
+  otherOptionMeansOfInternet: z.string().nullable().optional(),
+
+  internetAccess: z.enum([
+    "No internet access",
+    "Limited internet access",
+    "Full internet access",
+  ]),
+
+  learningReadiness: z.enum([
+    "Fully ready",
+    "Ready",
+    "A little ready",
+    "Not ready",
+  ]),
+
+  learningSpace: z
+    .string()
+    .trim()
+    .min(2, "Learning space must be at least 2 characters")
+    .max(50, "Learning space activities must be at most 50 characters"),
+})
+
+export const psychosocialDataSchema = z.object({
+  personalCharacteristics: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(100, "Must be at most 100 characters"),
+
+  copingMechanismBadDay: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
+
+  hadCounseling: z.enum(["Yes", "No"]),
+
+  seekProfessionalHelp: z.enum(["Yes", "No"]),
+
+  perceiveMentalHealth: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
+
+  problemSharers: z
+    .array(z.string())
+    .min(1, "Please select at least one to share your problem with."),
+
+  otherOptionProblemSharer: z.string().nullable().optional(),
+
+  needsImmediateCounseling: z.enum(["Yes", "No"]),
+
+  concernsToDiscuss: z
+    .string()
+    .trim()
+    .min(2, "Must be at least 2 characters")
+    .max(200, "Must be at most 200 characters"),
+})
+
+export const needsAssessmentSchema = z.object({
+  improvementNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionImprovementNeeds: z.string().nullable().optional(),
+  financialAssistanceNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionfinancialAssistanceNeeds: z.string().nullable().optional(),
+  personalSocialNeeds: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionPersonalSocialNeeds: z.string().nullable().optional(),
+  upsetResponses: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionUpsetResponses: z.string().nullable().optional(),
+  primaryProblemSharer: z
+    .array(z.string())
+    .min(1, "Please select at least one that apply to you."),
+  othersOptionPrimaryProblemSharer: z.string().nullable().optional(),
+
+  firstQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  secondQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  thirdQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  fourthQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+
+  fifthQuestion: z.enum(["Always", "Oftentimes", "Sometimes", "Never"]),
+})
