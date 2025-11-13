@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
 
@@ -26,3 +26,8 @@ from app.routes.counselors import counselors_bp
 app.register_blueprint(check_bp)
 app.register_blueprint(students_bp)
 app.register_blueprint(counselors_bp)
+
+
+@app.route("/healthcheck")
+def healthcheck():
+    return jsonify({"status": "ok"}), 200
