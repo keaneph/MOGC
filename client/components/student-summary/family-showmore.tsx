@@ -12,7 +12,7 @@ export default function FamilyShowMoreSection({ summary }: Props) {
           <div className="w-[315px] flex-col p-2">
             <div className="mb-5 flex flex-col">
               <span className="text-main2 mb-2 text-[12px] tracking-wide">
-                Parents' Marital Status
+                Parents&apos; Marital Status
               </span>
               <span className="text-sm tracking-wide">
                 {summary.parents_marital_status}
