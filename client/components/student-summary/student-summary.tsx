@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { PrimaryButton } from "@/components/primary-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSupabaseEmail } from "@/hooks/use-supabase-email"
 import { useSupabaseUser } from "@/hooks/use-supabase-user"
