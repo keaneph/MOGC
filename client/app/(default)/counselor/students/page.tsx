@@ -64,7 +64,7 @@ export default function StudentsPage() {
     try {
       const data = await getCounselorStudentList()
       setStudents(data)
-    } catch (err) {
+    } catch {
       setError("Failed to load student list.")
     } finally {
       setLoading(false)

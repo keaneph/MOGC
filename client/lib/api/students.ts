@@ -27,7 +27,7 @@ type SectionIndex = 0 | 1 | 2 | 3 | 4 | 5
 type PartIndex = 0 | 1 | 2 | 3 | 4
 
 // database record type (dapat ni imatch sa Supabase)
-type StudentRecord = {
+export type StudentRecord = {
   id?: string
   auth_user_id?: string
   id_number?: string
@@ -297,5 +297,29 @@ export async function getStudentProfile(): Promise<StudentRecord | null> {
   } catch (error) {
     console.error("Error getting student profile:", error)
     return null
+  }
+}
+
+export async function getStudentProfileSummary(): Promise<StudentRecord | null> {
+  try {
+    const data = await apiRequest<{ data: StudentRecord | null }>(
+      "/api/students/profile/summary"
+    )
+    return data.data
+  } catch (error) {
+    console.error("Error getting student profile summary:", error)
+    return null
+  }
+}
+
+export async function isStudentProfileComplete(): Promise<boolean> {
+  try {
+    const data = await apiRequest<{ complete: boolean }>(
+      "/api/students/profile/completion-status"
+    )
+    return data.complete
+  } catch (error) {
+    console.error("Error checking profile completion:", error)
+    return false
   }
 }

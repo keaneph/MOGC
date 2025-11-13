@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EyeIcon, NotepadText } from "lucide-react"
-import { Badge } from "../ui/badge"
 import {
   updateStudentAssessment,
   updateStudentCounseling,
@@ -14,7 +13,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select" // adjust path if needed
+} from "@/components/ui/select"
 
 export type CounselorStudentListItem = {
   idNumber: string

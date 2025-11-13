@@ -38,7 +38,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm, UseFormReturn } from "react-hook-form"
 import { academicDataSchema } from "@/lib/schemas"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 
 const courses = [
   {

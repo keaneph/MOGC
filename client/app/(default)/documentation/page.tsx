@@ -99,141 +99,143 @@ export default function DocumentationPage() {
           </div>
         </div>
 
-        <div className="mt-10 mb-10 ml-20 text-lg font-semibold tracking-wide">
-          Roadmap
-        </div>
+        <div id="roadmap" className="mb-20 ml-10 w-full scroll-mt-24">
+          <div className="mt-10 mb-10 ml-20 scroll-mt-24 text-lg font-semibold tracking-wide">
+            Roadmap
+          </div>
 
-        <div className="mb-20 ml-10 h-50 w-full">
-          <div className="flex">
-            <div className="relative">
-              <Image
-                src="/roadmap.svg"
-                alt="Roadmap Image"
-                width={1600}
-                height={600}
-                className="h-auto w-[900px]"
-              />
-              <Image
-                src="/pulling.png"
-                alt="Siklab Mascot"
-                width={250}
-                height={250}
-                className="absolute top-[47.6%] left-[99.5%] -translate-y-1/2"
-              />
-              {/* Stepper 1 */}
-              <div className="absolute top-[-5%] left-[5.5%] flex flex-col items-center">
-                <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
-                <div className="bg-main h-15 w-[2px]"></div>{" "}
-                {/* vertical line */}
-                <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
-                  {/* Icon */}
-                  <div className="mr-2 mb-auto">
-                    <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
-                      <ClipboardClock
-                        className="h-4 w-4"
-                        style={{ color: "var(--main)" }}
-                      />
+          <div className="mb-20 ml-10 h-50 w-full">
+            <div className="flex">
+              <div className="relative">
+                <Image
+                  src="/roadmap.svg"
+                  alt="Roadmap Image"
+                  width={1600}
+                  height={600}
+                  className="h-auto w-[900px]"
+                />
+                <Image
+                  src="/pulling.png"
+                  alt="Siklab Mascot"
+                  width={250}
+                  height={250}
+                  className="absolute top-[47.6%] left-[99.5%] -translate-y-1/2"
+                />
+                {/* Stepper 1 */}
+                <div className="absolute top-[-5%] left-[5.5%] flex flex-col items-center">
+                  <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
+                  <div className="bg-main h-15 w-[2px]"></div>{" "}
+                  {/* vertical line */}
+                  <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
+                    {/* Icon */}
+                    <div className="mr-2 mb-auto">
+                      <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
+                        <ClipboardClock
+                          className="h-4 w-4"
+                          style={{ color: "var(--main)" }}
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Texts */}
-                  <div className="flex flex-col">
-                    <div className="text-[12px] font-medium tracking-wide">
-                      Appointment Scheduling
-                    </div>
-                    <div className="font-regular text-main2 text-[10px] tracking-wide">
-                      Counselor & Student
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stepper 2*/}
-              <div className="absolute top-[-15%] left-[21.5%] flex flex-col items-center">
-                {/* container */}
-                <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
-                  {/* Icon */}
-                  <div className="mr-2 mb-auto">
-                    <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
-                      <BookHeart
-                        className="h-4 w-4"
-                        style={{ color: "var(--main)" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Texts */}
-                  <div className="flex flex-col">
-                    <div className="text-[12px] font-medium tracking-wide">
-                      Session notes and counseling history
-                    </div>
-                    <div className="font-regular text-main2 text-[10px] tracking-wide">
-                      Counselor
+                    {/* Texts */}
+                    <div className="flex flex-col">
+                      <div className="text-[12px] font-medium tracking-wide">
+                        Appointment Scheduling
+                      </div>
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
+                        Counselor & Student
+                      </div>
                     </div>
                   </div>
                 </div>
-                {/* vertical line */}
-                <div className="bg-main h-15 w-[2px]"></div>
-                <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
-              </div>
 
-              {/* Stepper 3 */}
-              <div className="absolute top-[-4%] left-[42.5%] flex flex-col items-center">
-                <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
-                <div className="bg-main h-15 w-[2px]"></div>{" "}
-                {/* vertical line */}
-                <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
-                  {/* Icon */}
-                  <div className="mr-2 mb-auto">
-                    <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
-                      <ChartLine
-                        className="h-4 w-4"
-                        style={{ color: "var(--main)" }}
-                      />
+                {/* Stepper 2*/}
+                <div className="absolute top-[-15%] left-[21.5%] flex flex-col items-center">
+                  {/* container */}
+                  <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
+                    {/* Icon */}
+                    <div className="mr-2 mb-auto">
+                      <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
+                        <BookHeart
+                          className="h-4 w-4"
+                          style={{ color: "var(--main)" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Texts */}
+                    <div className="flex flex-col">
+                      <div className="text-[12px] font-medium tracking-wide">
+                        Session notes and counseling history
+                      </div>
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
+                        Counselor
+                      </div>
                     </div>
                   </div>
+                  {/* vertical line */}
+                  <div className="bg-main h-15 w-[2px]"></div>
+                  <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
+                </div>
 
-                  {/* Texts */}
-                  <div className="flex flex-col">
-                    <div className="text-[12px] font-medium tracking-wide">
-                      Analytics dashboard for trends
+                {/* Stepper 3 */}
+                <div className="absolute top-[-4%] left-[42.5%] flex flex-col items-center">
+                  <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
+                  <div className="bg-main h-15 w-[2px]"></div>{" "}
+                  {/* vertical line */}
+                  <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
+                    {/* Icon */}
+                    <div className="mr-2 mb-auto">
+                      <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
+                        <ChartLine
+                          className="h-4 w-4"
+                          style={{ color: "var(--main)" }}
+                        />
+                      </div>
                     </div>
-                    <div className="font-regular text-main2 text-[10px] tracking-wide">
-                      Counselor & Student
+
+                    {/* Texts */}
+                    <div className="flex flex-col">
+                      <div className="text-[12px] font-medium tracking-wide">
+                        Analytics dashboard for trends
+                      </div>
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
+                        Counselor & Student
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Stepper 2*/}
-              <div className="absolute top-[5.8%] left-[65%] flex flex-col items-center">
-                {/* container */}
-                <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
-                  {/* Icon */}
-                  <div className="mr-2 mb-auto">
-                    <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
-                      <CalendarDays
-                        className="h-4 w-4"
-                        style={{ color: "var(--main)" }}
-                      />
+                {/* Stepper 2*/}
+                <div className="absolute top-[5.8%] left-[65%] flex flex-col items-center">
+                  {/* container */}
+                  <div className="container mb-auto flex !w-[210px] items-center rounded-sm border bg-white pt-2 pr-3 pb-2 pl-2 shadow-md">
+                    {/* Icon */}
+                    <div className="mr-2 mb-auto">
+                      <div className="bg-main/5 flex h-6 w-6 items-center justify-center rounded-sm">
+                        <CalendarDays
+                          className="h-4 w-4"
+                          style={{ color: "var(--main)" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Texts */}
+                    <div className="flex flex-col">
+                      <div className="text-[12px] font-medium tracking-wide">
+                        Calendar of Events
+                      </div>
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
+                        Counselor & Student
+                      </div>
                     </div>
                   </div>
-
-                  {/* Texts */}
-                  <div className="flex flex-col">
-                    <div className="text-[12px] font-medium tracking-wide">
-                      Calendar of Events
-                    </div>
-                    <div className="font-regular text-main2 text-[10px] tracking-wide">
-                      Counselor & Student
-                    </div>
-                  </div>
+                  {/* vertical line */}
+                  <div className="bg-main h-15 w-[2px]"></div>
+                  <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
                 </div>
-                {/* vertical line */}
-                <div className="bg-main h-15 w-[2px]"></div>
-                <div className="bg-main ring-main2 h-5 w-5 rounded-full border-3 border-white ring-1"></div>
+                {/* End of Steppers */}
               </div>
-              {/* End of Steppers */}
             </div>
           </div>
         </div>
