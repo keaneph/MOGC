@@ -45,11 +45,15 @@ export function LoginForm({ ...props }: React.ComponentProps<"div">) {
     setError(null)
 
     try {
+      const appOrigin =
+        (typeof window !== "undefined" && window.location?.origin) ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        "https://mogc.vercel.app"
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           queryParams: { prompt: "select_account" },
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${appOrigin}/auth/callback`,
         },
       })
 
