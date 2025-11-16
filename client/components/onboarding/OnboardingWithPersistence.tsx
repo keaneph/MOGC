@@ -29,11 +29,14 @@ export default function OnboardingWithPersistence(props: OnboardingProps) {
           .update({ onboarding_completed: true })
           .eq("id", user.id)
           .select()
-        
+
         if (error) {
           console.error("Failed to persist onboarding completion:", error)
         } else {
-          console.log("Successfully updated onboarding_completed to true:", data)
+          console.log(
+            "Successfully updated onboarding_completed to true:",
+            data
+          )
         }
       }
     } catch (err) {
