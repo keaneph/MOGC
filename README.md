@@ -1,74 +1,144 @@
-# MOGC - MSU-IIT Office of Guidance and Counseling
+<h1 align="center">
+  MOGC - MSU-IIT Office of Guidance & Counseling
 
-### Prerequisites
+![status](https://img.shields.io/badge/status-WIP-orange?)
+![GitHub last commit](https://img.shields.io/github/last-commit/keaneph/mogc?)
+![Next.js](https://img.shields.io/badge/Next.js-15-white?&logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?&logo=react&logoColor=blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?&logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38BDF8?&logo=tailwind-css)
+![Python](https://img.shields.io/badge/Python-3.13-yellow?&logo=python)
+![Flask](https://img.shields.io/badge/Flask-3.1-lightblue?&logo=flask)
+![Supabase](https://img.shields.io/badge/Supabase-Database_&_Auth-3ECF8E?&logo=supabase)
 
-- Node.js 20+
-- Python 3.13
-- Pipenv
+</h1>
 
-### Development and Current Project Flow
+A two-part web application for MSU‑IIT's Office of Guidance and Counseling (MOGC). It includes a modern Next.js + React frontend and a Flask backend that integrates with Supabase for authentication and storage.
 
-run both frontend and backend simultaneously in separate terminals.
-for devs: you can opt to open a third terminal for git
+## Key features
 
-for syncing purposes only, do: pipenv requirements > requirements.txt
+- Next.js 15 + React 19 frontend (TypeScript)
+- Flask backend (Python 3.13) providing API endpoints and Supabase integration
+- Supabase for auth, realtime, and Postgres storage
+- Tailwind CSS for styling and a collection of reusable UI components
 
-**Frontend:**
+## Who should read this
 
-```bash
+This README is focused on developers who want to run the project locally, contribute, or extend it. For API reference and user documentation, see the `client/` and `server/` source folders and any internal docs.
+
+---
+
+## Quick start — run locally (PowerShell)
+
+Prerequisites
+
+- Node.js 20+ (for the `client`)
+- Python 3.13 (for the `server`)
+- pipenv (optional; you can also use plain venv + pip)
+
+Open two terminals (one for frontend, one for backend) and run:
+
+Frontend (client)
+
+```powershell
 cd client
 npm install
 npm run dev
 ```
 
--> runs on http://localhost:3000
+The frontend dev server runs at http://localhost:3000 by default.
 
-**Backend:**
+Backend (server)
 
-```bash
+If you use pipenv (recommended for parity with this repo):
+
+```powershell
 cd server
-pipenv install          # first time only
+pipenv install      # first time only
 pipenv shell
-flask run
-exit                    # if done
+flask run           # runs on http://localhost:5000
+python run.py       # optional: alternative way to run the backend
+exit                # leave the virtualenv
 ```
 
--> runs on http://localhost:5000
+Or with a plain venv:
 
-**Env:**
-make sure to create one in server/ directory
+```powershell
+cd server
+python -m venv .venv
+.\\.venv\\Scripts\\Activate.ps1
+pip install -r requirements.txt
+flask run
+```
 
-```bash
-SUPABASE_URL=your-supabase-url
+Environment variables
+
+Create a `.env.local` file in the `client/` directory (or set env vars in your shell). Minimum vars used by the client:
+
+```text
+RESEND_API_KEY = your-resend-api-key
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your-publishable-or-anon-key
+```
+
+Create a `.env` file in the `server/` directory (or set env vars in your shell). Minimum vars used by the server:
+
+```text
+PIPENV_VENV_IN_PROJECT=1
+SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-### Project Structure
+## Project layout (top-level)
 
 ```
-mogc/
-├── client/          # Next.js 15 + React 19 + TypeScript
-├── server/          # Flask + Python 3.13
-└── supabase/        # Database migrations & seeds
+README.md            # <- you are here
+client/              # Next.js frontend (TSX, Tailwind)
+server/              # Flask backend and API
 ```
 
-### Tech Stack
+Important paths
 
-**Frontend:**
+- `client/` — Next.js app, run with `npm run dev`.
+- `server/` — Flask app, run with `flask run` or `python run.py`
 
-- Next.js 15.5.6 (App Router)
-- React 19.1.0
-- TypeScript 5
-- Tailwind CSS 4
-- ESLint 9
+## Development notes
 
-**Backend:**
+- Frontend tech highlights: Next.js 15, React 19, TypeScript 5, Tailwind CSS 4.
+- Backend tech highlights: Flask, Flask-CORS, python-dotenv, Supabase Python client.
+- See `client/package.json` for available npm scripts (dev, build, start, lint).
+- See `server/Pipfile` and `server/requirements.txt` for Python dependencies.
 
-- Flask
-- Python 3.13
-- Flask-CORS
-- python-dotenv
+## Running production build
 
-**Database:**
+Build frontend:
 
-- Supabase (PostgreSQL)
+```powershell
+cd client
+npm run build
+```
+
+Serve the frontend with `npm start` or deploy to a hosting provider. The backend can be run behind a WSGI server (e.g., Gunicorn) in production.
+
+## Where to get help
+
+- Open an issue in this repository for bugs and feature requests.
+- Join developer discussions by creating issues or pull requests.
+- For environment-specific questions (Supabase etc.), consult their official docs.
+
+## Contributing
+
+We welcome contributions. For contribution guidelines and the preferred PR process, see `CONTRIBUTING.md` in the repo root.
+
+## Primary Maintainers
+
+- @keaneph (GitHub repository owner)
+- @CodeDotcom2
+- @00hanas
+- noobmaster126
+
+To propose changes: fork → branch → open PR. Use descriptive PR titles and include screenshots or notes for frontend changes.
+
+## Security & License
+
+If you discover a security vulnerability, please open a private issue or contact the maintainers. This repository contains a `LICENSE` file, contact the maintainers to clarify licensing.
