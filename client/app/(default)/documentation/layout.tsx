@@ -1,10 +1,13 @@
-import { requireAnyRole } from "@/lib/auth"
-import { AppHeader } from "@/components/app-header"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { AppSidebarCounselor } from "@/components/app-sidebar-cs"
-import { Announcements } from "@/components/announcements"
 import { cookies } from "next/headers"
+
+import { Announcements } from "@/components/layouts/announcements"
+import { AppHeader } from "@/components/layouts/app-header"
+import { AppSidebar } from "@/components/layouts/app-sidebar"
+import { AppSidebarCounselor } from "@/components/layouts/app-sidebar-cs"
+
+import { SidebarProvider } from "@/components/ui/sidebar"
+
+import { requireAnyRole } from "@/lib/auth"
 
 export default async function DocumentationLayout({
   children,

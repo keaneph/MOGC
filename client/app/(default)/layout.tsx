@@ -1,7 +1,10 @@
-import { TooltipProvider } from "@radix-ui/react-tooltip"
-import { SiklabSheet } from "@/components/siklab-sheet"
-import { createClient } from "@/lib/server"
 import { redirect } from "next/navigation"
+
+import { TooltipProvider } from "@radix-ui/react-tooltip"
+
+import { SiklabSheet } from "@/components/layouts/sheet"
+
+import { createClient } from "@/lib/server"
 
 export default async function WithSidebarLayout({
   children,

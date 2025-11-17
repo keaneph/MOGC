@@ -1,6 +1,29 @@
 "use client"
 
+import { CircleCheckIcon } from "lucide-react"
+
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+import { useNextStep } from "nextstepjs"
+
 import { useState, useEffect } from "react"
+
+import { toast } from "sonner"
+
+import { PrimaryButton } from "@/components/common/primary-button"
+
+import Confetti from "@/components/feedback/confetti"
+import CatImage from "@/components/feedback/happy-toast"
+import { TooltipThis } from "@/components/feedback/tooltip-this"
+
+import { SiklabSheet } from "@/components/layouts/sheet"
+
+import { Button } from "@/components/ui/button"
+
+import { getOnboardingStatus } from "@/lib/api/students"
+
 import {
   MegaphoneIcon,
   MessagesSquareIcon,
@@ -8,20 +31,8 @@ import {
   SpeechIcon,
   TelescopeIcon,
 } from "lucide-react"
-import Link from "next/link"
-import { PrimaryButton } from "@/components/primary-button"
-import { Button } from "@/components/ui/button"
+
 import love from "@/public/love.png"
-import Image from "next/image"
-import { TooltipThis } from "@/components/tooltip-this"
-import { SiklabSheet } from "@/components/siklab-sheet"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import CatImage from "@/components/happy-toast"
-import { CircleCheckIcon } from "lucide-react"
-import Confetti from "@/components/confetti"
-import { useNextStep } from "nextstepjs"
-import { getOnboardingStatus } from "@/lib/api/students"
 
 export default function GettingStartedPage() {
   const [sheetOpen, setSheetOpen] = useState(false)

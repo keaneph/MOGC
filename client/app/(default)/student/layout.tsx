@@ -1,10 +1,14 @@
 import { cookies } from "next/headers"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Announcements } from "@/components/announcements"
-import { AppHeader } from "@/components/app-header"
-import { requireRole } from "@/lib/auth"
+
 import { NextStepViewport } from "nextstepjs"
+
+import { AppSidebar } from "@/components/layouts/app-sidebar"
+import { Announcements } from "@/components/layouts/announcements"
+import { AppHeader } from "@/components/layouts/app-header"
+
+import { SidebarProvider } from "@/components/ui/sidebar"
+
+import { requireRole } from "@/lib/auth"
 
 export default async function StudentLayout({
   children,

@@ -1,11 +1,13 @@
-import Image from "next/image"
-import { DocumentationTable } from "@/components/documentation-table"
 import {
   BookHeart,
   CalendarDays,
   ChartLine,
   ClipboardClock,
 } from "lucide-react"
+
+import Image from "next/image"
+
+import { DocumentationTable } from "@/components/data/docs/documentation-table"
 
 export default function DocumentationPage() {
   return (

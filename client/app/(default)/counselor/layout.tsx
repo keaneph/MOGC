@@ -1,8 +1,11 @@
 import { cookies } from "next/headers"
+
+import { Announcements } from "@/components/layouts/announcements"
+import { AppSidebarCounselor } from "@/components/layouts/app-sidebar-cs"
+import { AppHeader } from "@/components/layouts/app-header"
+
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { Announcements } from "@/components/announcements"
-import { AppSidebarCounselor } from "@/components/app-sidebar-cs"
-import { AppHeader } from "@/components/app-header"
+
 import { requireRole } from "@/lib/auth"
 
 export default async function CounselorLayout({

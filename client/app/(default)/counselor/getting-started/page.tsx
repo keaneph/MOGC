@@ -1,23 +1,30 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import CatImage from "@/components/happy-toast"
-import { CircleCheckIcon } from "lucide-react"
-import Confetti from "@/components/confetti"
 import {
+  CircleCheckIcon,
   CalendarClockIcon,
   FileSpreadsheetIcon,
   HandHeartIcon,
   TelescopeIcon,
 } from "lucide-react"
-import Link from "next/link"
-import { PrimaryButton } from "@/components/primary-button"
-import { Button } from "@/components/ui/button"
-import love from "@/public/love.png"
+
 import Image from "next/image"
-import { TooltipThis } from "@/components/tooltip-this"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+import { useEffect, useState } from "react"
+
+import { toast } from "sonner"
+
+import { PrimaryButton } from "@/components/common/primary-button"
+
+import Confetti from "@/components/feedback/confetti"
+import CatImage from "@/components/feedback/happy-toast"
+import { TooltipThis } from "@/components/feedback/tooltip-this"
+
+import { Button } from "@/components/ui/button"
+
+import love from "@/public/love.png"
 
 export default function GettiingStartedPage() {
   const router = useRouter()
