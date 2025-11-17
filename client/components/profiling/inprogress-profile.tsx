@@ -1,0 +1,1622 @@
+"use client"
+
+import Image from "next/image"
+
+import {
+  UserStarIcon,
+  HandHeartIcon,
+  GraduationCapIcon,
+  WifiIcon,
+  RibbonIcon,
+  RoseIcon,
+  CircleAlertIcon,
+  ArrowLeftToLineIcon,
+  CircleCheckIcon,
+} from "lucide-react"
+
+import { useState, useEffect, useRef } from "react"
+
+import { toast } from "sonner"
+
+import * as z from "zod"
+
+import CatImage from "@/components/feedback/happy-toast"
+import CatImageSad from "@/components/feedback/sad-toast"
+import { TooltipThis } from "@/components/feedback/tooltip-this"
+
+import { Button } from "@/components/ui/button"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { Progress } from "@/components/ui/progress"
+
+import {
+  PersonalDataASection,
+  PersonalDataASectionRef,
+  PersonalDataBSection,
+  PersonalDataBSectionRef,
+  PersonalDataCSection,
+  PersonalDataCSectionRef,
+  PersonalDataDSection,
+  PersonalDataDSectionRef,
+} from "@/components/profiling/profiling-sections/personal-data"
+
+import {
+  FamilyDataASection,
+  FamilyDataASectionRef,
+  FamilyDataBSection,
+  FamilyDataBSectionRef,
+  FamilyDataCSection,
+  FamilyDataCSectionRef,
+} from "./profiling-sections/family-data"
+
+import {
+  AcademicDataASection,
+  AcademicDataASectionRef,
+  AcademicDataBSection,
+  AcademicDataBSectionRef,
+  AcademicDataCSection,
+  AcademicDataCSectionRef,
+} from "./profiling-sections/academic-and-career-data"
+
+import {
+  DistanceLearningASection,
+  DistanceLearningASectionRef,
+  DistanceLearningBSection,
+  DistanceLearningBSectionRef,
+} from "./profiling-sections/distance-learning-resources"
+
+import {
+  PsychosocialDataASection,
+  PsychosocialDataASectionRef,
+  PsychosocialDataBSection,
+  PsychosocialDataBSectionRef,
+} from "./profiling-sections/psychosocial-data"
+
+import {
+  NeedsAssessmentASection,
+  NeedsAssessmentASectionRef,
+  NeedsAssessmentBSection,
+  NeedsAssessmentBSectionRef,
+  NeedsAssessmentCSection,
+  NeedsAssessmentCSectionRef,
+  NeedsAssessmentDSection,
+  NeedsAssessmentDSectionRef,
+  NeedsAssessmentESection,
+  NeedsAssessmentESectionRef,
+} from "./profiling-sections/needs-assessment"
+
+import {
+  saveStudentSection,
+  profileExists,
+  getProfileProgress,
+  getStudentProfile,
+} from "@/lib/api/students"
+import {
+  studentIndividualDataSchema,
+  familyDataSchema,
+  academicDataSchema,
+  distanceLearningSchema,
+  psychosocialDataSchema,
+  needsAssessmentSchema,
+} from "@/lib/schemas"
+
+import MSULove from "@/public/msu iit love.png"
+
+type PersonalDataFormFields = keyof z.infer<typeof studentIndividualDataSchema>
+type FamilyDataFormFields = keyof z.infer<typeof familyDataSchema>
+type AcademicDataFormFields = keyof z.infer<typeof academicDataSchema>
+type DistanceLearningFormFields = keyof z.infer<typeof distanceLearningSchema>
+type PsychosocialDataFormFields = keyof z.infer<typeof psychosocialDataSchema>
+type NeedsAssessmentDataFormFields = keyof z.infer<typeof needsAssessmentSchema>
+
+type FormFields =
+  | PersonalDataFormFields
+  | FamilyDataFormFields
+  | AcademicDataFormFields
+  | DistanceLearningFormFields
+  | PsychosocialDataFormFields
+  | NeedsAssessmentDataFormFields
+
+type InProgressProfileProps = {
+  isEditing?: boolean
+  onBackToSummary?: () => void
+}
+
+export function InProgressProfile({
+  isEditing,
+  onBackToSummary,
+}: InProgressProfileProps) {
+  // 0–5 (6 sections)
+  const [currentSection, setCurrentSection] = useState(0)
+  const [currentPart, setCurrentPart] = useState(0)
+  const [isIconGrabbed, setIsIconGrabbed] = useState(false)
+  const [draggedOverStep, setDraggedOverStep] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [loadedProfileData, setLoadedProfileData] =
+    useState<Awaited<ReturnType<typeof getStudentProfile>>>(null) // Store full profile data
+  const [completedSections, setCompletedSections] = useState<Set<number>>(
+    new Set()
+  ) // Track completed sections
+  const [lastPartPerSection, setLastPartPerSection] = useState<
+    Map<number, number>
+  >(new Map()) // Track last part visited per section
+  const dragOverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const circleRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  // cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dragOverTimeoutRef.current) {
+        clearTimeout(dragOverTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Helper function to populate current visible form
+  const populateCurrentForm = async (
+    fullProfile: Awaited<ReturnType<typeof getStudentProfile>>
+  ) => {
+    if (!fullProfile) return
+
+    // Wait a tick for form to be mounted
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    if (currentSection === 0) {
+      // Personal Data
+      if (currentPart === 0) {
+        const dataA = transformFromPersonalDataA(fullProfile)
+        if (dataA && personalDataARef.current && hasAnyData(dataA)) {
+          personalDataARef.current.form.reset(
+            dataA as Parameters<typeof personalDataARef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const dataB = transformFromPersonalDataB(fullProfile)
+        if (dataB && personalDataBRef.current && hasAnyData(dataB)) {
+          personalDataBRef.current.form.reset(
+            dataB as Parameters<typeof personalDataBRef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const dataC = transformFromPersonalDataC(fullProfile)
+        if (dataC && personalDataCRef.current && hasAnyData(dataC)) {
+          personalDataCRef.current.form.reset(
+            dataC as Parameters<typeof personalDataCRef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 3) {
+        const dataD = transformFromPersonalDataD(fullProfile)
+        if (dataD && personalDataDRef.current && hasAnyData(dataD)) {
+          personalDataDRef.current.form.reset(
+            dataD as Parameters<typeof personalDataDRef.current.form.reset>[0]
+          )
+        }
+      }
+    } else if (currentSection === 1) {
+      // Family Data
+      if (currentPart === 0) {
+        const familyA = transformFromFamilyDataA(fullProfile)
+        if (familyA && familyDataARef.current && hasAnyData(familyA)) {
+          familyDataARef.current.form.reset(
+            familyA as Parameters<typeof familyDataARef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const familyB = transformFromFamilyDataB(fullProfile)
+        if (familyB && familyDataBRef.current && hasAnyData(familyB)) {
+          familyDataBRef.current.form.reset(
+            familyB as Parameters<typeof familyDataBRef.current.form.reset>[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const familyC = transformFromFamilyDataC(fullProfile)
+        if (familyC && familyDataCRef.current && hasAnyData(familyC)) {
+          familyDataCRef.current.form.reset(
+            familyC as Parameters<typeof familyDataCRef.current.form.reset>[0]
+          )
+        }
+      }
+    } else if (currentSection === 2) {
+      // Academic Data
+      if (currentPart === 0) {
+        const academicA = transformFromAcademicDataA(fullProfile)
+        if (academicA && academicDataARef.current && hasAnyData(academicA)) {
+          academicDataARef.current.form.reset(
+            academicA as Parameters<
+              typeof academicDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const academicB = transformFromAcademicDataB(fullProfile)
+        if (academicB && academicDataBRef.current && hasAnyData(academicB)) {
+          academicDataBRef.current.form.reset(
+            academicB as Parameters<
+              typeof academicDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const academicC = transformFromAcademicDataC(fullProfile)
+        if (academicC && academicDataCRef.current && hasAnyData(academicC)) {
+          academicDataCRef.current.form.reset(
+            academicC as Parameters<
+              typeof academicDataCRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 3) {
+      // Distance Learning
+      if (currentPart === 0) {
+        const distanceA = transformFromDistanceLearningDataA(fullProfile)
+        if (
+          distanceA &&
+          distanceLearningARef.current &&
+          hasAnyData(distanceA)
+        ) {
+          distanceLearningARef.current.form.reset(
+            distanceA as Parameters<
+              typeof distanceLearningARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const distanceB = transformFromDistanceLearningDataB(fullProfile)
+        if (
+          distanceB &&
+          distanceLearningBRef.current &&
+          hasAnyData(distanceB)
+        ) {
+          distanceLearningBRef.current.form.reset(
+            distanceB as Parameters<
+              typeof distanceLearningBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 4) {
+      // Psychosocial Data
+      if (currentPart === 0) {
+        const psychosocialA = transformFromPsychosocialDataA(fullProfile)
+        if (
+          psychosocialA &&
+          psychosocialDataARef.current &&
+          hasAnyData(psychosocialA)
+        ) {
+          psychosocialDataARef.current.form.reset(
+            psychosocialA as Parameters<
+              typeof psychosocialDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const psychosocialB = transformFromPsychosocialDataB(fullProfile)
+        if (
+          psychosocialB &&
+          psychosocialDataBRef.current &&
+          hasAnyData(psychosocialB)
+        ) {
+          psychosocialDataBRef.current.form.reset(
+            psychosocialB as Parameters<
+              typeof psychosocialDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    } else if (currentSection === 5) {
+      // Needs Assessment
+      if (currentPart === 0) {
+        const needsAssessmentA = transformFromNeedsAssessmentDataA(fullProfile)
+        if (
+          needsAssessmentA &&
+          needsAssessmentDataARef.current &&
+          hasAnyData(needsAssessmentA)
+        ) {
+          needsAssessmentDataARef.current.form.reset(
+            needsAssessmentA as Parameters<
+              typeof needsAssessmentDataARef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 1) {
+        const needsAssessmentB = transformFromNeedsAssessmentDataB(fullProfile)
+        if (
+          needsAssessmentB &&
+          needsAssessmentDataBRef.current &&
+          hasAnyData(needsAssessmentB)
+        ) {
+          needsAssessmentDataBRef.current.form.reset(
+            needsAssessmentB as Parameters<
+              typeof needsAssessmentDataBRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 2) {
+        const needsAssessmentC = transformFromNeedsAssessmentDataC(fullProfile)
+        if (
+          needsAssessmentC &&
+          needsAssessmentDataCRef.current &&
+          hasAnyData(needsAssessmentC)
+        ) {
+          needsAssessmentDataCRef.current.form.reset(
+            needsAssessmentC as Parameters<
+              typeof needsAssessmentDataCRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 3) {
+        const needsAssessmentD = transformFromNeedsAssessmentDataD(fullProfile)
+        if (
+          needsAssessmentD &&
+          needsAssessmentDataDRef.current &&
+          hasAnyData(needsAssessmentD)
+        ) {
+          needsAssessmentDataDRef.current.form.reset(
+            needsAssessmentD as Parameters<
+              typeof needsAssessmentDataDRef.current.form.reset
+            >[0]
+          )
+        }
+      } else if (currentPart === 4) {
+        const needsAssessmentE = transformFromNeedsAssessmentDataE(fullProfile)
+        if (
+          needsAssessmentE &&
+          needsAssessmentDataERef.current &&
+          hasAnyData(needsAssessmentE)
+        ) {
+          needsAssessmentDataERef.current.form.reset(
+            needsAssessmentE as Parameters<
+              typeof needsAssessmentDataERef.current.form.reset
+            >[0]
+          )
+        }
+      }
+    }
+  }
+
+  // Populate form when section/part changes (if data is already loaded)
+  useEffect(() => {
+    if (loadedProfileData && !isLoading && !isSaving) {
+      populateCurrentForm(loadedProfileData)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSection, currentPart])
+
+  // Helper to check if object has any non-undefined values
+  const hasAnyData = (data: Record<string, unknown>): boolean => {
+    return Object.values(data).some(
+      (value) => value !== undefined && value !== null && value !== ""
+    )
+  }
+  const transformFromPersonalDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      idNo: dbRecord.id_number,
+      course: dbRecord.course,
+      saseScore: dbRecord.msu_sase_score,
+      academicYear: dbRecord.academic_year,
+      familyName: dbRecord.family_name,
+      givenName: dbRecord.given_name,
+      middleInitial: dbRecord.middle_initial,
+      studentStatus: dbRecord.student_status,
+    }
+  }
+
+  const transformFromPersonalDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      nickname: dbRecord.nickname,
+      age: dbRecord.age,
+      sex: dbRecord.sex,
+      citizenship: dbRecord.citizenship,
+      dateOfBirth: dbRecord.date_of_birth,
+      placeOfBirth: dbRecord.place_of_birth,
+      civilStatus: dbRecord.civil_status,
+      otherCivilStatus: dbRecord.civil_status_others,
+    }
+  }
+
+  const transformFromPersonalDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      religiousAffiliation: dbRecord.religious_affiliation,
+      noOfChildren: dbRecord.number_of_children,
+      addressInIligan: dbRecord.address_iligan,
+      contactNo: dbRecord.contact_number,
+      homeAddress: dbRecord.home_address,
+      staysWith: dbRecord.stays_with,
+      workingStudent: dbRecord.working_student_status,
+      talentsAndSkills: dbRecord.talents_skills,
+    }
+  }
+
+  const transformFromPersonalDataD = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const seriousMedicalCondition =
+      dbRecord.medical_condition === "Existing" ? "Existing" : "None"
+    const physicalDisability =
+      dbRecord.physical_disability === "Existing" ? "Existing" : "None"
+
+    return {
+      leisureAndRecreationalActivities: dbRecord.leisure_activities,
+      seriousMedicalCondition,
+      // If "None", set to empty string (will be cleared by component's useEffect)
+      otherSeriousMedicalCondition:
+        seriousMedicalCondition === "None"
+          ? ""
+          : dbRecord.medical_condition_others || "",
+      physicalDisability,
+      // If "None", set to empty string (will be cleared by component's useEffect)
+      otherPhysicalDisability:
+        physicalDisability === "None"
+          ? ""
+          : dbRecord.physical_disability_others || "",
+      genderIdentity: dbRecord.gender_identity,
+      sexualAttraction: dbRecord.attraction,
+    }
+  }
+
+  const transformFromFamilyDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      fathersName: dbRecord.father_name,
+      fathersStatus: dbRecord.father_deceased === true ? "Deceased" : "Living",
+      fathersOccupation: dbRecord.father_occupation,
+      fathersContactNo: dbRecord.father_contact_number,
+      mothersName: dbRecord.mother_name,
+      mothersStatus: dbRecord.mother_deceased === true ? "Deceased" : "Living",
+      mothersOccupation: dbRecord.mother_occupation,
+      mothersContactNo: dbRecord.mother_contact_number,
+    }
+  }
+
+  const transformFromFamilyDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      guardianName: dbRecord.guardian_name,
+      guardianOccupation: dbRecord.guardian_occupation,
+      guardianContactNo: dbRecord.guardian_contact_number,
+      relationshipWithGuardian: dbRecord.guardian_relationship,
+      ordinalPosition: dbRecord.ordinal_position,
+      noOfSiblings: dbRecord.number_of_siblings,
+      parentsMaritalStatus: dbRecord.parents_marital_status,
+      familyMonthlyIncome: dbRecord.family_monthly_income,
+    }
+  }
+  const transformFromFamilyDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      describeEnvironment: dbRecord.home_environment_description,
+    }
+  }
+
+  const transformFromAcademicDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      generalPointAverage: dbRecord.shs_gpa,
+      scholar: dbRecord.is_scholar === true ? "Yes" : "No",
+      scholarDetails: dbRecord.scholarship_type,
+      lastSchoolAttended: dbRecord.previous_school_name,
+      lastSchoolAddress: dbRecord.previous_school_address,
+      shsTrack: dbRecord.shs_track,
+      shsStrand: dbRecord.shs_strand,
+      awards: dbRecord.awards_honors,
+    }
+  }
+
+  const transformFromAcademicDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      firstChoice: dbRecord.career_option_1,
+      secondChoice: dbRecord.career_option_2,
+      thirdChoice: dbRecord.career_option_3,
+      studentOrg: dbRecord.student_organizations,
+      courseChoiceActor: dbRecord.course_choice_actor,
+      otherCourseChoiceActor: dbRecord.course_choice_actor_others,
+      reasonForCourse: dbRecord.course_choice_reason,
+      careerPursuingInFuture: dbRecord.post_college_career_goal,
+    }
+  }
+
+  const transformFromAcademicDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbReasons = dbRecord.reasons_for_choosing_msuiit
+    return {
+      reasonsForChoosingiit: Array.isArray(dbReasons) ? dbReasons : [],
+      otherReasonForChoosingiit: dbRecord.reasons_for_choosing_msuiit_others,
+      coCurricularActivities: dbRecord.cocurricular_activities,
+    }
+  }
+
+  const transformFromDistanceLearningDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbGadgetOptions = dbRecord.technology_gadgets
+    const dbConnectivityOptions = dbRecord.internet_connectivity_means
+    return {
+      technologyGadgets: Array.isArray(dbGadgetOptions) ? dbGadgetOptions : [],
+      otherOptionTechnologyGadgets: dbRecord.technology_gadgets_other,
+      meansOfInternet: Array.isArray(dbConnectivityOptions)
+        ? dbConnectivityOptions
+        : [],
+      otherOptionMeansOfInternet: dbRecord.internet_connectivity_other,
+    }
+  }
+
+  const transformFromDistanceLearningDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      internetAccess: dbRecord.internet_access,
+      learningReadiness: dbRecord.distance_learning_readiness,
+      learningSpace: dbRecord.learning_space_description,
+    }
+  }
+
+  const transformFromPsychosocialDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      personalCharacteristics: dbRecord.personality_characteristics,
+      copingMechanismBadDay: dbRecord.coping_mechanism_bad_day,
+      hadCounseling: dbRecord.had_counseling_before === true ? "Yes" : "No",
+      seekProfessionalHelp:
+        dbRecord.seeking_professional_help === true ? "Yes" : "No",
+      perceiveMentalHealth: dbRecord.perceived_mental_health,
+    }
+  }
+
+  const transformFromPsychosocialDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.problem_sharers
+    return {
+      problemSharers: Array.isArray(dbOptions) ? dbOptions : [],
+      otherOptionProblemSharer: dbRecord.problem_sharers_others,
+      needsImmediateCounseling:
+        dbRecord.needs_immediate_counseling === true ? "Yes" : "No",
+      concernsToDiscuss: dbRecord.concerns_to_discuss,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataA = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbNeedsOptions = dbRecord.improvement_needs
+    const dbFinancialOptions = dbRecord.financial_assistance_needs
+    return {
+      improvementNeeds: Array.isArray(dbNeedsOptions) ? dbNeedsOptions : [],
+      othersOptionImprovementNeeds: dbRecord.improvement_needs_others,
+      financialAssistanceNeeds: Array.isArray(dbFinancialOptions)
+        ? dbFinancialOptions
+        : [],
+      othersOptionfinancialAssistanceNeeds:
+        dbRecord.financial_assistance_needs_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataB = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.personal_social_needs
+    return {
+      personalSocialNeeds: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPersonalSocialNeeds: dbRecord.personal_social_needs_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataC = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.upset_responses
+    return {
+      upsetResponses: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionUpsetResponses: dbRecord.upset_responses_others,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataD = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    const dbOptions = dbRecord.primary_problem_sharer
+    return {
+      primaryProblemSharer: Array.isArray(dbOptions) ? dbOptions : [],
+      othersOptionPrimaryProblemSharer: dbRecord.primary_problem_sharer_others,
+      firstQuestion: dbRecord.experience_counseling_willfully,
+      secondQuestion: dbRecord.experience_counseling_referral,
+      thirdQuestion: dbRecord.know_guidance_center_help,
+    }
+  }
+
+  const transformFromNeedsAssessmentDataE = (
+    dbRecord: NonNullable<Awaited<ReturnType<typeof getStudentProfile>>>
+  ) => {
+    return {
+      fourthQuestion: dbRecord.afraid_of_guidance_center,
+      fifthQuestion: dbRecord.shy_to_ask_counselor,
+    }
+  }
+
+  // Initial load: Check if profile exists and load ALL saved data
+  useEffect(() => {
+    async function loadInitialProfile() {
+      if (!isInitialLoad) return
+
+      setIsInitialLoad(false)
+      setIsLoading(true)
+
+      try {
+        const exists = await profileExists()
+        if (!exists) {
+          setIsLoading(false)
+          return // New user, start with empty forms
+        }
+
+        // Get profile progress to restore navigation position
+        const progress = await getProfileProgress()
+
+        if (progress.lastSection !== null && progress.lastPart !== null) {
+          // Restore navigation position
+          setCurrentSection(progress.lastSection)
+          setCurrentPart(progress.lastPart)
+          // Track the last part for the restored section
+          setLastPartPerSection((prev) =>
+            new Map(prev).set(progress.lastSection!, progress.lastPart!)
+          )
+        }
+
+        // Use completed sections from progress API
+        setCompletedSections(new Set(progress.completedSections || []))
+
+        // Fetch ALL profile data and store it
+        // Forms will be populated when they become visible
+        const fullProfile = await getStudentProfile()
+        if (fullProfile) {
+          setLoadedProfileData(fullProfile)
+          // Populate current form immediately
+          await populateCurrentForm(fullProfile)
+        }
+      } catch (error) {
+        console.error("Error loading initial profile:", error)
+        toast.error("Failed to load profile data", { duration: 3000 })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadInitialProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialLoad])
+
+  // refs for form sections
+  const personalDataARef = useRef<PersonalDataASectionRef>(null)
+  const personalDataBRef = useRef<PersonalDataBSectionRef>(null)
+  const personalDataCRef = useRef<PersonalDataCSectionRef>(null)
+  const personalDataDRef = useRef<PersonalDataDSectionRef>(null)
+  const familyDataARef = useRef<FamilyDataASectionRef>(null)
+  const familyDataBRef = useRef<FamilyDataBSectionRef>(null)
+  const familyDataCRef = useRef<FamilyDataCSectionRef>(null)
+  const academicDataARef = useRef<AcademicDataASectionRef>(null)
+  const academicDataBRef = useRef<AcademicDataBSectionRef>(null)
+  const academicDataCRef = useRef<AcademicDataCSectionRef>(null)
+  const distanceLearningARef = useRef<DistanceLearningASectionRef>(null)
+  const distanceLearningBRef = useRef<DistanceLearningBSectionRef>(null)
+  const psychosocialDataARef = useRef<PsychosocialDataASectionRef>(null)
+  const psychosocialDataBRef = useRef<PsychosocialDataBSectionRef>(null)
+  const needsAssessmentDataARef = useRef<NeedsAssessmentASectionRef>(null)
+  const needsAssessmentDataBRef = useRef<NeedsAssessmentBSectionRef>(null)
+  const needsAssessmentDataCRef = useRef<NeedsAssessmentCSectionRef>(null)
+  const needsAssessmentDataDRef = useRef<NeedsAssessmentDSectionRef>(null)
+  const needsAssessmentDataERef = useRef<NeedsAssessmentESectionRef>(null)
+
+  const sections = [
+    { name: "Personal Data", parts: 4 },
+    { name: "Family Data", parts: 3 },
+    { name: "Academic Data", parts: 3 },
+    { name: "Distance Learning", parts: 2 },
+    { name: "Psychosocial", parts: 2 },
+    { name: "Needs Assessment", parts: 5 },
+  ]
+
+  // calculate progress for the current section
+  const totalParts = sections[currentSection].parts
+  const progress = ((currentPart + 1) / totalParts) * 100
+
+  // get current form ref based on section and part
+  const getCurrentFormRef = () => {
+    if (currentSection === 0) {
+      if (currentPart === 0) return personalDataARef
+      if (currentPart === 1) return personalDataBRef
+      if (currentPart === 2) return personalDataCRef
+      if (currentPart === 3) return personalDataDRef
+    }
+    if (currentSection === 1) {
+      if (currentPart === 0) return familyDataARef
+      if (currentPart === 1) return familyDataBRef
+      if (currentPart === 2) return familyDataCRef
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0) return academicDataARef
+      if (currentPart === 1) return academicDataBRef
+      if (currentPart === 2) return academicDataCRef
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0) return distanceLearningARef
+      if (currentPart === 1) return distanceLearningBRef
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0) return psychosocialDataARef
+      if (currentPart === 1) return psychosocialDataBRef
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) return needsAssessmentDataARef
+      if (currentPart === 1) return needsAssessmentDataBRef
+      if (currentPart === 2) return needsAssessmentDataCRef
+      if (currentPart === 3) return needsAssessmentDataDRef
+      if (currentPart === 4) return needsAssessmentDataERef
+    }
+    return null
+  }
+
+  // get fields to validate for current section/part
+  const getFieldsToValidate = (): FormFields[] => {
+    if (currentSection === 0) {
+      if (currentPart === 0) {
+        return [
+          "idNo",
+          "course",
+          "saseScore",
+          "academicYear",
+          "familyName",
+          "givenName",
+          "middleInitial",
+          "studentStatus",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "nickname",
+          "age",
+          "sex",
+          "citizenship",
+          "dateOfBirth",
+          "placeOfBirth",
+          "civilStatus",
+          "otherCivilStatus",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "religiousAffiliation",
+          "noOfChildren",
+          "addressInIligan",
+          "contactNo",
+          "homeAddress",
+          "staysWith",
+          "workingStudent",
+          "talentsAndSkills",
+        ]
+      }
+      if (currentPart === 3) {
+        return [
+          "leisureAndRecreationalActivities",
+          "seriousMedicalCondition",
+          "otherSeriousMedicalCondition",
+          "physicalDisability",
+          "otherPhysicalDisability",
+          "genderIdentity",
+          "sexualAttraction",
+        ]
+      }
+    }
+    if (currentSection === 1) {
+      if (currentPart === 0) {
+        return [
+          "fathersName",
+          "fathersStatus",
+          "fathersOccupation",
+          "fathersContactNo",
+          "mothersName",
+          "mothersStatus",
+          "mothersOccupation",
+          "mothersContactNo",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "guardianName",
+          "guardianOccupation",
+          "guardianContactNo",
+          "relationshipWithGuardian",
+          "ordinalPosition",
+          "noOfSiblings",
+          "parentsMaritalStatus",
+          "familyMonthlyIncome",
+        ]
+      }
+      if (currentPart === 2) {
+        return ["describeEnvironment"]
+      }
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0) {
+        return [
+          "generalPointAverage",
+          "scholar",
+          "scholarDetails",
+          "lastSchoolAttended",
+          "lastSchoolAddress",
+          "shsTrack",
+          "shsStrand",
+          "awards",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "firstChoice",
+          "secondChoice",
+          "thirdChoice",
+          "studentOrg",
+          "courseChoiceActor",
+          "otherCourseChoiceActor",
+          "reasonForCourse",
+          "careerPursuingInFuture",
+        ]
+      }
+      if (currentPart === 2) {
+        return [
+          "reasonsForChoosingiit",
+          "otherReasonForChoosingiit",
+          "coCurricularActivities",
+        ]
+      }
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0) {
+        return [
+          "technologyGadgets",
+          "otherOptionTechnologyGadgets",
+          "meansOfInternet",
+          "otherOptionMeansOfInternet",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["internetAccess", "learningReadiness", "learningSpace"]
+      }
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0) {
+        return [
+          "personalCharacteristics",
+          "copingMechanismBadDay",
+          "hadCounseling",
+          "seekProfessionalHelp",
+          "perceiveMentalHealth",
+        ]
+      }
+      if (currentPart === 1) {
+        return [
+          "problemSharers",
+          "otherOptionProblemSharer",
+          "needsImmediateCounseling",
+          "concernsToDiscuss",
+        ]
+      }
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0) {
+        return [
+          "improvementNeeds",
+          "othersOptionImprovementNeeds",
+          "financialAssistanceNeeds",
+          "othersOptionfinancialAssistanceNeeds",
+        ]
+      }
+      if (currentPart === 1) {
+        return ["personalSocialNeeds", "othersOptionPersonalSocialNeeds"]
+      }
+      if (currentPart === 2) {
+        return ["upsetResponses", "othersOptionUpsetResponses"]
+      }
+      if (currentPart === 3) {
+        return [
+          "primaryProblemSharer",
+          "othersOptionPrimaryProblemSharer",
+          "firstQuestion",
+          "secondQuestion",
+          "thirdQuestion",
+        ]
+      }
+      if (currentPart === 4) {
+        return ["fourthQuestion", "fifthQuestion"]
+      }
+    }
+    return []
+  }
+
+  // nav handlers
+  const handleProceed = async () => {
+    const currentRef = getCurrentFormRef()
+
+    // validate form if it exists and is mounted
+    if (currentRef?.current?.form) {
+      const fieldsToValidate = getFieldsToValidate()
+      if (fieldsToValidate.length > 0) {
+        // Type assertion needed because different sections use different schemas
+        // Safe since we validate based on currentSection/currentPart matching the correct schema
+        // @ts-expect-error - Different sections use different schemas (PersonalData vs FamilyData)
+        const isValid = await currentRef.current.form.trigger(fieldsToValidate)
+        if (!isValid) {
+          console.log(
+            "Validation failed, errors:",
+            currentRef.current.form.formState.errors
+          )
+          toast.error(
+            <div className="relative flex w-full items-center pr-14">
+              <span className="pl-2">Failed to save. Please try again</span>
+              <CatImageSad />
+            </div>,
+            {
+              duration: 3000,
+              icon: <CircleCheckIcon className="size-4" />,
+            }
+          )
+          return
+        }
+      }
+    }
+
+    // SAVE current section data before proceeding
+    if (currentRef?.current?.form) {
+      setIsSaving(true)
+      try {
+        const formData = currentRef.current.form.getValues()
+        const result = await saveStudentSection(
+          formData,
+          currentSection as 0 | 1 | 2 | 3 | 4 | 5,
+          currentPart as 0 | 1 | 2 | 3 | 4
+        )
+
+        if (!result.success) {
+          toast.error(result.error || "Failed to save. Please try again.", {
+            duration: 3000,
+          })
+          setIsSaving(false)
+          return // Prevent navigation if save fails
+        }
+
+        toast.success(
+          <div className="relative flex w-full items-center pr-18">
+            <span className="pl-2">Section saved successfully</span>
+            <CatImage />
+          </div>,
+          {
+            duration: 3000,
+            icon: <CircleCheckIcon className="size-4" />,
+          }
+        )
+
+        // reload profile data after successful save to keep it in sync
+        const updatedProfile = await getStudentProfile()
+        if (updatedProfile) {
+          setLoadedProfileData(updatedProfile)
+        }
+
+        // should refresh not just on initial mount, but every after save
+        const progress = await getProfileProgress()
+        setCompletedSections(new Set(progress.completedSections || []))
+      } catch (error) {
+        console.error("Error saving section:", error)
+        toast.error(
+          <div className="relative flex w-full items-center pr-14">
+            <span className="pl-2">Failed to save. Please try again</span>
+            <CatImageSad />
+          </div>,
+          {
+            duration: 3000,
+            icon: <CircleCheckIcon className="size-4" />,
+          }
+        )
+        setIsSaving(false)
+        return // prevent navigation if save fails
+      } finally {
+        setIsSaving(false)
+      }
+    }
+
+    // proceed to next part or section
+    if (currentPart < totalParts - 1) {
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
+    } else if (currentSection < sections.length - 1) {
+      // track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
+      setCurrentPart(0)
+    } else {
+      window.location.reload()
+    }
+  }
+
+  // nav handlers
+  const handleProceedDEV = async () => {
+    // proceed to next part or section
+    if (currentPart < totalParts - 1) {
+      const nextPart = currentPart + 1
+      setCurrentPart(nextPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, nextPart)
+      )
+    } else if (currentSection < sections.length - 1) {
+      // Track that we've visited the last part of the current section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, currentPart)
+      )
+      const nextSection = currentSection + 1
+      setCurrentSection(nextSection)
+      setCurrentPart(0)
+    }
+  }
+
+  const handlePrevious = () => {
+    // Navigate to previous part/section
+    // Data is already loaded from initial populateAllForms(), so we just navigate
+    if (currentPart > 0) {
+      const prevPart = currentPart - 1
+      setCurrentPart(prevPart)
+      // Track the last part visited in this section
+      setLastPartPerSection((prev) =>
+        new Map(prev).set(currentSection, prevPart)
+      )
+    } else if (currentSection > 0) {
+      const prevSection = currentSection - 1
+      setCurrentSection(prevSection)
+      const prevParts = sections[prevSection].parts
+      // If we've visited this section before, go to the last part we visited
+      // Otherwise, go to the last part of the section (if completed) or first part
+      const lastVisitedPart = lastPartPerSection.get(prevSection)
+      const isCompleted = completedSections.has(prevSection)
+      if (lastVisitedPart !== undefined) {
+        setCurrentPart(lastVisitedPart)
+      } else if (isCompleted) {
+        // If completed but never tracked, go to last part
+        setCurrentPart(prevParts - 1)
+      } else {
+        // Otherwise start at the beginning
+        setCurrentPart(0)
+      }
+    }
+  }
+
+  const handleReset = () => {
+    const currentRef = getCurrentFormRef()
+    if (currentRef?.current) {
+      currentRef.current.form.reset()
+    }
+  }
+
+  // handle step click - navigate to section's first part
+  const handleStepClick = (sectionIndex: number) => {
+    // allow navigation to sections that are completed OR the current section
+    const isCompleted = completedSections.has(sectionIndex)
+    const isCurrent = sectionIndex === currentSection
+    if (isCompleted || isCurrent) {
+      // Navigate to section - data is already loaded from initial populateAllForms()
+      setCurrentSection(sectionIndex)
+
+      // If it's the current section, stay at current part
+      if (isCurrent) {
+        // Stay at current part
+        return
+      }
+
+      // If completed, go to the last part of that section for quick navigation
+      // Otherwise, check if we've visited this section before
+      if (isCompleted) {
+        const sectionParts = sections[sectionIndex].parts
+        setCurrentPart(sectionParts - 1) // Go to last part of completed section
+      } else {
+        // Check if we've visited this section before
+        const lastVisitedPart = lastPartPerSection.get(sectionIndex)
+        if (lastVisitedPart !== undefined) {
+          setCurrentPart(lastVisitedPart)
+        } else {
+          setCurrentPart(0) // Start at beginning if never visited
+        }
+      }
+    }
+  }
+
+  const renderForm = () => {
+    if (currentSection === 0) {
+      if (currentPart === 0)
+        return <PersonalDataASection ref={personalDataARef} />
+      if (currentPart === 1)
+        return <PersonalDataBSection ref={personalDataBRef} />
+      if (currentPart === 2)
+        return <PersonalDataCSection ref={personalDataCRef} />
+      if (currentPart === 3)
+        return <PersonalDataDSection ref={personalDataDRef} />
+    }
+    if (currentSection === 1) {
+      if (currentPart === 0) return <FamilyDataASection ref={familyDataARef} />
+      if (currentPart === 1) return <FamilyDataBSection ref={familyDataBRef} />
+      if (currentPart === 2) return <FamilyDataCSection ref={familyDataCRef} />
+    }
+    if (currentSection === 2) {
+      if (currentPart === 0)
+        return <AcademicDataASection ref={academicDataARef} />
+      if (currentPart === 1)
+        return <AcademicDataBSection ref={academicDataBRef} />
+      if (currentPart === 2)
+        return <AcademicDataCSection ref={academicDataCRef} />
+    }
+    if (currentSection === 3) {
+      if (currentPart === 0)
+        return <DistanceLearningASection ref={distanceLearningARef} />
+      if (currentPart === 1)
+        return <DistanceLearningBSection ref={distanceLearningBRef} />
+    }
+    if (currentSection === 4) {
+      if (currentPart === 0)
+        return <PsychosocialDataASection ref={psychosocialDataARef} />
+      if (currentPart === 1)
+        return <PsychosocialDataBSection ref={psychosocialDataBRef} />
+    }
+    if (currentSection === 5) {
+      if (currentPart === 0)
+        return <NeedsAssessmentASection ref={needsAssessmentDataARef} />
+      if (currentPart === 1)
+        return <NeedsAssessmentBSection ref={needsAssessmentDataBRef} />
+      if (currentPart === 2)
+        return <NeedsAssessmentCSection ref={needsAssessmentDataCRef} />
+      if (currentPart === 3)
+        return <NeedsAssessmentDSection ref={needsAssessmentDataDRef} />
+      if (currentPart === 4)
+        return <NeedsAssessmentESection ref={needsAssessmentDataERef} />
+    }
+
+    // placeholder muna
+    return (
+      <div className="flex h-full flex-col items-center justify-center text-gray-500">
+        <p>
+          Section {currentSection + 1}, Part {currentPart + 1}
+        </p>
+        <p className="text-sm">to be implementtedddddddddddd</p>
+      </div>
+    )
+  }
+
+  const stepIcons = [
+    UserStarIcon,
+    HandHeartIcon,
+    GraduationCapIcon,
+    WifiIcon,
+    RibbonIcon,
+    RoseIcon,
+  ]
+
+  return (
+    <div className="flex">
+      <div
+        id="steps"
+        className="relative mt-3 flex w-[260px] flex-col gap-7 px-21"
+        onDragOver={(e) => {
+          // allow dragging over the container
+          if (isDragging) {
+            e.preventDefault()
+            e.dataTransfer.dropEffect = "move"
+          }
+        }}
+        onDrop={(e) => {
+          // handle drop outside of any step (cancel drag)
+          if (isDragging) {
+            e.preventDefault()
+            setDraggedOverStep(null)
+            setIsDragging(false)
+            setIsIconGrabbed(false)
+            if (dragOverTimeoutRef.current) {
+              clearTimeout(dragOverTimeoutRef.current)
+              dragOverTimeoutRef.current = null
+            }
+          }
+        }}
+      >
+        <Image
+          src={MSULove}
+          alt="MSU Love Icon"
+          draggable
+          className={`absolute z-50 h-18 w-12 transition-all duration-300 ease-in-out hover:scale-110 ${
+            isDragging
+              ? "cursor-grabbing opacity-70"
+              : isIconGrabbed
+                ? "cursor-grabbing"
+                : "cursor-pointer"
+          }`}
+          style={{
+            left: "50%",
+            top: `${currentSection * 70 - 40 + [0, 10, 19, 29, 37, 46][currentSection]}px`,
+            transform: `translateX(${[-43, -88, -136, -88, -46, -98][currentSection] + 8}px)`,
+          }}
+          onMouseDown={() => setIsIconGrabbed(true)}
+          onMouseUp={() => {
+            setIsIconGrabbed(false)
+            setIsDragging(false)
+          }}
+          onMouseLeave={() => {
+            if (!isDragging) {
+              setIsIconGrabbed(false)
+            }
+          }}
+          onDragStart={(e) => {
+            setIsDragging(true)
+            setIsIconGrabbed(true)
+            e.dataTransfer.effectAllowed = "move"
+            e.dataTransfer.setData("text/plain", "msu-love-icon")
+          }}
+          onDragEnd={() => {
+            setIsDragging(false)
+            setIsIconGrabbed(false)
+            setDraggedOverStep(null)
+            if (dragOverTimeoutRef.current) {
+              clearTimeout(dragOverTimeoutRef.current)
+              dragOverTimeoutRef.current = null
+            }
+          }}
+        />
+        <div className="absolute -translate-x-[62px] translate-y-12">
+          <svg
+            width="98"
+            height="380"
+            viewBox="0 0 98 380"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g filter="url(#filter0_d_1098_17622)">
+              <path
+                d="M80.549 0.306885C73.3736 34.6504 63.8137 49.3067 37.549 67.8069C1.66176 101.411 6.04899 132.307 5.54896 139.307C5.04894 146.307 7.88242 189.975 37.549 209.307C76.7648 226.744 88.3142 243.987 92.049 286.807C92.0207 325.487 80.6849 343.12 48.549 370.307"
+                stroke="#747B7D"
+                strokeWidth="3"
+                strokeDasharray="6 6"
+              />
+            </g>
+            <defs>
+              <filter
+                id="filter0_d_1098_17622"
+                x="0"
+                y="0"
+                width="97.5488"
+                height="379.452"
+                filterUnits="userSpaceOnUse"
+                colorInterpolationFilters="sRGB"
+              >
+                <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                <feColorMatrix
+                  in="SourceAlpha"
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha"
+                />
+                <feOffset dy="4" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                />
+                <feBlend
+                  mode="normal"
+                  in2="BackgroundImageFix"
+                  result="effect1_dropShadow_1098_17622"
+                />
+                <feBlend
+                  mode="normal"
+                  in="SourceGraphic"
+                  in2="effect1_dropShadow_1098_17622"
+                  result="shape"
+                />
+              </filter>
+            </defs>
+          </svg>
+        </div>
+
+        {stepIcons.map((Icon, index) => {
+          // Section is active/clickable if it's completed OR it's the current section
+          const isCompleted = completedSections.has(index)
+          const isCurrent = index === currentSection
+          const isActive = isCompleted || isCurrent
+          const isClickable = isCompleted || isCurrent
+          const mainColor = isActive ? "bg-main" : "bg-main4"
+          const shadowColor = isActive ? "bg-main-dark" : "bg-main2"
+
+          const translateX = [-0, -45, -92, -45, -3, -55][index]
+
+          const isDragOver = draggedOverStep === index && isDragging
+
+          return (
+            <div
+              key={index}
+              className={`relative ${isClickable ? "cursor-pointer" : "cursor-not-allowed"} ${
+                isClickable ? "group" : ""
+              }`}
+              id={`circle-${index + 1}`}
+              onClick={() => isClickable && handleStepClick(index)}
+              onDragEnter={(e) => {
+                if (isClickable && isDragging) {
+                  // check if mouse is actually over the circle area using the circle's bounding rect
+                  const circleEl = circleRefs.current[index]
+                  if (circleEl) {
+                    const rect = circleEl.getBoundingClientRect()
+                    const circleCenterX = rect.left + rect.width / 2
+                    const circleCenterY = rect.top + rect.height / 2
+                    const distance = Math.sqrt(
+                      Math.pow(e.clientX - circleCenterX, 2) +
+                        Math.pow(e.clientY - circleCenterY, 2)
+                    )
+
+                    // then only trigger if within circle radius + padding (circle is ~32px radius, so 45px gives some buffer)
+                    if (distance < 45) {
+                      e.preventDefault()
+                      if (dragOverTimeoutRef.current) {
+                        clearTimeout(dragOverTimeoutRef.current)
+                      }
+                      setDraggedOverStep(index)
+                    }
+                  }
+                }
+              }}
+              onDragOver={(e) => {
+                // always prevent default to allow dropping
+                if (isDragging) {
+                  e.preventDefault()
+
+                  if (isClickable) {
+                    // check if mouse is actually over the circle area using the circle's bounding rect
+                    const circleEl = circleRefs.current[index]
+                    if (circleEl) {
+                      const rect = circleEl.getBoundingClientRect()
+                      const circleCenterX = rect.left + rect.width / 2
+                      const circleCenterY = rect.top + rect.height / 2
+                      const distance = Math.sqrt(
+                        Math.pow(e.clientX - circleCenterX, 2) +
+                          Math.pow(e.clientY - circleCenterY, 2)
+                      )
+
+                      // only highlight if within circle radius + padding (estimate lang na 45px)
+                      const isOverCircle = distance < 45
+
+                      if (isOverCircle) {
+                        e.stopPropagation()
+                        e.dataTransfer.dropEffect = "move"
+                        if (draggedOverStep !== index) {
+                          if (dragOverTimeoutRef.current) {
+                            clearTimeout(dragOverTimeoutRef.current)
+                          }
+                          setDraggedOverStep(index)
+                        }
+                      } else {
+                        // mouse is over container but not circle - clear highlight
+                        e.dataTransfer.dropEffect = "none"
+                        if (draggedOverStep === index) {
+                          if (dragOverTimeoutRef.current) {
+                            clearTimeout(dragOverTimeoutRef.current)
+                          }
+                          dragOverTimeoutRef.current = setTimeout(() => {
+                            setDraggedOverStep(null)
+                            dragOverTimeoutRef.current = null
+                          }, 50)
+                        }
+                      }
+                    }
+                  } else {
+                    e.dataTransfer.dropEffect = "none"
+                  }
+                }
+              }}
+              onDragLeave={(e) => {
+                // more reliable drag leave detection
+                // check if we're moving to a different element (not a child of this one)
+                const relatedTarget = e.relatedTarget as Node | null
+                const currentTarget = e.currentTarget as Node
+
+                // if relatedTarget is null or not a child of currentTarget, were truly leaving
+                if (!relatedTarget || !currentTarget.contains(relatedTarget)) {
+                  // also check mouse position as fallback
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const x = e.clientX || 0
+                  const y = e.clientY || 0
+
+                  const padding = 25 // larger padding for easier drop detection
+                  const isOutside =
+                    x < rect.left - padding ||
+                    x > rect.right + padding ||
+                    y < rect.top - padding ||
+                    y > rect.bottom + padding
+
+                  if (isOutside || !relatedTarget) {
+                    // delay clearing to prevent flickering when moving between child elements
+                    if (dragOverTimeoutRef.current) {
+                      clearTimeout(dragOverTimeoutRef.current)
+                    }
+                    dragOverTimeoutRef.current = setTimeout(() => {
+                      if (draggedOverStep === index) {
+                        setDraggedOverStep(null)
+                      }
+                      dragOverTimeoutRef.current = null
+                    }, 100)
+                  }
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (dragOverTimeoutRef.current) {
+                  clearTimeout(dragOverTimeoutRef.current)
+                  dragOverTimeoutRef.current = null
+                }
+
+                const data = e.dataTransfer.getData("text/plain")
+                if (data === "msu-love-icon" && isClickable && isDragging) {
+                  // verify mouse is actually over the circle when dropped
+                  const circleEl = circleRefs.current[index]
+                  if (circleEl) {
+                    const rect = circleEl.getBoundingClientRect()
+                    const circleCenterX = rect.left + rect.width / 2
+                    const circleCenterY = rect.top + rect.height / 2
+                    const distance = Math.sqrt(
+                      Math.pow(e.clientX - circleCenterX, 2) +
+                        Math.pow(e.clientY - circleCenterY, 2)
+                    )
+
+                    // only accept drop if within reasonable distance (50px for easier dropping)
+                    if (distance < 50) {
+                      handleStepClick(index)
+                      setDraggedOverStep(null)
+                      setIsDragging(false)
+                      setIsIconGrabbed(false)
+                    }
+                  }
+                }
+              }}
+            >
+              <div
+                className={`absolute h-[51px] w-[64px] translate-y-[7px] ${shadowColor} transition-all duration-200 ${
+                  isClickable
+                    ? "group-hover:scale-115 group-hover:shadow-lg"
+                    : ""
+                } ${isDragOver ? "scale-115" : ""}`}
+                style={{
+                  borderRadius: "100%",
+                  transform: `translateX(${translateX}px)`,
+                }}
+              ></div>
+              <div
+                ref={(el) => {
+                  circleRefs.current[index] = el
+                }}
+                className={`relative h-[51px] w-[64px] ${mainColor} flex items-center justify-center shadow-md transition-all duration-200 ${
+                  isClickable
+                    ? "group-hover:scale-115 group-hover:shadow-lg"
+                    : "opacity-60"
+                } ${isDragOver ? "z-10 scale-115" : ""}`}
+                style={{
+                  borderRadius: "100%",
+                  transform: `translateX(${translateX}px)`,
+                }}
+              >
+                <Icon className="h-[24px] w-[24px] text-white" />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="flex h-[520px] w-full max-w-3xl flex-col">
+        <div
+          id="form-container"
+          className="flex h-[480px] w-full max-w-3xl flex-col rounded-md border"
+        >
+          <div className="flex-1 overflow-y-auto p-4">
+            <Progress value={progress} className="mb-4 h-4 w-full" />
+            <div className="min-h-[300px]">{renderForm()}</div>
+          </div>
+          <div className="border-t p-4">
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                className="cursor-pointer border"
+              >
+                Reset Changes
+              </Button>
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={
+                    (currentSection === 0 && currentPart === 0) ||
+                    isSaving ||
+                    isLoading
+                  }
+                  className="cursor-pointer disabled:opacity-50"
+                >
+                  {isLoading ? "Loading..." : "Previous"}
+                </Button>
+                <Button
+                  onClick={handleProceed}
+                  disabled={isSaving || isLoading}
+                  className="bg-main hover:bg-main/90 cursor-pointer rounded-sm tracking-wide disabled:opacity-50"
+                >
+                  {isSaving
+                    ? "Saving..."
+                    : currentSection === sections.length - 1 &&
+                        currentPart === totalParts - 1
+                      ? "Finish"
+                      : "Proceed"}
+                </Button>
+
+                {/* DEV BUTTON: just remove if ok na*/}
+                <Button
+                  onClick={handleProceedDEV}
+                  className="bg-main2 hover:bg-main2/90 cursor-pointer rounded-sm tracking-wide"
+                >
+                  {currentSection === sections.length - 1 &&
+                  currentPart === totalParts - 1
+                    ? "for testing: finish"
+                    : "for testing: next"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 flex">
+          {isEditing && onBackToSummary && (
+            <TooltipThis label="Go Back to Profile">
+              <Button
+                variant="outline"
+                onClick={onBackToSummary}
+                className="cursor-pointer rounded-sm px-4 py-2 text-sm tracking-wide"
+              >
+                <ArrowLeftToLineIcon />
+              </Button>
+            </TooltipThis>
+          )}
+          <HoverCard>
+            <HoverCardTrigger className="ml-auto">
+              <CircleAlertIcon className="text-main2/50 hover:text-main h-4 w-4" />
+            </HoverCardTrigger>
+            <HoverCardContent className="text-center text-xs italic">
+              Information will only be saved/updated upon clicking the
+              &quot;Proceed&quot; button.
+            </HoverCardContent>
+          </HoverCard>
+        </div>
+      </div>
+    </div>
+  )
+}

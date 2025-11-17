@@ -1,18 +1,22 @@
 "use client"
 
+import React, { useState } from "react"
+
+import { PrimaryButton } from "@/components/common/primary-button"
+
+import EmptyProfile from "@/components/profiling/empty-profile"
+import { InProgressProfile } from "@/components/profiling/inprogress-profile"
+import StudentSummaryPage from "@/components/profiling/student-summary/student-summary"
+
 import { Skeleton } from "@/components/ui/skeleton"
-import EmptyProfile from "@/components/empty-profile"
-import { InProgressProfile } from "@/components/inprogress-profile"
-import { PrimaryButton } from "@/components/primary-button"
+
 import { profileExists, isStudentProfileComplete } from "@/lib/api/students"
-import StudentSummaryPage from "@/components/student-summary/student-summary"
-import * as React from "react"
 
 export default function StudentProfilingPage() {
-  const [profileStatus, setProfileStatus] = React.useState<
+  const [profileStatus, setProfileStatus] = useState<
     "none" | "in-progress" | "complete" | null
   >(null)
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   React.useEffect(() => {
     async function checkProfile() {

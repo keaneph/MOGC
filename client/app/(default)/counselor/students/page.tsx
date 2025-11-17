@@ -1,13 +1,16 @@
 "use client"
 
+import { RefreshCcw } from "lucide-react"
+
 import { useEffect, useState } from "react"
-import { DataTable } from "@/components/student-list/data-table"
-import { getCounselorStudentList } from "@/lib/api/counselors"
+
+import { SortingState } from "@tanstack/react-table"
+
 import {
   columns,
   CounselorStudentListItem,
-} from "@/components/student-list/columns"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/data/student-list/columns"
+import { DataTable } from "@/components/data/student-list/data-table"
 import {
   Pagination,
   PaginationContent,
@@ -16,10 +19,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { SearchInput } from "@/components/student-list/search-input"
-import { SortingState } from "@tanstack/react-table"
+import { SearchInput } from "@/components/data/student-list/search-input"
+
 import { Button } from "@/components/ui/button"
-import { RefreshCcw } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+
+import { getCounselorStudentList } from "@/lib/api/counselors"
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<CounselorStudentListItem[]>([])

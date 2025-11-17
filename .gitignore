@@ -48,7 +48,6 @@ __pycache__/
 *.so
 .pytest_cache/
 
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts

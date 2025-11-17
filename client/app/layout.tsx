@@ -1,9 +1,13 @@
-import { ToasterWrapper } from "@/components/ui/toaster-wrapper"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "@/styles/globals.css"
+
 import { NextStepProvider, NextStep, Tour } from "nextstepjs"
-import OnboardingWithPersistence from "@/components/onboarding/OnboardingWithPersistence"
+
+import OnboardingWithPersistence from "@/components/onboarding/onboarding-persistence"
+
+import { ToasterWrapper } from "@/components/ui/toaster-wrapper"
+
+import "@/styles/globals.css"
 
 const inter = Inter({
   subsets: ["latin"],
