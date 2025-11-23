@@ -341,7 +341,7 @@ export const columns = (
     cell: ({ row }) => {
       const studentName = row.original.studentName
       return (
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-5 w-8 cursor-pointer p-0">
@@ -357,7 +357,7 @@ export const columns = (
                   className="flex w-full cursor-pointer justify-between text-xs"
                 >
                   View Profile
-                  <CircleUserRoundIcon className="ml-2 h-4 w-4" />
+                  <CircleUserRoundIcon className="text-main2 ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <DropdownMenuSeparator className="mr-2 ml-2" />
@@ -369,7 +369,7 @@ export const columns = (
                   className="flex w-full cursor-pointer justify-between text-xs"
                 >
                   Add Note
-                  <NotepadText className="ml-2 h-4 w-4" />
+                  <NotepadText className="text-main2 ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </DropdownMenuContent>

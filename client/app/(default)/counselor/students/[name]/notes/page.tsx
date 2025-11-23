@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-
 import { getCounselorStudentList } from "@/lib/api/counselors"
 import { CounselorStudentListItem } from "@/components/data/student-list/columns"
 import { Skeleton } from "@/components/ui/skeleton"
