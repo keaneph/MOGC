@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu"
+import Link from "next/link"
 
 export type CounselorStudentListItem = {
   idNumber: string
@@ -338,7 +338,8 @@ export const columns = (
     accessorKey: "actions",
     header: "Actions",
     size: 75,
-    cell: ({}) => {
+    cell: ({ row }) => {
+      const studentName = row.original.studentName
       return (
         <div className="flex justify-end">
           <DropdownMenu>
@@ -348,13 +349,17 @@ export const columns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Button
-                variant="ghost"
-                className="flex w-full cursor-pointer justify-between text-xs"
+              <Link
+                href={`/counselor/students/${encodeURIComponent(studentName)}/profile`}
               >
-                View Details
-                <CircleUserRoundIcon className="ml-2 h-4 w-4" />
-              </Button>
+                <Button
+                  variant="ghost"
+                  className="flex w-full cursor-pointer justify-between text-xs"
+                >
+                  View Profile
+                  <CircleUserRoundIcon className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               <DropdownMenuSeparator className="mr-2 ml-2" />
               <Button
                 variant="ghost"
