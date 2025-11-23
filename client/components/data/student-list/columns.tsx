@@ -361,13 +361,17 @@ export const columns = (
                 </Button>
               </Link>
               <DropdownMenuSeparator className="mr-2 ml-2" />
-              <Button
-                variant="ghost"
-                className="flex w-full cursor-pointer justify-between text-xs"
+              <Link
+                href={`/counselor/students/${encodeURIComponent(studentName)}/notes`}
               >
-                Add Note
-                <NotepadText className="ml-2 h-4 w-4" />
-              </Button>
+                <Button
+                  variant="ghost"
+                  className="flex w-full cursor-pointer justify-between text-xs"
+                >
+                  Add Note
+                  <NotepadText className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
