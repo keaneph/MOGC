@@ -1,9 +1,7 @@
 "use client"
 
-import { EyeIcon, NotepadText } from "lucide-react"
-
+import { CircleUserRoundIcon, EllipsisIcon, NotepadText } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-
 import {
   Select,
   SelectTrigger,
@@ -11,12 +9,19 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
-
 import {
   updateStudentAssessment,
   updateStudentCounseling,
   updateStudentInterview,
 } from "@/lib/api/counselors"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export type CounselorStudentListItem = {
   idNumber: string
@@ -333,11 +338,42 @@ export const columns = (
     accessorKey: "actions",
     header: "Actions",
     size: 75,
-    cell: ({}) => {
+    cell: ({ row }) => {
+      const studentName = row.original.studentName
       return (
-        <div className="flex-cols-2 flex justify-center">
-          <EyeIcon className="text-main2 hover:text-main h-4 w-4 cursor-pointer" />
-          <NotepadText className="text-main2 hover:text-main ml-4 h-4 w-4 cursor-pointer" />
+        <div className="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-5 w-8 cursor-pointer p-0">
+                <EllipsisIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <Link
+                href={`/counselor/students/${encodeURIComponent(studentName)}/profile`}
+              >
+                <Button
+                  variant="ghost"
+                  className="flex w-full cursor-pointer justify-between text-xs"
+                >
+                  View Profile
+                  <CircleUserRoundIcon className="text-main2 ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <DropdownMenuSeparator className="mr-2 ml-2" />
+              <Link
+                href={`/counselor/students/${encodeURIComponent(studentName)}/notes`}
+              >
+                <Button
+                  variant="ghost"
+                  className="flex w-full cursor-pointer justify-between text-xs"
+                >
+                  Add Note
+                  <NotepadText className="text-main2 ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )
     },
