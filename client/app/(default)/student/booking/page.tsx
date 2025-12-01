@@ -196,15 +196,9 @@ function SessionContent({
         <div className="flex items-center gap-4">
           <div className="bg-main/5 flex h-12 w-12 items-center justify-center rounded-sm">
             {isCompleted ? (
-              <CheckCircle2
-                className="h-6 w-6"
-                style={{ color: "var(--status-green)" }}
-              />
+              <CheckCircle2 className="h-6 w-6 text-[var(--status-green)]" />
             ) : (
-              <config.icon
-                className="h-6 w-6"
-                style={{ color: "var(--main)" }}
-              />
+              <config.icon className="text-main h-6 w-6" />
             )}
           </div>
           <div>
@@ -245,10 +239,7 @@ function SessionContent({
             <ul className="space-y-4">
               {config.expectations.map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
-                  <span
-                    className="bg-main/10 mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs font-medium"
-                    style={{ color: "var(--main)" }}
-                  >
+                  <span className="text-main bg-main/10 mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm text-xs font-medium">
                     {i + 1}
                   </span>
                   <span className="text-main2 leading-relaxed font-medium tracking-wide">
@@ -265,7 +256,7 @@ function SessionContent({
           {/* Scheduled Date Card */}
           <div className="flex flex-col rounded-sm border p-4">
             <div className="mb-3 flex items-center gap-2">
-              <Calendar className="h-4 w-4" style={{ color: "var(--main)" }} />
+              <Calendar className="text-main h-4 w-4" />
               <span className="text-sm font-semibold tracking-wide">
                 Schedule
               </span>
@@ -285,10 +276,7 @@ function SessionContent({
                   {bookingState.time && (
                     <>
                       <span>•</span>
-                      <span
-                        style={{ color: "var(--main)" }}
-                        className="font-medium"
-                      >
+                      <span className="text-main font-medium">
                         {bookingState.time}
                       </span>
                     </>
@@ -297,10 +285,7 @@ function SessionContent({
               </div>
             ) : isCompleted ? (
               <div className="flex items-center gap-2">
-                <CheckCircle2
-                  className="h-4 w-4"
-                  style={{ color: "var(--status-green)" }}
-                />
+                <CheckCircle2 className="h-4 w-4 text-[var(--status-green)]" />
                 <span className="text-sm font-medium tracking-wide">
                   Completed
                 </span>
@@ -313,7 +298,7 @@ function SessionContent({
           {/* Format Card */}
           <div className="flex flex-col rounded-sm border p-4">
             <div className="mb-3 flex items-center gap-2">
-              <UserCheck className="h-4 w-4" style={{ color: "var(--main)" }} />
+              <UserCheck className="text-main h-4 w-4" />
               <span className="text-sm font-semibold tracking-wide">
                 Format
               </span>
@@ -334,10 +319,7 @@ function SessionContent({
               </div>
             ) : isCompleted ? (
               <div className="flex items-center gap-2">
-                <CheckCircle2
-                  className="h-4 w-4"
-                  style={{ color: "var(--status-green)" }}
-                />
+                <CheckCircle2 className="h-4 w-4 text-[var(--status-green)]" />
                 <span className="text-sm font-medium tracking-wide">
                   Completed
                 </span>
@@ -364,10 +346,7 @@ function SessionContent({
               </>
             ) : (
               <div className="flex items-center gap-2">
-                <CheckCircle2
-                  className="h-4 w-4"
-                  style={{ color: "var(--status-green)" }}
-                />
+                <CheckCircle2 className="h-4 w-4 text-[var(--status-green)]" />
                 <span className="text-sm font-medium tracking-wide">
                   Session completed
                 </span>
@@ -388,14 +367,14 @@ function CoverContent({
   setActiveTab: (tab: string) => void
 }) {
   return (
-    <div className="h-fu30 relative">
+    <div className="relative h-full">
       {/* Siklab Peek - Left */}
       <Image
         src={Siklab}
         alt="Siklab peeking"
         width={300}
         height={300}
-        className="pointer-events-none absolute bottom-4 -left-33.5 z-10 translate-y-[35%]"
+        className="pointer-events-none absolute bottom-30 -left-33.5 z-10 translate-y-[35%]"
       />
 
       {/* Mochi Peek - Right */}
@@ -404,7 +383,7 @@ function CoverContent({
         alt="Mochi peeking"
         width={350}
         height={350}
-        className="pointer-events-none absolute -right-34 bottom-4 z-10 translate-y-[35%]"
+        className="pointer-events-none absolute -right-34 bottom-30 z-10 translate-y-[35%]"
       />
 
       <Empty className="!justify-start rounded-sm pt-6 !pb-0">
@@ -439,15 +418,9 @@ function CoverContent({
                       }`}
                     >
                       {isCompleted ? (
-                        <CheckCircle2
-                          className="h-3.5 w-3.5"
-                          style={{ color: "var(--status-green)" }}
-                        />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[var(--status-green)]" />
                       ) : (
-                        <span
-                          className="text-xs font-semibold"
-                          style={{ color: "var(--main2)" }}
-                        >
+                        <span className="text-main2 text-xs font-semibold">
                           {index + 1}
                         </span>
                       )}
@@ -566,10 +539,7 @@ export default function BookingPage() {
               }`}
             >
               <BookOpen
-                className="h-4 w-4"
-                style={{
-                  color: activeTab === "cover" ? "var(--main)" : "var(--main2)",
-                }}
+                className={`h-4 w-4 ${activeTab === "cover" ? "text-main" : "text-main2"}`}
               />
               <span
                 className={`text-sm font-medium tracking-wide ${
@@ -597,10 +567,7 @@ export default function BookingPage() {
                 >
                   <div className="relative">
                     <config.icon
-                      className="h-4 w-4"
-                      style={{
-                        color: isActive ? "var(--main)" : "var(--main2)",
-                      }}
+                      className={`h-4 w-4 ${isActive ? "text-main" : "text-main2"}`}
                     />
                     <span className="absolute -top-1 -right-1 flex h-2 w-2">
                       <span
@@ -642,10 +609,7 @@ export default function BookingPage() {
                     className="z-[99] w-64 rounded-sm border bg-white p-4 shadow-lg"
                   >
                     <div className="flex items-center gap-2">
-                      <div
-                        className="bg-main/10 flex h-7 w-7 items-center justify-center rounded-full"
-                        style={{ color: "var(--main)" }}
-                      >
+                      <div className="text-main bg-main/10 flex h-7 w-7 items-center justify-center rounded-full">
                         <Calendar className="h-3.5 w-3.5" />
                       </div>
                       <div>
@@ -667,9 +631,7 @@ export default function BookingPage() {
                         {nextAction.time && (
                           <>
                             <span className="mx-0.5">•</span>
-                            <span style={{ color: "var(--main)" }}>
-                              {nextAction.time}
-                            </span>
+                            <span className="text-main">{nextAction.time}</span>
                           </>
                         )}
                       </div>
