@@ -222,5 +222,141 @@ def get_student_notes(user_id: str, id_number: str):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes", methods=["POST"])
+@require_auth
+def add_student_note(user_id: str, id_number: str):
+    """Add a new note for a student"""
+    try:
+        data = request.get_json()
+        note_title = data.get("note_title")
+        note_type = data.get("note_type")
+        content = data.get("content")
+
+        if not note_title or not note_type or not content:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        if note_type not in ["regular", "progress", "closure"]:
+            return jsonify({"error": "Invalid note type"}), 400
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .insert(
+                {
+                    "student_id": student_id,
+                    "note_title": note_title,
+                    "note_type": note_type,
+                    "content": content,
+                }
+            )
+            .execute()
+        )
+
+        if not response.data:
+            return jsonify({"error": "Failed to insert note"}), 500
+
+        return jsonify({"note": response.data[0]}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@counselors_bp.route("/student/<string:id_number>/notes/<string:note_id>", methods=["PUT"])
+@require_auth
+def update_student_note(user_id: str, id_number: str, note_id: str):
+    """Update an existing note"""
+    try:
+        data = request.get_json()
+        note_title = data.get("note_title")
+        note_type = data.get("note_type")
+        content = data.get("content")
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .update(
+                {
+                    "note_title": note_title,
+                    "note_type": note_type,
+                    "content": content,
+                }
+            )
+            .eq("id", note_id)
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if not response.data:
+            return jsonify({"error": "Failed to update note"}), 500
+
+        return jsonify({"note": response.data[0]}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes/<string:note_id>", methods=["DELETE"])
+@require_auth
+def delete_student_note(user_id: str, id_number: str, note_id: str):
+    """Delete a note for a student"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .delete()
+            .eq("id", note_id)
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if not response.data:   
+            return jsonify({"error": "Failed to delete note"}), 500
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 

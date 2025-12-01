@@ -160,3 +160,60 @@ export async function getStudentNotes(
     return []
   }
 }
+
+export async function saveStudentNote(
+  idNumber: string,
+  note: Omit<StudentNote, "id" | "created_at">
+): Promise<StudentNote | null> {
+  try {
+    const data = await apiRequest<{ note: StudentNote }>(
+      `/api/counselors/student/${idNumber}/notes`,
+      {
+        method: "POST",
+        body: JSON.stringify(note),
+      }
+    )
+    return data.note
+  } catch (error) {
+    console.error("Error saving student note:", error)
+    return null
+  }
+}
+
+export async function updateStudentNote(
+  idNumber: string,
+  noteId: string,
+  updates: { note_title: string; note_type: string; content: string }
+): Promise<StudentNote | null> {
+  try {
+    const data = await apiRequest<{ note: StudentNote }>(
+      `/api/counselors/student/${idNumber}/notes/${noteId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(updates),
+      }
+    )
+    return data.note
+  } catch (error) {
+    console.error("Error updating student note:", error)
+    return null
+  }
+}
+
+export async function deleteStudentNote(
+  idNumber: string,
+  noteId: string
+): Promise<boolean> {
+  try {
+    await apiRequest<{ success: boolean }>(
+      `/api/counselors/student/${idNumber}/notes/${noteId}`,
+      {
+        method: "DELETE",
+      }
+    )
+    return true
+  } catch (error) {
+    console.error("Error deleting student note:", error)
+    return false
+  }
+}
