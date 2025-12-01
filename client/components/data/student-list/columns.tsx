@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table"
 import {
   Select,
   SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import StatusBadge, { StatusType } from "./status-badge"
 
 export type CounselorStudentListItem = {
   idNumber: string
@@ -126,45 +126,16 @@ export const columns = (
         )
       }
 
-      const getBgColor = (val: string) => {
-        switch (val) {
-          case "high risk":
-            return "bg-[var(--status-red)]"
-          case "low risk":
-            return "bg-[var(--status-green)]"
-          case "pending":
-          default:
-            return "bg-[var(--status-yellow)]"
-        }
-      }
-
-      const getTextColor = (val: string) => {
-        switch (val) {
-          case "high risk":
-          case "low risk":
-            return "text-white"
-          case "pending":
-          default:
-            return "text-main2"
-        }
-      }
-
       return (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger
-              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
-            >
-              <SelectValue />
+            <SelectTrigger className="!h-[20px] cursor-pointer !border-none p-1 text-center text-[10px] leading-none [&>svg]:hidden">
+              <StatusBadge value={value as StatusType} />
             </SelectTrigger>
-            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+            <SelectContent className="!w-[100px] rounded-lg text-[10px]">
               {["pending", "high risk", "low risk"].map((option) => (
-                <SelectItem
-                  key={option}
-                  value={option}
-                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
-                >
-                  {option.toUpperCase()}
+                <SelectItem key={option} value={option}>
+                  <StatusBadge value={option as StatusType} />
                 </SelectItem>
               ))}
             </SelectContent>
@@ -208,47 +179,16 @@ export const columns = (
         )
       }
 
-      const getBgColor = (val: string) => {
-        switch (val) {
-          case "done":
-            return "bg-[var(--status-green)]"
-          case "scheduled":
-            return "bg-[var(--status-peach)]"
-          case "rescheduled":
-            return "bg-[var(--status-blue)]"
-          default:
-            return "bg-[var(--status-yellow)]"
-        }
-      }
-
-      const getTextColor = (val: string) => {
-        switch (val) {
-          case "done":
-          case "scheduled":
-          case "rescheduled":
-            return "text-white"
-          case "pending":
-          default:
-            return "text-main2"
-        }
-      }
-
       return (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger
-              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
-            >
-              <SelectValue />
+            <SelectTrigger className="!h-[20px] cursor-pointer !border-none p-1 text-center text-[10px] leading-none [&>svg]:hidden">
+              <StatusBadge value={value as StatusType} />
             </SelectTrigger>
-            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+            <SelectContent className="!w-[140px] rounded-lg text-[10px]">
               {["pending", "scheduled", "rescheduled", "done"].map((option) => (
-                <SelectItem
-                  key={option}
-                  value={option}
-                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
-                >
-                  {option.toUpperCase()}
+                <SelectItem key={option} value={option}>
+                  <StatusBadge value={option as StatusType} />
                 </SelectItem>
               ))}
             </SelectContent>
@@ -288,44 +228,16 @@ export const columns = (
         )
       }
 
-      const getBgColor = (val: string) => {
-        switch (val) {
-          case "ongoing":
-            return "bg-[var(--status-blue)]"
-          case "closed":
-            return "bg-[var(--status-green)]"
-          default:
-            return "bg-[var(--status-yellow)]"
-        }
-      }
-
-      const getTextColor = (val: string) => {
-        switch (val) {
-          case "ongoing":
-          case "closed":
-            return "text-white"
-          case "no record":
-          default:
-            return "text-main2"
-        }
-      }
-
       return (
         <div className="flex justify-center">
           <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger
-              className={`cursor-pointer rounded-lg px-2 py-1 text-center text-[10px] leading-none ${getBgColor(value)} ${getTextColor(value)} !h-[20px] [&>svg]:hidden`}
-            >
-              <SelectValue />
+            <SelectTrigger className="!h-[20px] cursor-pointer !border-none p-1 text-center text-[10px] leading-none [&>svg]:hidden">
+              <StatusBadge value={value as StatusType} />
             </SelectTrigger>
-            <SelectContent className="!w-[100px] !min-w-[100px] rounded-lg text-[10px]">
+            <SelectContent className="!w-[100px] rounded-lg text-[10px]">
               {["no record", "ongoing", "closed"].map((option) => (
-                <SelectItem
-                  key={option}
-                  value={option}
-                  className={`mb-2 cursor-pointer rounded-md px-2 py-1 text-center text-[9px] ${getBgColor(option)} ${getTextColor(option)} data-[highlighted]:${getBgColor(option)} data-[highlighted]:${getTextColor(option)} data-[state=checked]:${getBgColor(option)} data-[state=checked]:${getTextColor(option)} hover:${getBgColor(option)} hover:${getTextColor(option)} focus:${getBgColor(option)} focus:${getTextColor(option)}`}
-                >
-                  {option.toUpperCase()}
+                <SelectItem key={option} value={option}>
+                  <StatusBadge value={option as StatusType} />
                 </SelectItem>
               ))}
             </SelectContent>
