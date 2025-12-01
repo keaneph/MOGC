@@ -12,7 +12,7 @@ What we expect
 Working locally
 
 - Run the frontend: `cd client && npm install && npm run dev`
-- Run the backend: `cd server && pipenv install && pipenv shell && flask run`
+- Run the backend: `cd server && pipenv install && pipenv shell && python -m flask run`
 
 Pull request process
 

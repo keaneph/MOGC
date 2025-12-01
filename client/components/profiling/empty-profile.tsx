@@ -23,7 +23,7 @@ export default function EmptyProfile({ onCreateProfile }: EmptyProfileProps) {
           You don&apos;t have a profile yet
         </EmptyTitle>
       </EmptyHeader>
-      <EmptyContent className="text-regular text-md text-main4 gap-8 tracking-wide">
+      <EmptyContent className="text-md text-main4 gap-8 text-base tracking-wide">
         <div>
           Ready to level up your learning experience? This profile is your
           starter quest — each <br /> step unlocks a clearer picture of who you
