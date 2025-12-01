@@ -14,6 +14,7 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
   variable: "--font-geist-inter",
   display: "swap",
+  preload: true,
 })
 
 export const metadata: Metadata = {

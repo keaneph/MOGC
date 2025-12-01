@@ -49,8 +49,8 @@ const items = [
     icon: UserPenIcon,
   },
   {
-    title: "Counseling",
-    url: "/student/counseling",
+    title: "Booking",
+    url: "/student/booking",
     icon: CalendarPlusIcon,
   },
   {
