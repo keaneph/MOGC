@@ -13,6 +13,9 @@ import {
 } from "lucide-react"
 
 import Link from "next/link"
+import Image from "next/image"
+import Mochi from "@/public/mochi_peek.png"
+import Siklab from "@/public/siklab_peek.png"
 
 import { useState, useMemo } from "react"
 
@@ -385,92 +388,112 @@ function CoverContent({
   setActiveTab: (tab: string) => void
 }) {
   return (
-    <Empty className="!justify-start rounded-sm pt-6 !pb-0">
-      <EmptyHeader>
-        <EmptyTitle className="text-3xl font-semibold tracking-wide">
-          Student Guidance
-        </EmptyTitle>
-      </EmptyHeader>
-      <EmptyContent className="text-md text-main4 gap-8 text-base tracking-wide">
-        <div>Manage your counseling journey</div>
+    <div className="h-fu30 relative">
+      {/* Siklab Peek - Left */}
+      <Image
+        src={Siklab}
+        alt="Siklab peeking"
+        width={300}
+        height={300}
+        className="pointer-events-none absolute bottom-4 -left-33.5 z-10 translate-y-[35%]"
+      />
 
-        {/* Session Cards - 2x2 Grid */}
-        <div className="grid w-full max-w-xl grid-cols-2 gap-3">
-          {SESSION_CONFIGS.map((config, index) => {
-            const state = bookingStatuses[config.bookingKey]
-            const colors = STATUS_COLORS[state.status]
-            const isCompleted = state.status === "completed"
+      {/* Mochi Peek - Right */}
+      <Image
+        src={Mochi}
+        alt="Mochi peeking"
+        width={350}
+        height={350}
+        className="pointer-events-none absolute -right-34 bottom-4 z-10 translate-y-[35%]"
+      />
 
-            return (
-              <button
-                key={config.id}
-                onClick={() => setActiveTab(config.id)}
-                className="hover:bg-muted/50 cursor-pointer rounded-sm border p-3 text-left transition-all"
-              >
-                <div className="flex items-start gap-3">
-                  {/* Step indicator */}
-                  <div
-                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm border-2 ${
-                      isCompleted
-                        ? "border-green-500 bg-green-50"
-                        : "border-border bg-background"
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <CheckCircle2
-                        className="h-3.5 w-3.5"
-                        style={{ color: "var(--status-green)" }}
-                      />
-                    ) : (
-                      <span
-                        className="text-xs font-semibold"
-                        style={{ color: "var(--main2)" }}
-                      >
-                        {index + 1}
-                      </span>
-                    )}
-                  </div>
+      <Empty className="!justify-start rounded-sm pt-6 !pb-0">
+        <EmptyHeader>
+          <EmptyTitle className="text-3xl font-semibold tracking-wide">
+            Student Guidance
+          </EmptyTitle>
+        </EmptyHeader>
+        <EmptyContent className="text-md text-main4 gap-8 text-base tracking-wide">
+          <div>Manage your counseling journey</div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-foreground text-sm font-medium tracking-wide">
-                        {config.shortTitle}
-                      </span>
-                      <div
-                        className={`flex items-center gap-1.5 text-xs ${colors.text}`}
-                      >
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span
-                            className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${colors.dot}`}
-                          />
-                          <span
-                            className={`relative inline-flex h-1.5 w-1.5 rounded-full ${colors.dot}`}
-                          />
-                        </span>
-                        {STATUS_LABELS[state.status]}
-                      </div>
-                    </div>
+          {/* Session Cards - 2x2 Grid */}
+          <div className="grid w-full max-w-xl grid-cols-2 gap-3">
+            {SESSION_CONFIGS.map((config, index) => {
+              const state = bookingStatuses[config.bookingKey]
+              const colors = STATUS_COLORS[state.status]
+              const isCompleted = state.status === "completed"
 
-                    {/* Date info */}
-                    <div className="text-main2 mt-1 flex items-center gap-1 text-[11px]">
-                      <Calendar className="h-3 w-3 flex-shrink-0" />
-                      {state.bookedDate ? (
-                        <span>
-                          {formatDate(state.bookedDate)}
-                          {state.time && ` • ${state.time}`}
-                        </span>
+              return (
+                <button
+                  key={config.id}
+                  onClick={() => setActiveTab(config.id)}
+                  className="hover:bg-muted/50 cursor-pointer rounded-sm border p-3 text-left transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Step indicator */}
+                    <div
+                      className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-sm border-2 ${
+                        isCompleted
+                          ? "border-green-500 bg-green-50"
+                          : "border-border bg-background"
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle2
+                          className="h-3.5 w-3.5"
+                          style={{ color: "var(--status-green)" }}
+                        />
                       ) : (
-                        <span>Not scheduled</span>
+                        <span
+                          className="text-xs font-semibold"
+                          style={{ color: "var(--main2)" }}
+                        >
+                          {index + 1}
+                        </span>
                       )}
                     </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-foreground text-sm font-medium tracking-wide">
+                          {config.shortTitle}
+                        </span>
+                        <div
+                          className={`flex items-center gap-1.5 text-xs ${colors.text}`}
+                        >
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span
+                              className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${colors.dot}`}
+                            />
+                            <span
+                              className={`relative inline-flex h-1.5 w-1.5 rounded-full ${colors.dot}`}
+                            />
+                          </span>
+                          {STATUS_LABELS[state.status]}
+                        </div>
+                      </div>
+
+                      {/* Date info */}
+                      <div className="text-main2 mt-1 flex items-center gap-1 text-[11px]">
+                        <Calendar className="h-3 w-3 flex-shrink-0" />
+                        {state.bookedDate ? (
+                          <span>
+                            {formatDate(state.bookedDate)}
+                            {state.time && ` • ${state.time}`}
+                          </span>
+                        ) : (
+                          <span>Not scheduled</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      </EmptyContent>
-    </Empty>
+                </button>
+              )
+            })}
+          </div>
+        </EmptyContent>
+      </Empty>
+    </div>
   )
 }
 
@@ -607,9 +630,9 @@ export default function BookingPage() {
               <div className="ml-auto flex items-center">
                 <HoverCard openDelay={100} closeDelay={100}>
                   <HoverCardTrigger asChild>
-                    <button className="group relative flex cursor-pointer items-center justify-center">
-                      <span className="bg-main2/50 group-hover:bg-main absolute inline-flex h-4 w-4 animate-[ping_2s_ease-in-out_infinite] rounded-full opacity-50 transition-colors" />
-                      <CircleAlertIcon className="text-main2/50 group-hover:text-main relative h-4 w-4 transition-colors" />
+                    <button className="relative flex cursor-pointer items-center justify-center">
+                      <span className="bg-main absolute inline-flex h-4 w-4 animate-[ping_2s_ease-in-out_infinite] rounded-full opacity-50" />
+                      <CircleAlertIcon className="text-main relative h-4 w-4" />
                     </button>
                   </HoverCardTrigger>
                   <HoverCardContent

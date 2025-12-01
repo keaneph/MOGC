@@ -1607,9 +1607,9 @@ export function InProgressProfile({
             </TooltipThis>
           )}
           <HoverCard openDelay={100} closeDelay={100}>
-            <HoverCardTrigger className="group relative ml-auto flex cursor-pointer items-center justify-center">
-              <span className="bg-main2/50 group-hover:bg-main absolute inline-flex h-4 w-4 animate-[ping_3s_ease-in-out_infinite] rounded-full opacity-50 transition-colors" />
-              <CircleAlertIcon className="text-main2/50 group-hover:text-main relative h-4 w-4 transition-colors" />
+            <HoverCardTrigger className="relative ml-auto flex cursor-pointer items-center justify-center">
+              <span className="bg-main absolute inline-flex h-4 w-4 animate-[ping_3s_ease-in-out_infinite] rounded-full opacity-50" />
+              <CircleAlertIcon className="text-main relative h-4 w-4" />
             </HoverCardTrigger>
             <HoverCardContent className="text-center text-xs italic">
               Information will only be saved/updated upon clicking the
