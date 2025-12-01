@@ -12,13 +12,14 @@ import {
 } from "@/lib/api/counselors"
 import { SearchInput } from "../search-input"
 import { Separator } from "@/components/ui/separator"
-import { SquarePenIcon, CircleCheckIcon, TrashIcon } from "lucide-react"
+import { SquarePenIcon, CircleCheckIcon } from "lucide-react"
 import { NoteForm } from "./note-form"
 import { toast } from "sonner"
 import CatImage from "@/components/feedback/happy-toast"
 import CatImageSad from "@/components/feedback/sad-toast"
 import { DeleteConfirmationDialog } from "./delete-confirmation"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type Props = {
   student: CounselorStudentListItem
@@ -34,6 +35,15 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
   const [newContent, setNewContent] = useState("")
   const [editNoteOpen, setEditNoteOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    getStudentNotes(student.idNumber).then((data) => {
+      setNotes(data)
+      setLoading(false)
+    })
+  }, [student.idNumber])
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -167,7 +177,7 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
       <div className="w-full max-w-5xl">
         <div className="mb-10 text-3xl font-semibold tracking-wide">Notes</div>
 
-        <div className="mb-2 flex w-full justify-center gap-4 text-sm tracking-wide">
+        <div className="mb-2 flex w-full justify-center gap-4 text-[13px] tracking-wide">
           <div>
             Name: <strong>{student.studentName}</strong>
           </div>
@@ -203,27 +213,38 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
 
             <ScrollArea className="mt-4 h-full w-full overflow-y-auto rounded-md">
               <ul className="space-y-2">
-                {filteredNotes.map((note) => (
-                  <li
-                    key={note.id}
-                    className={`hover:bg-muted cursor-pointer rounded-md p-2 ${
-                      selectedNote?.id === note.id ? "bg-muted" : ""
-                    }`}
-                    onClick={() => setSelectedNote(note)}
-                  >
-                    <div className="flex items-center font-semibold">
-                      <div
-                        className={`${getTypeColor(note.note_type)} mr-3 h-5 w-2`}
-                      ></div>{" "}
-                      {note.note_title}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      {note.note_type} •{" "}
-                      {new Date(note.created_at).toLocaleDateString()}
-                    </div>
-                  </li>
-                ))}
-                {filteredNotes.length === 0 && (
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <li key={i} className="rounded-md p-2">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-5 w-2" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                      <Skeleton className="mt-2 h-3 w-24" />
+                    </li>
+                  ))
+                ) : filteredNotes.length > 0 ? (
+                  filteredNotes.map((note) => (
+                    <li
+                      key={note.id}
+                      className={`hover:bg-muted cursor-pointer rounded-md p-2 ${
+                        selectedNote?.id === note.id ? "bg-muted" : ""
+                      }`}
+                      onClick={() => setSelectedNote(note)}
+                    >
+                      <div className="flex items-center font-semibold">
+                        <div
+                          className={`${getTypeColor(note.note_type)} mr-3 h-5 w-2`}
+                        ></div>{" "}
+                        {note.note_title}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        {note.note_type} •{" "}
+                        {new Date(note.created_at).toLocaleDateString()}
+                      </div>
+                    </li>
+                  ))
+                ) : (
                   <li className="text-muted-foreground text-center text-sm">
                     No notes found
                   </li>
@@ -326,7 +347,7 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
                   </Badge>
                 </p>
                 <ScrollArea className="h-[350px] overflow-y-auto">
-                  <div className="overflow-y-auto p-4 text-sm leading-relaxed">
+                  <div className="overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-line">
                     {selectedNote.content}
                   </div>
                 </ScrollArea>
