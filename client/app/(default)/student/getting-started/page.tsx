@@ -186,13 +186,13 @@ export default function GettingStartedPage() {
               <div className="mb-2 text-sm font-medium tracking-wide">
                 Counselor Interview
               </div>
-              <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+              <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                 Book an appointment with the guidance counselor of your
                 department to finish initialization.
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to book an appointment with your counselor">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"
@@ -229,13 +229,13 @@ export default function GettingStartedPage() {
               <div className="mb-2 text-sm font-medium tracking-wide">
                 Initialization Tests
               </div>
-              <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+              <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                 Take the required tests to help us understand your needs better
                 and provide appropriate support.
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to take the initialization tests">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"
@@ -272,13 +272,13 @@ export default function GettingStartedPage() {
               <div className="mb-2 text-sm font-medium tracking-wide">
                 Counseling Sessions
               </div>
-              <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+              <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                 Schedule counseling sessions with your assigned counselor to
                 discuss your concerns and goals.
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to schedule counseling sessions">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"
@@ -315,7 +315,7 @@ export default function GettingStartedPage() {
               <div className="mb-2 text-sm font-medium tracking-wide">
                 Explore MOGC
               </div>
-              <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+              <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                 Explore the various features and resources available in the MOGC
                 web application.
               </div>

@@ -129,7 +129,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   Create Schedule
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   Create different types of events to manage your schedule
                   effectively.
                 </div>
@@ -169,7 +169,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   View Students
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   View the list of students assigned to you for counseling,
                   including their profiles, counseling history, and progress.
                 </div>
@@ -209,7 +209,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   View Meetings
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   View and manage your upcoming counseling sessions with
                   students.
                 </div>
@@ -249,7 +249,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   Explore MOGC
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   Explore the various features and resources available in the
                   MOGC web application.
                 </div>
