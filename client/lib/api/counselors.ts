@@ -5,7 +5,7 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-type CounselorStudentListItem = {
+export type CounselorStudentListItem = {
   idNumber: string
   studentName: string
   course: string
@@ -13,6 +13,15 @@ type CounselorStudentListItem = {
   assessment: "pending" | "high risk" | "low risk"
   initialInterview: "pending" | "scheduled" | "rescheduled" | "done"
   counselingStatus: "no record" | "ongoing" | "closed"
+}
+
+export type StudentNote = {
+  id: string
+  student_id: string
+  note_type: string
+  content: string
+  created_at: string
+  note_title: string
 }
 
 /**
@@ -135,5 +144,19 @@ export async function updateStudentCounseling(
     })
   } catch (error) {
     console.error("Failed to update interview:", error)
+  }
+}
+
+export async function getStudentNotes(
+  idNumber: string
+): Promise<StudentNote[]> {
+  try {
+    const data = await apiRequest<{ notes: StudentNote[] }>(
+      `/api/counselors/student/${idNumber}/notes`
+    )
+    return data.notes
+  } catch (error) {
+    console.error("Error fetching student notes:", error)
+    return []
   }
 }

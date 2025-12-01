@@ -189,4 +189,38 @@ def update_student_counselingstatus(user_id: str, id_number: str):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes", methods=["GET"])
+@require_auth
+def get_student_notes(user_id: str, id_number: str):
+    """Fetch notes for a student"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .select("id, student_id, note_type, content, created_at, note_title")
+            .eq("student_id", student_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+
+        return jsonify({"notes": response.data}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
