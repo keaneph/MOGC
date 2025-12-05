@@ -10,14 +10,18 @@ import {
   BookOpen,
   CircleAlertIcon,
   LucideIcon,
+  Loader2,
+  Clock,
+  MapPin,
+  Video,
+  Phone,
 } from "lucide-react"
 
-import Link from "next/link"
 import Image from "next/image"
 import Mochi from "@/public/mochi_peek.png"
 import Siklab from "@/public/siklab_peek.png"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 
 import { PrimaryButton } from "@/components/common/primary-button"
 
@@ -35,6 +39,30 @@ import {
   EmptyContent,
   EmptyTitle,
 } from "@/components/ui/empty"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { Skeleton } from "@/components/ui/skeleton"
+
+import {
+  getStudentAppointments,
+  getAvailableSlots,
+  createBooking,
+  cancelAppointment,
+  formatAppointmentTime,
+  type Appointment,
+  type TimeSlot,
+  type EventTypeCategory,
+} from "@/lib/api/appointments"
+import { getPublicEventTypes, type EventType } from "@/lib/api/event-types"
+import { getAssignedCounselor } from "@/lib/api/counselors"
 
 type BookingStatus = "not-booked" | "pending" | "confirmed" | "completed"
 
@@ -42,12 +70,14 @@ interface BookingState {
   status: BookingStatus
   bookedDate?: string
   time?: string
+  appointmentId?: string
+  eventType?: EventType
 }
 
-type BookingStatuses = Record<
-  "initialInterview" | "counseling" | "testInterpretation" | "exitInterview",
-  BookingState
->
+// Category to booking key mapping
+type CategoryKey = "interview" | "counseling" | "assessment" | "exit"
+
+type BookingStatuses = Record<CategoryKey, BookingState>
 
 interface SessionConfig {
   id: string
@@ -58,7 +88,8 @@ interface SessionConfig {
   duration: string
   format: string
   expectations: string[]
-  bookingKey: keyof BookingStatuses
+  category: EventTypeCategory
+  bookingKey: CategoryKey
   buttonText: string
   tooltipLabel: string
 }
@@ -71,7 +102,7 @@ const SESSION_CONFIGS: SessionConfig[] = [
     description:
       "Your first step in the guidance journey. Meet with your assigned counselor to introduce yourself, share your background, and establish a supportive relationship.",
     icon: UserCheck,
-    duration: "30-45 minutes",
+    duration: "30 minutes",
     format: "One-on-One",
     expectations: [
       "Introduce yourself and share your academic background",
@@ -79,7 +110,8 @@ const SESSION_CONFIGS: SessionConfig[] = [
       "Complete a personal profile questionnaire for your records",
       "Establish a personalized guidance plan tailored to your needs",
     ],
-    bookingKey: "initialInterview",
+    category: "interview",
+    bookingKey: "interview",
     buttonText: "Book Interview",
     tooltipLabel: "Schedule your initial interview now!",
   },
@@ -90,7 +122,7 @@ const SESSION_CONFIGS: SessionConfig[] = [
     description:
       "Engage in supportive sessions to navigate academic, personal, and social challenges. Our counselors provide a safe, confidential space to develop effective strategies.",
     icon: MessageSquare,
-    duration: "45-60 minutes",
+    duration: "30 - 60 minutes",
     format: "One-on-One, One-to-Many",
     expectations: [
       "Address academic challenges such as study habits and time management",
@@ -98,6 +130,7 @@ const SESSION_CONFIGS: SessionConfig[] = [
       "Develop coping strategies and problem-solving skills",
       "Explore career interests and receive guidance on future planning",
     ],
+    category: "counseling",
     bookingKey: "counseling",
     buttonText: "Book Session",
     tooltipLabel: "Schedule your counseling session!",
@@ -109,7 +142,7 @@ const SESSION_CONFIGS: SessionConfig[] = [
     description:
       "Discover your strengths, interests, and personality traits through standardized assessments. Receive an in-depth interpretation to guide your academic and career decisions.",
     icon: ClipboardList,
-    duration: "60-90 minutes",
+    duration: "60 minutes",
     format: "One-on-One",
     expectations: [
       "Complete standardized psychological and aptitude assessments",
@@ -117,7 +150,8 @@ const SESSION_CONFIGS: SessionConfig[] = [
       "Identify your strengths, interests, and areas for development",
       "Get personalized career path recommendations based on your profile",
     ],
-    bookingKey: "testInterpretation",
+    category: "assessment",
+    bookingKey: "assessment",
     buttonText: "Book Assessment",
     tooltipLabel: "Schedule your assessment!",
   },
@@ -136,7 +170,8 @@ const SESSION_CONFIGS: SessionConfig[] = [
       "Discuss future goals and create an actionable plan",
       "Receive final recommendations, resources, and referrals if needed",
     ],
-    bookingKey: "exitInterview",
+    category: "exit",
+    bookingKey: "exit",
     buttonText: "Book Interview",
     tooltipLabel: "Schedule your exit interview!",
   },
@@ -180,14 +215,26 @@ const formatDate = (dateString?: string): string => {
 function SessionContent({
   config,
   bookingState,
+  onBookClick,
+  onCancelClick,
 }: {
   config: SessionConfig
   bookingState: BookingState
+  onBookClick: () => void
+  onCancelClick?: () => void
 }) {
   const colors = STATUS_COLORS[bookingState.status]
   const isCompleted = bookingState.status === "completed"
   const isScheduled =
     bookingState.status === "pending" || bookingState.status === "confirmed"
+
+  // Get location icon based on event type
+  const LocationIcon =
+    bookingState.eventType?.locationType === "video"
+      ? Video
+      : bookingState.eventType?.locationType === "phone"
+        ? Phone
+        : MapPin
 
   return (
     <div className="flex h-full flex-col">
@@ -206,7 +253,10 @@ function SessionContent({
               {config.title}
             </h2>
             <p className="text-main2 text-sm">
-              {config.duration} • {config.format}
+              {bookingState.eventType
+                ? `${bookingState.eventType.duration} minutes`
+                : config.duration}{" "}
+              • {config.format}
             </p>
           </div>
         </div>
@@ -228,7 +278,7 @@ function SessionContent({
         <div className="flex flex-1 flex-col">
           {/* Description */}
           <p className="text-main2 mb-8 text-sm leading-relaxed font-medium tracking-wide">
-            {config.description}
+            {bookingState.eventType?.description || config.description}
           </p>
 
           {/* Expectations */}
@@ -268,7 +318,7 @@ function SessionContent({
                   <span className="text-sm font-medium tracking-wide">
                     {bookingState.status === "confirmed"
                       ? "Confirmed"
-                      : "Pending"}
+                      : "Pending Approval"}
                   </span>
                 </div>
                 <div className="text-main2 flex items-center gap-1.5 text-xs">
@@ -295,26 +345,29 @@ function SessionContent({
             )}
           </div>
 
-          {/* Format Card */}
+          {/* Format/Location Card */}
           <div className="flex flex-col rounded-sm border p-4">
             <div className="mb-3 flex items-center gap-2">
-              <UserCheck className="text-main h-4 w-4" />
+              <LocationIcon className="text-main h-4 w-4" />
               <span className="text-sm font-semibold tracking-wide">
-                Format
+                {bookingState.eventType?.locationType === "video"
+                  ? "Video Call"
+                  : bookingState.eventType?.locationType === "phone"
+                    ? "Phone Call"
+                    : "In Person"}
               </span>
             </div>
 
             {isScheduled && bookingState.bookedDate ? (
               <div className="space-y-1">
                 <span className="text-sm font-medium tracking-wide">
-                  {config.format.includes(",")
+                  {bookingState.eventType?.name || config.format.includes(",")
                     ? config.format.split(",")[0].trim()
                     : config.format}
                 </span>
                 <div className="text-main2 text-xs">
-                  {config.format.includes(",")
-                    ? "Format confirmed upon booking"
-                    : "In-person session"}
+                  {bookingState.eventType?.locationDetails ||
+                    "Details to be provided"}
                 </div>
               </div>
             ) : isCompleted ? (
@@ -330,22 +383,38 @@ function SessionContent({
           </div>
 
           {/* Action Buttons - Bottom Right */}
-          <div className="mt-auto flex items-center justify-end gap-4 pt-8">
+          <div className="mt-auto flex flex-col gap-2 pt-8">
             {!isCompleted ? (
               <>
-                <TooltipThis label="Learn more about this session">
-                  <button className="text-link cursor-pointer text-sm decoration-2 underline-offset-4 hover:underline">
-                    Learn more
-                  </button>
-                </TooltipThis>
-                <TooltipThis label={config.tooltipLabel}>
-                  <Link href="/student/student-profiling">
-                    <PrimaryButton content={config.buttonText} />
-                  </Link>
-                </TooltipThis>
+                <div className="flex items-center justify-end gap-4">
+                  <TooltipThis label="Learn more about this session">
+                    <button className="text-link cursor-pointer text-sm decoration-2 underline-offset-4 hover:underline">
+                      Learn more
+                    </button>
+                  </TooltipThis>
+                  {!isScheduled ? (
+                    <TooltipThis label={config.tooltipLabel}>
+                      <PrimaryButton
+                        content={config.buttonText}
+                        onClick={onBookClick}
+                      />
+                    </TooltipThis>
+                  ) : (
+                    <TooltipThis label="Cancel this appointment">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={onCancelClick}
+                      >
+                        Cancel Booking
+                      </Button>
+                    </TooltipThis>
+                  )}
+                </div>
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end gap-2">
                 <CheckCircle2 className="h-4 w-4 text-[var(--status-green)]" />
                 <span className="text-sm font-medium tracking-wide">
                   Session completed
@@ -470,22 +539,446 @@ function CoverContent({
   )
 }
 
+// Booking Dialog Component
+function BookingDialog({
+  isOpen,
+  onClose,
+  config,
+  counselorId,
+  onSuccess,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  config: SessionConfig
+  counselorId: string
+  onSuccess: () => void
+}) {
+  const [step, setStep] = useState<"event-type" | "date" | "time" | "confirm">(
+    "event-type"
+  )
+  const [eventTypes, setEventTypes] = useState<EventType[]>([])
+  const [selectedEventType, setSelectedEventType] = useState<EventType | null>(
+    null
+  )
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
+  const [notes, setNotes] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [slotsLoading, setSlotsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Load event types for this category
+  useEffect(() => {
+    if (isOpen && counselorId) {
+      setLoading(true)
+      getPublicEventTypes(counselorId, config.category)
+        .then((types) => {
+          setEventTypes(types)
+          // Auto-select if only one
+          if (types.length === 1) {
+            setSelectedEventType(types[0])
+            setStep("date")
+          }
+        })
+        .finally(() => setLoading(false))
+    }
+  }, [isOpen, counselorId, config.category])
+
+  // Load available slots when date changes
+  useEffect(() => {
+    if (selectedDate && selectedEventType) {
+      setSlotsLoading(true)
+      const dateStr = selectedDate.toISOString().split("T")[0]
+      getAvailableSlots(counselorId, selectedEventType.id, dateStr)
+        .then((result) => {
+          setAvailableSlots(result.slots)
+          if (result.message && result.slots.length === 0) {
+            setError(result.message)
+          } else {
+            setError(null)
+          }
+        })
+        .finally(() => setSlotsLoading(false))
+    }
+  }, [selectedDate, selectedEventType, counselorId])
+
+  const handleConfirm = async () => {
+    if (!selectedEventType || !selectedDate || !selectedSlot) return
+
+    setLoading(true)
+    setError(null)
+
+    const result = await createBooking({
+      eventTypeId: selectedEventType.id,
+      counselorId,
+      scheduledDate: selectedDate.toISOString().split("T")[0],
+      startTime: selectedSlot.startTime,
+      studentNotes: notes || undefined,
+    })
+
+    setLoading(false)
+
+    if (result.success) {
+      onSuccess()
+      onClose()
+      // Reset state
+      setStep("event-type")
+      setSelectedEventType(null)
+      setSelectedDate(undefined)
+      setSelectedSlot(null)
+      setNotes("")
+    } else {
+      setError(result.error || "Failed to book appointment")
+    }
+  }
+
+  const handleClose = () => {
+    onClose()
+    // Reset state
+    setStep("event-type")
+    setSelectedEventType(null)
+    setSelectedDate(undefined)
+    setSelectedSlot(null)
+    setNotes("")
+    setError(null)
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <config.icon className="text-main h-5 w-5" />
+            Book {config.shortTitle}
+          </DialogTitle>
+          <DialogDescription>
+            {step === "event-type" && "Select an appointment type"}
+            {step === "date" && "Choose a date for your appointment"}
+            {step === "time" && "Select an available time slot"}
+            {step === "confirm" && "Review and confirm your booking"}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="mt-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="text-main h-6 w-6 animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Step 1: Event Type Selection */}
+              {step === "event-type" && (
+                <div className="space-y-3">
+                  {eventTypes.length === 0 ? (
+                    <p className="text-main2 py-4 text-center text-sm">
+                      No appointment types available for this category. Please
+                      contact your counselor.
+                    </p>
+                  ) : (
+                    eventTypes.map((et) => (
+                      <button
+                        key={et.id}
+                        onClick={() => {
+                          setSelectedEventType(et)
+                          setStep("date")
+                        }}
+                        className="hover:border-main/50 hover:bg-muted/50 w-full rounded-sm border p-4 text-left transition-all"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="mt-1.5 h-3 w-3 rounded-full"
+                            style={{ backgroundColor: et.color }}
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">{et.name}</div>
+                            <div className="text-main2 mt-1 text-sm">
+                              {et.duration} minutes •{" "}
+                              {et.locationType === "video"
+                                ? "Video Call"
+                                : et.locationType === "phone"
+                                  ? "Phone"
+                                  : "In Person"}
+                            </div>
+                            {et.description && (
+                              <div className="text-main2 mt-2 text-xs">
+                                {et.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Step 2: Date Selection */}
+              {step === "date" && (
+                <div className="space-y-4">
+                  <div className="text-main2 mb-4 flex items-center gap-2 text-sm">
+                    <div
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: selectedEventType?.color }}
+                    />
+                    <span>{selectedEventType?.name}</span>
+                    <span>•</span>
+                    <span>{selectedEventType?.duration} min</span>
+                  </div>
+
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      setSelectedDate(date)
+                      setSelectedSlot(null)
+                      if (date) setStep("time")
+                    }}
+                    disabled={(date) => date < new Date()}
+                    className="rounded-md border"
+                  />
+
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep("event-type")}
+                  >
+                    Back
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 3: Time Selection */}
+              {step === "time" && (
+                <div className="space-y-4">
+                  <div className="text-main2 flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4" />
+                    <span>
+                      {selectedDate?.toLocaleDateString("en-US", {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+
+                  {slotsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="text-main h-6 w-6 animate-spin" />
+                    </div>
+                  ) : error ? (
+                    <p className="py-4 text-center text-sm text-red-600">
+                      {error}
+                    </p>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-main2 py-4 text-center text-sm">
+                      No available slots on this date. Please select another
+                      date.
+                    </p>
+                  ) : (
+                    <div className="grid max-h-48 grid-cols-3 gap-2 overflow-y-auto">
+                      {availableSlots.map((slot) => (
+                        <button
+                          key={slot.startTime}
+                          onClick={() => {
+                            setSelectedSlot(slot)
+                            setStep("confirm")
+                          }}
+                          className={`rounded-sm border px-3 py-2 text-sm transition-all ${
+                            selectedSlot?.startTime === slot.startTime
+                              ? "border-main bg-main/10 text-main"
+                              : "hover:border-main/50 hover:bg-muted/50"
+                          }`}
+                        >
+                          {slot.displayTime}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <Button variant="outline" onClick={() => setStep("date")}>
+                    Back
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 4: Confirmation */}
+              {step === "confirm" && (
+                <div className="space-y-4">
+                  <div className="bg-muted/30 rounded-sm border p-4">
+                    <div className="mb-3 font-medium">
+                      {selectedEventType?.name}
+                    </div>
+                    <div className="text-main2 space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {selectedDate?.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>{selectedSlot?.displayTime}</span>
+                        <span>({selectedEventType?.duration} minutes)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {selectedEventType?.locationType === "video" ? (
+                          <Video className="h-4 w-4" />
+                        ) : selectedEventType?.locationType === "phone" ? (
+                          <Phone className="h-4 w-4" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                        <span>
+                          {selectedEventType?.locationType === "video"
+                            ? "Video Call"
+                            : selectedEventType?.locationType === "phone"
+                              ? "Phone Call"
+                              : "In Person"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">
+                      Notes (optional)
+                    </label>
+                    <Textarea
+                      placeholder="Add any notes for your counselor..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="mt-1.5"
+                      rows={3}
+                    />
+                  </div>
+
+                  {error && <p className="text-sm text-red-600">{error}</p>}
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setStep("time")}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handleConfirm}
+                      disabled={loading}
+                      className="bg-main hover:bg-main/90 flex-1 cursor-pointer"
+                    >
+                      {loading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      Confirm Booking
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function BookingPage() {
   const [activeTab, setActiveTab] = useState<string>("cover")
-  const [bookingStatuses] = useState<BookingStatuses>({
-    initialInterview: {
-      status: "pending",
-      bookedDate: "2025-11-28",
-      time: "10:00 AM",
-    },
-    counseling: { status: "not-booked" },
-    testInterpretation: {
-      status: "confirmed",
-      bookedDate: "2025-12-05",
-      time: "2:30 PM",
-    },
-    exitInterview: { status: "completed" },
-  })
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false)
+  const [bookingCategory, setBookingCategory] = useState<SessionConfig | null>(
+    null
+  )
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [appointmentToCancel, setAppointmentToCancel] = useState<string | null>(
+    null
+  )
+
+  // Counselor assignment based on student's course
+  const [counselorId, setCounselorId] = useState<string | null>(null)
+  const [counselorName, setCounselorName] = useState<string | null>(null)
+  const [assignmentError, setAssignmentError] = useState<string | null>(null)
+
+  // Fetch assigned counselor based on student's course
+  useEffect(() => {
+    async function fetchCounselor() {
+      const result = await getAssignedCounselor()
+      if (result) {
+        setCounselorId(result.counselorId)
+        setCounselorName(result.counselorName)
+      } else {
+        setAssignmentError(
+          "No counselor assigned for your course. Please contact the guidance office."
+        )
+      }
+    }
+    fetchCounselor()
+  }, [])
+
+  // Fetch student appointments
+  const loadAppointments = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getStudentAppointments()
+      setAppointments(data)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadAppointments()
+  }, [loadAppointments])
+
+  // Derive booking statuses from appointments
+  const bookingStatuses = useMemo<BookingStatuses>(() => {
+    const statuses: BookingStatuses = {
+      interview: { status: "not-booked" },
+      counseling: { status: "not-booked" },
+      assessment: { status: "not-booked" },
+      exit: { status: "not-booked" },
+    }
+
+    // Map appointments to categories
+    for (const apt of appointments) {
+      const category = apt.eventType?.category as CategoryKey | undefined
+      if (!category || !(category in statuses)) continue
+
+      // Map API status to UI status
+      let uiStatus: BookingStatus = "not-booked"
+      if (apt.status === "completed") uiStatus = "completed"
+      else if (apt.status === "confirmed") uiStatus = "confirmed"
+      else if (apt.status === "pending") uiStatus = "pending"
+      else continue // Skip cancelled/no-show
+
+      // Only update if this is a more relevant status
+      const current = statuses[category]
+      const statusPriority = {
+        "not-booked": 0,
+        pending: 1,
+        confirmed: 2,
+        completed: 3,
+      }
+
+      if (statusPriority[uiStatus] > statusPriority[current.status]) {
+        statuses[category] = {
+          status: uiStatus,
+          bookedDate: apt.scheduledDate,
+          time: formatAppointmentTime(apt.startTime),
+          appointmentId: apt.id,
+          eventType: apt.eventType as unknown as EventType,
+        }
+      }
+    }
+
+    return statuses
+  }, [appointments])
 
   const nextAction = useMemo(() => {
     const statusPriority: BookingStatus[] = [
@@ -519,11 +1012,77 @@ export default function BookingPage() {
 
   const activeSession = SESSION_CONFIGS.find((c) => c.id === activeTab)
 
+  const handleBookClick = (config: SessionConfig) => {
+    setBookingCategory(config)
+    setBookingDialogOpen(true)
+  }
+
+  const handleCancelClick = (appointmentId: string) => {
+    setAppointmentToCancel(appointmentId)
+    setCancelDialogOpen(true)
+  }
+
+  const handleConfirmCancel = async () => {
+    if (!appointmentToCancel) return
+
+    const result = await cancelAppointment(appointmentToCancel)
+    if (result.success) {
+      loadAppointments()
+    }
+    setCancelDialogOpen(false)
+    setAppointmentToCancel(null)
+  }
+
+  if (loading) {
+    return (
+      <div className="mt-12 flex w-full justify-center px-6">
+        <div className="w-full max-w-5xl">
+          <div className="mb-10 text-3xl font-semibold tracking-wide">
+            Booking
+          </div>
+          <Skeleton className="h-[510px] w-full rounded-md" />
+        </div>
+      </div>
+    )
+  }
+
+  // Show error if no counselor assigned
+  if (assignmentError) {
+    return (
+      <div className="mt-12 flex w-full justify-center px-6">
+        <div className="w-full max-w-5xl">
+          <div className="mb-10 text-3xl font-semibold tracking-wide">
+            Booking
+          </div>
+          <Card className="p-8">
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="mb-4 rounded-full bg-yellow-100 p-3">
+                <CircleAlertIcon className="h-8 w-8 text-yellow-600" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">
+                No Counselor Assigned
+              </h3>
+              <p className="text-main2 max-w-md">{assignmentError}</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="mt-12 flex w-full justify-center px-6">
       <div className="w-full max-w-5xl">
-        <div className="mb-10 text-3xl font-semibold tracking-wide">
-          Booking
+        <div className="mb-10 flex items-center justify-between">
+          <div className="text-3xl font-semibold tracking-wide">Booking</div>
+          {counselorName && (
+            <div className="text-main2 text-sm">
+              <span className="text-foreground font-medium">
+                {counselorName}
+              </span>
+              <span className="ml-1.5">• Your Counselor</span>
+            </div>
+          )}
         </div>
 
         {/* Main Content Area */}
@@ -664,6 +1223,13 @@ export default function BookingPage() {
                 <SessionContent
                   config={activeSession}
                   bookingState={bookingStatuses[activeSession.bookingKey]}
+                  onBookClick={() => handleBookClick(activeSession)}
+                  onCancelClick={() => {
+                    const state = bookingStatuses[activeSession.bookingKey]
+                    if (state.appointmentId) {
+                      handleCancelClick(state.appointmentId)
+                    }
+                  }}
                 />
               ) : (
                 <CoverContent
@@ -675,6 +1241,49 @@ export default function BookingPage() {
           </Card>
         </div>
       </div>
+
+      {/* Booking Dialog */}
+      {bookingCategory && counselorId && (
+        <BookingDialog
+          isOpen={bookingDialogOpen}
+          onClose={() => {
+            setBookingDialogOpen(false)
+            setBookingCategory(null)
+          }}
+          config={bookingCategory}
+          counselorId={counselorId}
+          onSuccess={loadAppointments}
+        />
+      )}
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cancel Appointment</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this appointment? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+              className="flex-1"
+            >
+              Keep Appointment
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmCancel}
+              className="flex-1"
+            >
+              Cancel Appointment
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
