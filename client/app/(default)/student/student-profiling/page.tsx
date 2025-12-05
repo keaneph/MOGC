@@ -68,7 +68,7 @@ export default function StudentProfilingPage() {
 
         <div>
           {profileStatus === null ? (
-            <Skeleton className="rounded-m h-[510px] w-full" />
+            <Skeleton className="h-[510px] w-full rounded-md" />
           ) : profileStatus === "none" ? (
             <EmptyProfile onCreateProfile={handleCreateProfile} />
           ) : profileStatus === "in-progress" ? (

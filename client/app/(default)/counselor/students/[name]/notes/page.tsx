@@ -38,7 +38,13 @@ export default function StudentProfilePage() {
   }, [studentName])
 
   if (loading) {
-    return <Skeleton className="m-20 mr-20 h-100" />
+    return (
+      <div className="mt-12 flex w-full justify-center px-6">
+        <div className="w-full max-w-5xl">
+          <Skeleton className="h-[510px] w-full rounded-md" />
+        </div>
+      </div>
+    )
   }
 
   if (error) {
