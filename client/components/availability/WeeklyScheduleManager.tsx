@@ -61,6 +61,7 @@ interface WeeklyScheduleManagerProps {
     field: "start" | "end",
     value: string
   ) => void
+  daysWithOverlap?: Day[]
 }
 
 const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
@@ -70,25 +71,26 @@ const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
   handleAddSlot,
   handleCopySlot,
   handleUpdateSlot,
+  daysWithOverlap = [],
 }) => {
   return (
-    <div className="space-y-4">
+    <div>
       <div className="flex items-center gap-2">
-        <RefreshCcw className="h-5 w-5 text-gray-700" />
-        <h2 className="text-lg font-semibold">Weekly Hours</h2>
+        <RefreshCcw className="text-muted-foreground h-4 w-4" />
+        <h2 className="text-sm font-semibold">Weekly hours</h2>
       </div>
-      <p className="text-muted-foreground text-sm">
-        Set when you are typically available for meetings.
+      <p className="text-muted-foreground mt-1 text-xs">
+        Set when you are typically available for meetings
       </p>
 
-      <div className="space-y-3">
+      <div className="mt-4 space-y-3">
         {weeklySchedule.map((item) => (
-          <div key={item.day} className="flex items-start gap-2">
+          <div key={item.day} className="flex items-start gap-3">
             {/* Day Toggle */}
             <Button
               variant={item.available ? "default" : "secondary"}
               size="icon"
-              className={`h-8 w-8 cursor-pointer rounded-full font-bold ${item.available ? "bg-red-800 hover:bg-red-900" : "bg-gray-200 text-gray-500 hover:bg-gray-300"}`}
+              className={`h-7 w-7 flex-shrink-0 cursor-pointer rounded-full text-xs font-semibold ${item.available ? "bg-main hover:bg-main/90" : "text-muted-foreground bg-gray-200 hover:bg-gray-300"}`}
               onClick={() => handleToggleDay(item.day, !item.available)}
             >
               {getDayInitial(item.day)}
@@ -97,9 +99,21 @@ const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
             {/* Time Slots Container */}
             <div className="flex flex-col gap-2">
               {!item.available ? (
-                <span className="mt-1 font-semibold text-red-700">
-                  Unavailable
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-sm">
+                    Unavailable
+                  </span>
+                  {/* Add Button - allows adding a slot which makes the day available */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 cursor-pointer p-1"
+                    onClick={() => handleAddSlot(item.day)}
+                    aria-label="Add time slot"
+                  >
+                    <CirclePlus className="text-muted-foreground h-4 w-4" />
+                  </Button>
+                </div>
               ) : (
                 <>
                   {item.slots.map((slot, index) => (
@@ -114,17 +128,17 @@ const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
                         showAddButton={false}
                       />
 
-                      {index === 0 && (
+                      {index === 0 ? (
                         <div className="flex gap-0">
                           {/* Add Button */}
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 cursor-pointer p-1 hover:bg-green-500/10"
+                            className="h-7 w-7 cursor-pointer p-1"
                             onClick={() => handleAddSlot(item.day)}
                             aria-label="Add time slot"
                           >
-                            <CirclePlus className="h-4 w-4 text-green-600 hover:text-green-700" />
+                            <CirclePlus className="text-muted-foreground h-4 w-4" />
                           </Button>
 
                           {/* Copy Dropdown Button */}
@@ -133,10 +147,10 @@ const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 cursor-pointer p-1 hover:bg-gray-500/10"
+                                className="h-7 w-7 cursor-pointer p-1"
                                 aria-label={`Copy time slots from ${item.day}`}
                               >
-                                <CopyIcon className="h-4 w-4 text-gray-600 hover:text-gray-700" />
+                                <CopyIcon className="text-muted-foreground h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
 
@@ -157,9 +171,18 @@ const WeeklyScheduleManager: React.FC<WeeklyScheduleManagerProps> = ({
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
+                      ) : (
+                        // Spacer for alignment on additional slots
+                        <div className="w-14" />
                       )}
                     </div>
                   ))}
+                  {/* Overlap Warning */}
+                  {daysWithOverlap.includes(item.day) && (
+                    <span className="text-xs text-red-600">
+                      Time overlap with another set of times
+                    </span>
+                  )}
                 </>
               )}
             </div>

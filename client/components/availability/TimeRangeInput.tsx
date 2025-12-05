@@ -121,7 +121,7 @@ const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
           )}
         </div>
 
-        <span className="text-gray-500">-</span>
+        <span className="text-muted-foreground">-</span>
 
         {/* End Time */}
         <div className="relative">
@@ -156,26 +156,26 @@ const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
             className="cursor-pointer hover:bg-red-500/10"
             onClick={() => onRemove(slot.id)}
           >
-            <X className="h-4 w-4 text-gray-500 hover:text-red-600" />
+            <X className="text-muted-foreground h-4 w-4 hover:text-red-600" />
           </Button>
           {showAddButton && onAdd && (
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer hover:bg-green-500/10"
+              className="cursor-pointer"
               onClick={onAdd}
             >
-              <CirclePlus className="h-4 w-4 text-green-600 hover:text-green-700" />
+              <CirclePlus className="text-muted-foreground h-4 w-4" />
             </Button>
           )}
           {showCopyButton && onCopy && (
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer hover:bg-gray-500/10"
+              className="cursor-pointer"
               onClick={onCopy}
             >
-              <Copy className="h-4 w-4 text-gray-600 hover:text-gray-700" />
+              <Copy className="text-muted-foreground h-4 w-4" />
             </Button>
           )}
         </div>

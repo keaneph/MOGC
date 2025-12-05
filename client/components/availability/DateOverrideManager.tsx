@@ -1,8 +1,7 @@
 // components/availability/DateOverrideManager.tsx
 
-import React, { Dispatch, SetStateAction } from "react"
-import { CalendarClock, Plus, X } from "lucide-react"
-import { Card } from "@/components/ui/card"
+import React, { useMemo } from "react"
+import { CalendarClock, Plus, X, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -47,6 +46,7 @@ interface DateOverrideManagerProps {
   handleDialogSlotRemove: (id: string) => void
   handleDialogSlotAdd: () => void
   formatDate: (date: Date) => string
+  dialogHasOverlap?: boolean
 }
 
 const DateOverrideManager: React.FC<DateOverrideManagerProps> = ({
@@ -64,133 +64,212 @@ const DateOverrideManager: React.FC<DateOverrideManagerProps> = ({
   handleDialogSlotRemove,
   handleDialogSlotAdd,
   formatDate,
+  dialogHasOverlap = false,
 }) => {
+  // Check if selected date already has an override (conflict detection)
+  const existingOverride = useMemo(() => {
+    if (!selectedDate) return null
+    return dateOverrides.find((override) => {
+      const overrideDate = new Date(override.date)
+      return (
+        overrideDate.getFullYear() === selectedDate.getFullYear() &&
+        overrideDate.getMonth() === selectedDate.getMonth() &&
+        overrideDate.getDate() === selectedDate.getDate()
+      )
+    })
+  }, [selectedDate, dateOverrides])
+
+  // Get dates that already have overrides for calendar highlighting
+  const overrideDates = useMemo(() => {
+    return dateOverrides.map((override) => new Date(override.date))
+  }, [dateOverrides])
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <CalendarClock className="h-5 w-5 text-gray-700" />
-        <h2 className="text-lg font-semibold">Date-specific hours</h2>
-      </div>
-      <p className="text-muted-foreground text-sm">
-        Adjust hours for specific days, holidays, or vacations.
-      </p>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-full cursor-pointer text-green-600 hover:text-green-700"
-          >
-            <Plus className="mr-2 h-4 w-4 text-green-600" /> Add Date Override
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Add Date Override</DialogTitle>
-            <DialogDescription>
-              Select a date and set custom availability hours
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-4">
-            <div className="flex justify-center">
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="rounded-md border"
-              />
-            </div>
-
-            {selectedDate && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium">{formatDate(selectedDate)}</p>
-                  <Button
-                    variant={markAsUnavailable ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setMarkAsUnavailable(!markAsUnavailable)}
-                    className="cursor-pointer text-red-800 hover:text-red-900"
-                  >
-                    {markAsUnavailable
-                      ? "Mark as Available"
-                      : "Mark as Unavailable"}
-                  </Button>
-                </div>
-
-                {!markAsUnavailable && (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Time Slots</p>
-                    {dialogSlots.map((slot, index) => (
-                      <TimeRangeInput
-                        key={slot.id}
-                        slot={slot}
-                        onRemove={handleDialogSlotRemove}
-                        onAdd={handleDialogSlotAdd}
-                        onUpdate={handleDialogSlotUpdate}
-                        showAddButton={index === 0}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+    <div>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <CalendarClock className="text-muted-foreground h-4 w-4" />
+            <h2 className="text-sm font-semibold">Date-specific hours</h2>
           </div>
-
-          <DialogFooter>
-            <Button
-              className="cursor-pointer"
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-            >
-              Cancel
+          <p className="text-muted-foreground mt-1 text-xs">
+            Adjust hours for specific days
+          </p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="cursor-pointer">
+              <Plus className="mr-1 h-4 w-4" /> Hours
             </Button>
-            <Button
-              variant="outline"
-              className="cursor-pointer text-red-800 hover:text-red-900"
-              onClick={handleAddDateOverride}
-              disabled={!selectedDate}
-            >
-              Save Override
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add Date Override</DialogTitle>
+              <DialogDescription>
+                Select a date and set custom availability hours
+              </DialogDescription>
+            </DialogHeader>
 
-      {/* Date Overrides List */}
-      <div className="space-y-2">
-        {dateOverrides.length === 0 ? (
-          <Card className="border-2 border-dashed p-6 text-center text-gray-500 italic">
-            No date-specific hours set.
-          </Card>
-        ) : (
-          dateOverrides.map((override) => (
-            <Card key={override.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="font-medium">{formatDate(override.date)}</p>
-                  {override.isUnavailable ? (
-                    <p className="text-sm text-red-600">Unavailable</p>
-                  ) : (
-                    <div className="mt-2 space-y-1">
-                      {override.slots.map((slot) => (
-                        <p key={slot.id} className="text-sm text-gray-600">
-                          {slot.start} - {slot.end}
+            <div className="grid gap-4 py-4">
+              <div className="flex justify-center">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="rounded-md border"
+                  modifiers={{
+                    hasOverride: overrideDates,
+                  }}
+                  modifiersStyles={{
+                    hasOverride: {
+                      backgroundColor: "rgb(254 226 226)",
+                      color: "rgb(153 27 27)",
+                      fontWeight: "bold",
+                    },
+                  }}
+                />
+              </div>
+
+              {selectedDate && (
+                <div className="space-y-4">
+                  {/* Conflict Warning */}
+                  {existingOverride && (
+                    <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                      <div className="text-sm">
+                        <p className="font-medium text-amber-800">
+                          Override already exists
                         </p>
+                        <p className="text-amber-700">
+                          This date already has an override. Adding a new one
+                          will replace the existing settings.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium">{formatDate(selectedDate)}</p>
+                    <Button
+                      variant={markAsUnavailable ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setMarkAsUnavailable(!markAsUnavailable)}
+                      className="cursor-pointer text-red-800 hover:text-red-900"
+                    >
+                      {markAsUnavailable
+                        ? "Mark as Available"
+                        : "Mark as Unavailable"}
+                    </Button>
+                  </div>
+
+                  {!markAsUnavailable && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Time Slots</p>
+                      {dialogSlots.map((slot, index) => (
+                        <div key={slot.id} className="flex items-center gap-2">
+                          <TimeRangeInput
+                            slot={slot}
+                            onRemove={handleDialogSlotRemove}
+                            onAdd={handleDialogSlotAdd}
+                            onUpdate={handleDialogSlotUpdate}
+                            showAddButton={false}
+                          />
+                          {index === 0 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 cursor-pointer p-1"
+                              onClick={handleDialogSlotAdd}
+                              aria-label="Add time slot"
+                            >
+                              <Plus className="text-muted-foreground h-4 w-4" />
+                            </Button>
+                          )}
+                          {index > 0 && <div className="w-7" />}
+                        </div>
                       ))}
+                      {dialogHasOverlap && (
+                        <span className="text-xs text-red-600">
+                          Time overlap with another set of times
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveDateOverride(override.id)}
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                className="cursor-pointer"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className="cursor-pointer text-red-800 hover:text-red-900"
+                onClick={handleAddDateOverride}
+                disabled={
+                  !selectedDate || (!markAsUnavailable && dialogHasOverlap)
+                }
+              >
+                {existingOverride ? "Replace Override" : "Save Override"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Date Overrides List */}
+      <div className="mt-4 space-y-3">
+        {dateOverrides.length === 0 ? (
+          <div className="text-muted-foreground py-4 text-center text-sm italic">
+            No date-specific hours set.
+          </div>
+        ) : (
+          <>
+            <p className="text-muted-foreground text-xs font-medium">2025</p>
+            <div className="space-y-2">
+              {dateOverrides.map((override) => (
+                <div
+                  key={override.id}
+                  className="flex items-start justify-between rounded-md border bg-white p-3"
                 >
-                  <X className="h-4 w-4 text-gray-500 hover:text-red-600" />
-                </Button>
-              </div>
-            </Card>
-          ))
+                  <div className="min-w-[80px]">
+                    <p className="text-sm font-medium">
+                      {new Date(override.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex-1 text-right">
+                    {override.isUnavailable ? (
+                      <p className="text-sm text-red-600">Unavailable</p>
+                    ) : (
+                      <div className="space-y-0.5">
+                        {override.slots.map((slot) => (
+                          <p key={slot.id} className="text-sm text-gray-600">
+                            {slot.start} – {slot.end}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-2 h-6 w-6"
+                    onClick={() => handleRemoveDateOverride(override.id)}
+                  >
+                    <X className="text-muted-foreground h-4 w-4 hover:text-red-600" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

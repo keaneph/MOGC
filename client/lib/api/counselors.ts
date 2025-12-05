@@ -5,7 +5,7 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-type CounselorStudentListItem = {
+export type CounselorStudentListItem = {
   idNumber: string
   studentName: string
   course: string
@@ -13,6 +13,21 @@ type CounselorStudentListItem = {
   assessment: "pending" | "high risk" | "low risk"
   initialInterview: "pending" | "scheduled" | "rescheduled" | "done"
   counselingStatus: "no record" | "ongoing" | "closed"
+}
+
+export type StudentNote = {
+  id: string
+  student_id: string
+  note_type: string
+  content: string
+  created_at: string
+  note_title: string
+}
+
+export type AssignedCounselor = {
+  counselorId: string
+  counselorName: string | null
+  studentCourse: string
 }
 
 /**
@@ -62,6 +77,19 @@ async function apiRequest<T>(
   }
 
   return response.json()
+}
+
+/**
+ * Get the assigned counselor for the current student based on their course
+ */
+export async function getAssignedCounselor(): Promise<AssignedCounselor | null> {
+  try {
+    const data = await apiRequest<AssignedCounselor>("/api/counselors/assigned")
+    return data
+  } catch (error) {
+    console.error("Error fetching assigned counselor:", error)
+    return null
+  }
 }
 
 /**
@@ -135,5 +163,76 @@ export async function updateStudentCounseling(
     })
   } catch (error) {
     console.error("Failed to update interview:", error)
+  }
+}
+
+export async function getStudentNotes(
+  idNumber: string
+): Promise<StudentNote[]> {
+  try {
+    const data = await apiRequest<{ notes: StudentNote[] }>(
+      `/api/counselors/student/${idNumber}/notes`
+    )
+    return data.notes
+  } catch (error) {
+    console.error("Error fetching student notes:", error)
+    return []
+  }
+}
+
+export async function saveStudentNote(
+  idNumber: string,
+  note: Omit<StudentNote, "id" | "created_at">
+): Promise<StudentNote | null> {
+  try {
+    const data = await apiRequest<{ note: StudentNote }>(
+      `/api/counselors/student/${idNumber}/notes`,
+      {
+        method: "POST",
+        body: JSON.stringify(note),
+      }
+    )
+    return data.note
+  } catch (error) {
+    console.error("Error saving student note:", error)
+    return null
+  }
+}
+
+export async function updateStudentNote(
+  idNumber: string,
+  noteId: string,
+  updates: { note_title: string; note_type: string; content: string }
+): Promise<StudentNote | null> {
+  try {
+    const data = await apiRequest<{ note: StudentNote }>(
+      `/api/counselors/student/${idNumber}/notes/${noteId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(updates),
+      }
+    )
+    return data.note
+  } catch (error) {
+    console.error("Error updating student note:", error)
+    return null
+  }
+}
+
+export async function deleteStudentNote(
+  idNumber: string,
+  noteId: string
+): Promise<boolean> {
+  try {
+    await apiRequest<{ success: boolean }>(
+      `/api/counselors/student/${idNumber}/notes/${noteId}`,
+      {
+        method: "DELETE",
+      }
+    )
+    return true
+  } catch (error) {
+    console.error("Error deleting student note:", error)
+    return false
   }
 }

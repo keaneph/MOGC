@@ -76,7 +76,7 @@ export default function GettiingStartedPage() {
 
           <div id="secondStepDIV">
             <div className="mb-6 text-lg font-semibold tracking-wide">
-              Start Scheduling
+              Start Event Types
             </div>
             <div className="mb-12 flex justify-center rounded-sm border pt-3 pl-3">
               <div className="mt-5 ml-6 h-auto w-full flex-col">
@@ -129,13 +129,13 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   Create Schedule
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   Create different types of events to manage your schedule
                   effectively.
                 </div>
                 <div className="text-sm font-medium tracking-wide">
                   <TooltipThis label="Proceed to create schedule">
-                    <Link href="/counselor/scheduling">
+                    <Link href="/counselor/appointment-types">
                       <Button
                         variant="outline"
                         className="cursor-pointer rounded-sm tracking-wide"
@@ -169,7 +169,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   View Students
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   View the list of students assigned to you for counseling,
                   including their profiles, counseling history, and progress.
                 </div>
@@ -207,15 +207,15 @@ export default function GettiingStartedPage() {
               </div>
               <div className="flex flex-col">
                 <div className="mb-2 text-sm font-medium tracking-wide">
-                  View Meetings
+                  View Appointments
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   View and manage your upcoming counseling sessions with
                   students.
                 </div>
                 <div className="text-sm font-medium tracking-wide">
-                  <TooltipThis label="Proceed to view meetings">
-                    <Link href="/counselor/meetings">
+                  <TooltipThis label="Proceed to view appointments">
+                    <Link href="/counselor/apppointments">
                       <Button
                         variant="outline"
                         className="cursor-pointer rounded-sm tracking-wide"
@@ -249,7 +249,7 @@ export default function GettiingStartedPage() {
                 <div className="mb-2 text-sm font-medium tracking-wide">
                   Explore MOGC
                 </div>
-                <div className="font-regular text-main2 mb-4 text-sm tracking-wide">
+                <div className="text-main2 mb-4 text-sm font-normal tracking-wide">
                   Explore the various features and resources available in the
                   MOGC web application.
                 </div>
