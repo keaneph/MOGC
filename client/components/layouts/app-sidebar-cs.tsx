@@ -46,13 +46,13 @@ const items = [
     icon: ChartNoAxesCombinedIcon,
   },
   {
-    title: "Scheduling",
-    url: "/counselor/scheduling",
+    title: "Event Types",
+    url: "/counselor/event-types",
     icon: CalendarRangeIcon,
   },
   {
-    title: "Meetings",
-    url: "/counselor/meetings",
+    title: "Appointments",
+    url: "/counselor/appointments",
     icon: HandshakeIcon,
   },
   {

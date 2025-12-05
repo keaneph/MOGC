@@ -38,7 +38,7 @@ export default function StudentProfilePage() {
   }, [studentName])
 
   if (loading) {
-    return <Skeleton className="mt-20 mr-50 ml-50 h-130" />
+    return <Skeleton className="m-20 mr-20 h-100" />
   }
 
   if (error) {

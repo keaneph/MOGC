@@ -56,7 +56,8 @@ If you use pipenv (recommended for parity with this repo):
 cd server
 pipenv install      # first time only
 pipenv shell
-python -m flask run # runs on http://localhost:5000
+flask run           # runs on http://localhost:5000
+python run.py       # optional: alternative way to run the backend
 exit                # leave the virtualenv
 ```
 
@@ -67,7 +68,7 @@ cd server
 python -m venv .venv
 .\\.venv\\Scripts\\Activate.ps1
 pip install -r requirements.txt
-python -m flask run
+flask run
 ```
 
 Environment variables
@@ -95,6 +96,11 @@ README.md            # <- you are here
 client/              # Next.js frontend (TSX, Tailwind)
 server/              # Flask backend and API
 ```
+
+Important paths
+
+- `client/` — Next.js app, run with `npm run dev`.
+- `server/` — Flask app, run with `flask run` or `python run.py`
 
 ## Development notes
 
