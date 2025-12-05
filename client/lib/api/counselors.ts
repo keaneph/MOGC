@@ -24,6 +24,12 @@ export type StudentNote = {
   note_title: string
 }
 
+export type AssignedCounselor = {
+  counselorId: string
+  counselorName: string | null
+  studentCourse: string
+}
+
 /**
  * get auth token from Supabase session
  */
@@ -71,6 +77,19 @@ async function apiRequest<T>(
   }
 
   return response.json()
+}
+
+/**
+ * Get the assigned counselor for the current student based on their course
+ */
+export async function getAssignedCounselor(): Promise<AssignedCounselor | null> {
+  try {
+    const data = await apiRequest<AssignedCounselor>("/api/counselors/assigned")
+    return data
+  } catch (error) {
+    console.error("Error fetching assigned counselor:", error)
+    return null
+  }
 }
 
 /**

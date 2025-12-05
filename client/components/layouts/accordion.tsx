@@ -33,7 +33,7 @@ export function SiklabAccordion({
             Fill up personal information
           </div>
         </AccordionTrigger>
-        <AccordionContent className="flex flex-col gap-4 pl-2 text-balance">
+        <AccordionContent className="font-regular flex flex-col gap-4 pl-2 text-balance">
           <p>
             Provide your personal and academic information. Accurate information
             ensures your counselor can tailor sessions to your needs.
@@ -108,8 +108,8 @@ export function SiklabAccordion({
             your preferred date, and time.
           </p>
           <p>
-            Once your session is booked, you&apos;ll receive a confirmation with
-            the details.
+            Once your session is booked, you’ll receive a confirmation with the
+            details.
           </p>
           <div className="flex w-auto gap-4">
             <PrimaryButton content="Guide me" />
