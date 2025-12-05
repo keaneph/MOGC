@@ -4,6 +4,69 @@ from app.services.supabase_service import get_supabase_client
 
 counselors_bp = Blueprint("counselors", __name__, url_prefix="/api/counselors")
 
+
+@counselors_bp.route("/assigned", methods=["GET"])
+@require_auth
+def get_assigned_counselor(user_id: str):
+    """Get the counselor assigned to the current student based on their course"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+        
+        # Get student's course (don't use .single() to avoid error on no rows)
+        student_response = (
+            supabase.table("students")
+            .select("course")
+            .eq("auth_user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        
+        if not student_response.data or len(student_response.data) == 0:
+            return jsonify({"error": "Student profile not found"}), 404
+        
+        student_course = student_response.data[0].get("course")
+        if not student_course:
+            return jsonify({"error": "Your profile doesn't have a course set. Please complete your profile first."}), 404
+        
+        # Find counselor who handles this course
+        counselor_response = (
+            supabase.table("counselor_course_filters")
+            .select("auth_user_id")
+            .eq("course", student_course)
+            .limit(1)
+            .execute()
+        )
+        
+        if not counselor_response.data:
+            return jsonify({"error": "No counselor assigned for your course"}), 404
+        
+        counselor_id = counselor_response.data[0]["auth_user_id"]
+        
+        # Get counselor details from profiles table (not counselors)
+        counselor_details = (
+            supabase.table("profiles")
+            .select("first_name")
+            .eq("id", counselor_id)
+            .eq("role", "counselor")
+            .limit(1)
+            .execute()
+        )
+        
+        counselor_name = None
+        if counselor_details.data and len(counselor_details.data) > 0:
+            c = counselor_details.data[0]
+            counselor_name = c.get('first_name', '')
+        
+        return jsonify({
+            "counselorId": counselor_id,
+            "counselorName": counselor_name,
+            "studentCourse": student_course
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @counselors_bp.route("/student-list", methods=["GET"])
 @require_auth
 def get_student_list(user_id: str):

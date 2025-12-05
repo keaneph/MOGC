@@ -2,7 +2,7 @@
 
 import { RefreshCcw } from "lucide-react"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 
 import { SortingState } from "@tanstack/react-table"
 
@@ -35,35 +35,47 @@ export default function StudentsPage() {
   const [sorting, setSorting] = useState<SortingState>([])
 
   const pageSize = 10
-  const filteredStudents = students.filter((student) => {
+
+  const filteredStudents = useMemo(() => {
     const term = searchTerm.toLowerCase()
-    return (
-      student.idNumber.toLowerCase().includes(term) ||
-      student.studentName.toLowerCase().includes(term)
+    return students.filter(
+      (student) =>
+        student.idNumber.toLowerCase().includes(term) ||
+        student.studentName.toLowerCase().includes(term)
     )
-  })
+  }, [students, searchTerm])
 
-  const sortedStudents = [...filteredStudents].sort((a, b) => {
-    for (const sort of sorting) {
-      const { id, desc } = sort
-      const aValue = a[id as keyof CounselorStudentListItem]
-      const bValue = b[id as keyof CounselorStudentListItem]
+  const sortedStudents = useMemo(() => {
+    return [...filteredStudents].sort((a, b) => {
+      for (const sort of sorting) {
+        const { id, desc } = sort
+        const aValue = a[id as keyof CounselorStudentListItem]
+        const bValue = b[id as keyof CounselorStudentListItem]
 
-      const aStr = String(aValue).toLowerCase()
-      const bStr = String(bValue).toLowerCase()
+        const aStr = String(aValue).toLowerCase()
+        const bStr = String(bValue).toLowerCase()
 
-      if (aStr < bStr) return desc ? 1 : -1
-      if (aStr > bStr) return desc ? -1 : 1
-    }
-    return 0
-  })
+        if (aStr < bStr) return desc ? 1 : -1
+        if (aStr > bStr) return desc ? -1 : 1
+      }
+      return 0
+    })
+  }, [filteredStudents, sorting])
 
   const totalPages = Math.ceil(filteredStudents.length / pageSize)
-  const paginatedData = sortedStudents.slice(
-    (page - 1) * pageSize,
-    page * pageSize
+
+  const paginatedData = useMemo(() => {
+    return sortedStudents.slice((page - 1) * pageSize, page * pageSize)
+  }, [sortedStudents, page, pageSize])
+
+  const tableColumns = useMemo(() => columns(setStudents), [])
+
+  const paginationPages = useMemo(
+    () => Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
   )
-  const fetchStudents = async () => {
+
+  const fetchStudents = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -74,11 +86,11 @@ export default function StudentsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchStudents()
-  }, [])
+  }, [fetchStudents])
 
   return (
     <main id="main-container" className="mt-12 flex w-full justify-center px-6">
@@ -96,16 +108,14 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        {loading && (
-          <Skeleton className="container mx-auto h-[300px] rounded-xl py-10" />
-        )}
+        {loading && <Skeleton className="h-[510px] w-full rounded-md" />}
         {error && <p className="text-red-600">{error}</p>}
 
         {!loading && !error && (
           <div className="container h-[500px] w-full overflow-y-auto">
             <div className="overflow-y-auto rounded-md border shadow-sm">
               <DataTable
-                columns={columns(setStudents)}
+                columns={tableColumns}
                 data={paginatedData}
                 sorting={sorting}
                 setSorting={setSorting}
@@ -132,14 +142,14 @@ export default function StudentsPage() {
                     />
                   </PaginationItem>
 
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i}>
+                  {paginationPages.map((pageNum) => (
+                    <PaginationItem key={pageNum}>
                       <PaginationLink
                         href="#"
-                        isActive={page === i + 1}
-                        onClick={() => setPage(i + 1)}
+                        isActive={page === pageNum}
+                        onClick={() => setPage(pageNum)}
                       >
-                        {i + 1}
+                        {pageNum}
                       </PaginationLink>
                     </PaginationItem>
                   ))}

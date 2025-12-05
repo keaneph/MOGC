@@ -144,7 +144,7 @@ export default function DocumentationPage() {
                       <div className="text-[12px] font-medium tracking-wide">
                         Appointment Scheduling
                       </div>
-                      <div className="text-main2 text-[10px] font-normal tracking-wide">
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
                         Counselor & Student
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export default function DocumentationPage() {
                       <div className="text-[12px] font-medium tracking-wide">
                         Session notes and counseling history
                       </div>
-                      <div className="text-main2 text-[10px] font-normal tracking-wide">
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
                         Counselor
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export default function DocumentationPage() {
                       <div className="text-[12px] font-medium tracking-wide">
                         Analytics dashboard for trends
                       </div>
-                      <div className="text-main2 text-[10px] font-normal tracking-wide">
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
                         Counselor & Student
                       </div>
                     </div>
@@ -227,7 +227,7 @@ export default function DocumentationPage() {
                       <div className="text-[12px] font-medium tracking-wide">
                         Calendar of Events
                       </div>
-                      <div className="font-normaltext-main2 text-[10px] tracking-wide">
+                      <div className="font-regular text-main2 text-[10px] tracking-wide">
                         Counselor & Student
                       </div>
                     </div>
