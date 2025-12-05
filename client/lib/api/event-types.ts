@@ -306,6 +306,7 @@ export const LOCATION_TYPE_OPTIONS = [
   { label: "Phone Call", value: "phone" as const },
 ]
 
+// Category options (maps to student journey steps)
 export const CATEGORY_OPTIONS = [
   {
     label: "Interview",
