@@ -4,6 +4,69 @@ from app.services.supabase_service import get_supabase_client
 
 counselors_bp = Blueprint("counselors", __name__, url_prefix="/api/counselors")
 
+
+@counselors_bp.route("/assigned", methods=["GET"])
+@require_auth
+def get_assigned_counselor(user_id: str):
+    """Get the counselor assigned to the current student based on their course"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+        
+        # Get student's course (don't use .single() to avoid error on no rows)
+        student_response = (
+            supabase.table("students")
+            .select("course")
+            .eq("auth_user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        
+        if not student_response.data or len(student_response.data) == 0:
+            return jsonify({"error": "Student profile not found"}), 404
+        
+        student_course = student_response.data[0].get("course")
+        if not student_course:
+            return jsonify({"error": "Your profile doesn't have a course set. Please complete your profile first."}), 404
+        
+        # Find counselor who handles this course
+        counselor_response = (
+            supabase.table("counselor_course_filters")
+            .select("auth_user_id")
+            .eq("course", student_course)
+            .limit(1)
+            .execute()
+        )
+        
+        if not counselor_response.data:
+            return jsonify({"error": "No counselor assigned for your course"}), 404
+        
+        counselor_id = counselor_response.data[0]["auth_user_id"]
+        
+        # Get counselor details from profiles table (not counselors)
+        counselor_details = (
+            supabase.table("profiles")
+            .select("first_name")
+            .eq("id", counselor_id)
+            .eq("role", "counselor")
+            .limit(1)
+            .execute()
+        )
+        
+        counselor_name = None
+        if counselor_details.data and len(counselor_details.data) > 0:
+            c = counselor_details.data[0]
+            counselor_name = c.get('first_name', '')
+        
+        return jsonify({
+            "counselorId": counselor_id,
+            "counselorName": counselor_name,
+            "studentCourse": student_course
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @counselors_bp.route("/student-list", methods=["GET"])
 @require_auth
 def get_student_list(user_id: str):
@@ -189,4 +252,174 @@ def update_student_counselingstatus(user_id: str, id_number: str):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes", methods=["GET"])
+@require_auth
+def get_student_notes(user_id: str, id_number: str):
+    """Fetch notes for a student"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .select("id, student_id, note_type, content, created_at, note_title")
+            .eq("student_id", student_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+
+        return jsonify({"notes": response.data}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes", methods=["POST"])
+@require_auth
+def add_student_note(user_id: str, id_number: str):
+    """Add a new note for a student"""
+    try:
+        data = request.get_json()
+        note_title = data.get("note_title")
+        note_type = data.get("note_type")
+        content = data.get("content")
+
+        if not note_title or not note_type or not content:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        if note_type not in ["regular", "progress", "closure"]:
+            return jsonify({"error": "Invalid note type"}), 400
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .insert(
+                {
+                    "student_id": student_id,
+                    "note_title": note_title,
+                    "note_type": note_type,
+                    "content": content,
+                }
+            )
+            .execute()
+        )
+
+        if not response.data:
+            return jsonify({"error": "Failed to insert note"}), 500
+
+        return jsonify({"note": response.data[0]}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@counselors_bp.route("/student/<string:id_number>/notes/<string:note_id>", methods=["PUT"])
+@require_auth
+def update_student_note(user_id: str, id_number: str, note_id: str):
+    """Update an existing note"""
+    try:
+        data = request.get_json()
+        note_title = data.get("note_title")
+        note_type = data.get("note_type")
+        content = data.get("content")
+
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .update(
+                {
+                    "note_title": note_title,
+                    "note_type": note_type,
+                    "content": content,
+                }
+            )
+            .eq("id", note_id)
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if not response.data:
+            return jsonify({"error": "Failed to update note"}), 500
+
+        return jsonify({"note": response.data[0]}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@counselors_bp.route("/student/<string:id_number>/notes/<string:note_id>", methods=["DELETE"])
+@require_auth
+def delete_student_note(user_id: str, id_number: str, note_id: str):
+    """Delete a note for a student"""
+    try:
+        supabase = get_supabase_client(use_service_role=True)
+
+        student_lookup = (
+            supabase.table("students")
+            .select("id")
+            .eq("id_number", id_number)
+            .single()
+            .execute()
+        )
+        if not student_lookup.data:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_id = student_lookup.data["id"]
+
+        response = (
+            supabase.table("student_notes")
+            .delete()
+            .eq("id", note_id)
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if not response.data:   
+            return jsonify({"error": "Failed to delete note"}), 500
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 
