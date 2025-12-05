@@ -22,10 +22,18 @@ CORS(
 from app.routes.check import check_bp
 from app.routes.students import students_bp
 from app.routes.counselors import counselors_bp
+from app.routes.availability import availability_bp
+from app.routes.schedules import schedules_bp
+from app.routes.event_types import event_types_bp
+from app.routes.appointments import appointments_bp
 
 app.register_blueprint(check_bp)
 app.register_blueprint(students_bp)
 app.register_blueprint(counselors_bp)
+app.register_blueprint(availability_bp)
+app.register_blueprint(schedules_bp)
+app.register_blueprint(event_types_bp)
+app.register_blueprint(appointments_bp)
 
 
 @app.route("/healthcheck")
