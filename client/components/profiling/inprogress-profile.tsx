@@ -129,13 +129,16 @@ export function InProgressProfile({
   isEditing,
   onBackToSummary,
 }: InProgressProfileProps) {
+  const [optimisticCache, setOptimisticCache] = useState<{
+    [sectionIndex: number]: { [partIndex: number]: unknown }
+  }>({})
   // 0–5 (6 sections)
   const [currentSection, setCurrentSection] = useState(0)
   const [currentPart, setCurrentPart] = useState(0)
   const [isIconGrabbed, setIsIconGrabbed] = useState(false)
   const [draggedOverStep, setDraggedOverStep] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [loadedProfileData, setLoadedProfileData] =
@@ -162,11 +165,27 @@ export function InProgressProfile({
   const populateCurrentForm = async (
     fullProfile: Awaited<ReturnType<typeof getStudentProfile>>
   ) => {
-    if (!fullProfile) return
-
+    // Prefer optimistic cache if available
+    const optimisticData = optimisticCache[currentSection]?.[currentPart]
     // Wait a tick for form to be mounted
     await new Promise((resolve) => setTimeout(resolve, 50))
 
+    if (
+      optimisticData &&
+      typeof optimisticData === "object" &&
+      optimisticData !== null
+    ) {
+      const ref = getCurrentFormRef()
+      const dataAsRecord = optimisticData as Record<string, unknown>
+      if (ref?.current && hasAnyData(dataAsRecord)) {
+        ref.current.form.reset(dataAsRecord)
+      }
+      return
+    }
+
+    if (!fullProfile) return
+
+    // ...existing code for populating from fullProfile...
     if (currentSection === 0) {
       // Personal Data
       if (currentPart === 0) {
@@ -656,6 +675,8 @@ export function InProgressProfile({
 
   // Initial load: Check if profile exists and load ALL saved data
   useEffect(() => {
+    let pollingInterval: NodeJS.Timeout | null = null
+
     async function loadInitialProfile() {
       if (!isInitialLoad) return
 
@@ -702,6 +723,36 @@ export function InProgressProfile({
     }
 
     loadInitialProfile()
+
+    pollingInterval = setInterval(async () => {
+      try {
+        const latestProfile = await getStudentProfile()
+        if (latestProfile) {
+          setLoadedProfileData(latestProfile)
+          setOptimisticCache((prev) => {
+            const updated = { ...prev }
+            Object.keys(updated).forEach((sectionKey) => {
+              const sectionIdx = Number(sectionKey)
+              Object.keys(updated[sectionIdx] || {}).forEach((partKey) => {
+                const partIdx = Number(partKey)
+                if (sectionIdx === currentSection && partIdx === currentPart) {
+                  return
+                }
+                delete updated[sectionIdx][partIdx]
+                if (Object.keys(updated[sectionIdx]).length === 0) {
+                  delete updated[sectionIdx]
+                }
+              })
+            })
+            return updated
+          })
+        }
+      } catch {}
+    }, 1000) //1 sec poll rate
+
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialLoad])
 
@@ -983,62 +1034,59 @@ export function InProgressProfile({
       }
     }
 
-    // SAVE current section data before proceeding
     if (currentRef?.current?.form) {
-      setIsSaving(true)
-      try {
-        const formData = currentRef.current.form.getValues()
-        const result = await saveStudentSection(
-          formData,
-          currentSection as 0 | 1 | 2 | 3 | 4 | 5,
-          currentPart as 0 | 1 | 2 | 3 | 4
-        )
-
-        if (!result.success) {
-          toast.error(result.error || "Failed to save. Please try again.", {
-            duration: 3000,
-          })
-          setIsSaving(false)
-          return // Prevent navigation if save fails
-        }
-
-        toast.success(
-          <div className="relative flex w-full items-center pr-18">
-            <span className="pl-2">Section saved successfully</span>
-            <CatImage />
-          </div>,
-          {
-            duration: 3000,
-            icon: <CircleCheckIcon className="size-4" />,
+      const formData = currentRef.current.form.getValues()
+      setOptimisticCache((prev) => {
+        const sectionCache = prev[currentSection]
+          ? { ...prev[currentSection] }
+          : {}
+        sectionCache[currentPart] = formData
+        return { ...prev, [currentSection]: sectionCache }
+      })
+      saveStudentSection(
+        formData,
+        currentSection as 0 | 1 | 2 | 3 | 4 | 5,
+        currentPart as 0 | 1 | 2 | 3 | 4
+      )
+        .then((result) => {
+          if (!result.success) {
+            toast.error(result.error || "Failed to save. Please try again.", {
+              duration: 3000,
+              action: {
+                label: "Retry",
+                onClick: () => handleProceed(),
+              },
+            })
+          } else {
+            toast.success(
+              <div className="relative flex w-full items-center pr-18">
+                <span className="pl-2">Section saved successfully</span>
+                <CatImage />
+              </div>,
+              {
+                duration: 3000,
+                icon: <CircleCheckIcon className="size-4" />,
+              }
+            )
           }
-        )
-
-        // reload profile data after successful save to keep it in sync
-        const updatedProfile = await getStudentProfile()
-        if (updatedProfile) {
-          setLoadedProfileData(updatedProfile)
-        }
-
-        // should refresh not just on initial mount, but every after save
-        const progress = await getProfileProgress()
-        setCompletedSections(new Set(progress.completedSections || []))
-      } catch (error) {
-        console.error("Error saving section:", error)
-        toast.error(
-          <div className="relative flex w-full items-center pr-14">
-            <span className="pl-2">Failed to save. Please try again</span>
-            <CatImageSad />
-          </div>,
-          {
-            duration: 3000,
-            icon: <CircleCheckIcon className="size-4" />,
-          }
-        )
-        setIsSaving(false)
-        return // prevent navigation if save fails
-      } finally {
-        setIsSaving(false)
-      }
+        })
+        .catch((error) => {
+          console.error("Error saving section:", error)
+          toast.error(
+            <div className="relative flex w-full items-center pr-14">
+              <span className="pl-2">Failed to save. Please try again</span>
+              <CatImageSad />
+            </div>,
+            {
+              duration: 3000,
+              action: {
+                label: "Retry",
+                onClick: () => handleProceed(),
+              },
+              icon: <CircleCheckIcon className="size-4" />,
+            }
+          )
+        })
     }
 
     // proceed to next part or section
@@ -1297,7 +1345,7 @@ export function InProgressProfile({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g filter="url(#filter0_d_1098_17622)">
+            <g filter="u rl(#filter0_d_1098_17622)">
               <path
                 d="M80.549 0.306885C73.3736 34.6504 63.8137 49.3067 37.549 67.8069C1.66176 101.411 6.04899 132.307 5.54896 139.307C5.04894 146.307 7.88242 189.975 37.549 209.307C76.7648 226.744 88.3142 243.987 92.049 286.807C92.0207 325.487 80.6849 343.12 48.549 370.307"
                 stroke="#747B7D"
