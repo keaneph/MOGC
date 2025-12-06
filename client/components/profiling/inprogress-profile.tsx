@@ -1203,7 +1203,7 @@ export function InProgressProfile({
 
     // placeholder muna
     return (
-      <div className="flex h-full flex-col items-center justify-center text-gray-500">
+      <div className="text-muted-foreground flex h-full flex-col items-center justify-center">
         <p>
           Section {currentSection + 1}, Part {currentPart + 1}
         </p>
