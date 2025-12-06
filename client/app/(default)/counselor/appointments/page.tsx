@@ -394,20 +394,16 @@ export default function CounselorAppointmentsPage() {
       // "all" - no time filtering
     }
 
-    // Sort: pending first, then by date
+    // Sort: pending first, then by date (descending - most recent first)
     filtered.sort((a, b) => {
       // Pending appointments first
       if (a.status === "pending" && b.status !== "pending") return -1
       if (b.status === "pending" && a.status !== "pending") return 1
 
-      // Then by date (upcoming first for active, newest first for past)
+      // Then by date (most recent first - descending order)
       const dateA = new Date(`${a.scheduledDate}T${a.startTime}`)
       const dateB = new Date(`${b.scheduledDate}T${b.startTime}`)
-
-      if (timeFilter === "past") {
-        return dateB.getTime() - dateA.getTime()
-      }
-      return dateA.getTime() - dateB.getTime()
+      return dateB.getTime() - dateA.getTime()
     })
 
     return filtered
@@ -766,18 +762,17 @@ export default function CounselorAppointmentsPage() {
               variant="outline"
               onClick={() => setCancelDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer tracking-wide"
             >
               Keep Appointment
             </Button>
             <Button
-              variant="destructive"
               onClick={submitCancel}
               disabled={isDialogLoading}
+              className="bg-main hover:bg-main/90 cursor-pointer tracking-wide"
             >
-              {isDialogLoading ? (
+              {isDialogLoading && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <XCircle className="mr-2 h-4 w-4" />
               )}
               Cancel Appointment
             </Button>
@@ -1008,24 +1003,68 @@ export default function CounselorAppointmentsPage() {
               <div className="border-t pt-2 text-xs text-gray-400">
                 <div>
                   Created:{" "}
-                  {new Date(selectedAppointment.createdAt).toLocaleString()}
+                  {new Date(selectedAppointment.createdAt).toLocaleString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      hour12: true,
+                    }
+                  )}
                 </div>
                 {selectedAppointment.confirmedAt && (
                   <div>
                     Confirmed:{" "}
-                    {new Date(selectedAppointment.confirmedAt).toLocaleString()}
+                    {new Date(selectedAppointment.confirmedAt).toLocaleString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                      }
+                    )}
                   </div>
                 )}
                 {selectedAppointment.completedAt && (
                   <div>
                     Completed:{" "}
-                    {new Date(selectedAppointment.completedAt).toLocaleString()}
+                    {new Date(selectedAppointment.completedAt).toLocaleString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                      }
+                    )}
                   </div>
                 )}
                 {selectedAppointment.cancelledAt && (
                   <div>
                     Cancelled:{" "}
-                    {new Date(selectedAppointment.cancelledAt).toLocaleString()}
+                    {new Date(selectedAppointment.cancelledAt).toLocaleString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                      }
+                    )}
                   </div>
                 )}
               </div>

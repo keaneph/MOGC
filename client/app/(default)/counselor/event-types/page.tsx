@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import {
   EllipsisVertical,
   Copy,
@@ -43,7 +44,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Empty,
+  EmptyHeader,
+  EmptyContent,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { PrimaryButton } from "@/components/common/primary-button"
 import { toast } from "sonner"
+
+import sitting from "@/public/sitting.png"
 
 import {
   getEventTypes,
@@ -334,23 +344,33 @@ export default function EventTypesPage() {
         {isLoading ? (
           <Skeleton className="h-[510px] w-full rounded-md" />
         ) : eventTypes.length === 0 ? (
-          <Card className="p-12 text-center shadow-lg">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-              <CalendarClock className="h-8 w-8 text-gray-400" />
+          <Empty className="rounded-sm border-1 !pb-0">
+            <EmptyHeader>
+              <EmptyTitle className="mt-6 text-3xl font-semibold tracking-wide">
+                No event types yet
+              </EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent className="text-regular text-md text-main4 gap-8 tracking-wide">
+              <div>
+                Create your first event type to start accepting appointments
+                from students. <br />
+                Define the type, duration, and settings for your counseling
+                sessions.
+              </div>
+
+              <PrimaryButton
+                content="Create Event Type"
+                onClick={openCreateDialog}
+              />
+            </EmptyContent>
+            <div className="">
+              <Image
+                src={sitting}
+                alt="Sitting Siklab"
+                className="relative top-7 h-auto w-50"
+              />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              No event types yet
-            </h3>
-            <p className="text-muted-foreground mt-1 mb-4">
-              Create your first event type to start accepting appointments
-            </p>
-            <Button
-              onClick={openCreateDialog}
-              className="bg-main hover:bg-main/90 cursor-pointer rounded-sm tracking-wide"
-            >
-              Create Event Type
-            </Button>
-          </Card>
+          </Empty>
         ) : (
           <div className="space-y-2">
             {eventTypes.map((eventType) => (

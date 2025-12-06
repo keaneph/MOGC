@@ -1443,7 +1443,39 @@ export default function AvailabilityPage() {
               </p>
               <Select
                 value={String(bookingBuffer)}
-                onValueChange={(value) => setBookingBuffer(Number(value))}
+                onValueChange={async (value) => {
+                  const newBuffer = Number(value)
+                  setBookingBuffer(newBuffer)
+
+                  if (!activeSchedule) return
+
+                  const bufferResult = await updateScheduleSettings(
+                    activeSchedule.id,
+                    {
+                      bookingBuffer: newBuffer,
+                    }
+                  )
+
+                  if (bufferResult.success) {
+                    if (bufferResult.schedule) {
+                      setSchedules((prev) =>
+                        prev.map((s) =>
+                          s.id === activeSchedule.id
+                            ? bufferResult.schedule!
+                            : s
+                        )
+                      )
+                      setActiveSchedule(bufferResult.schedule)
+                    }
+                    setOriginalBookingBuffer(newBuffer)
+                    toast.success("Booking buffer updated successfully")
+                  } else {
+                    toast.error(
+                      bufferResult.error || "Failed to update booking buffer"
+                    )
+                    setBookingBuffer(originalBookingBuffer)
+                  }
+                }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select minimum notice" />
