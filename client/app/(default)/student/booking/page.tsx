@@ -66,6 +66,14 @@ import { getAssignedCounselor } from "@/lib/api/counselors"
 
 type BookingStatus = "not-booked" | "pending" | "confirmed" | "completed"
 
+// Helper to format date as YYYY-MM-DD in local timezone
+function formatDateLocal(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
 interface BookingState {
   status: BookingStatus
   bookedDate?: string
@@ -589,7 +597,7 @@ function BookingDialog({
   useEffect(() => {
     if (selectedDate && selectedEventType) {
       setSlotsLoading(true)
-      const dateStr = selectedDate.toISOString().split("T")[0]
+      const dateStr = formatDateLocal(selectedDate)
       getAvailableSlots(counselorId, selectedEventType.id, dateStr)
         .then((result) => {
           setAvailableSlots(result.slots)
@@ -612,7 +620,7 @@ function BookingDialog({
     const result = await createBooking({
       eventTypeId: selectedEventType.id,
       counselorId,
-      scheduledDate: selectedDate.toISOString().split("T")[0],
+      scheduledDate: formatDateLocal(selectedDate),
       startTime: selectedSlot.startTime,
       studentNotes: notes || undefined,
     })
@@ -952,8 +960,13 @@ export default function BookingPage() {
 
       // Map API status to UI status
       let uiStatus: BookingStatus = "not-booked"
-      if (apt.status === "completed") uiStatus = "completed"
-      else if (apt.status === "confirmed") uiStatus = "confirmed"
+      if (apt.status === "completed") {
+        // Counseling sessions can be rebooked after completion
+        if (category === "counseling") {
+          continue // Skip completed counseling to allow rebooking
+        }
+        uiStatus = "completed"
+      } else if (apt.status === "confirmed") uiStatus = "confirmed"
       else if (apt.status === "pending") uiStatus = "pending"
       else continue // Skip cancelled/no-show
 
@@ -1275,9 +1288,8 @@ export default function BookingPage() {
               Keep Appointment
             </Button>
             <Button
-              variant="destructive"
               onClick={handleConfirmCancel}
-              className="flex-1"
+              className="bg-main hover:bg-main/90 flex-1 cursor-pointer tracking-wide"
             >
               Cancel Appointment
             </Button>
