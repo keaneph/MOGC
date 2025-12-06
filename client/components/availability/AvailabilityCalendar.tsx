@@ -284,7 +284,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                           </span>
                         ) : isAvailable ? (
                           <span className="text-xs font-semibold text-red-700">
-                            {slots.length} slot{slots.length !== 1 ? "s" : ""}
+                            Available
                           </span>
                         ) : (
                           <span className="text-xs font-medium text-gray-400">
@@ -320,7 +320,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                   </TooltipTrigger>
                   <TooltipContent
                     side="top"
-                    className="max-w-[240px] border-gray-200"
+                    className="max-w-[240px] border !bg-white"
                   >
                     <div className="space-y-2">
                       <p className="text-sm font-semibold text-gray-800">
@@ -346,7 +346,10 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                             Available times:
                           </p>
                           {slots.map((slot, idx) => (
-                            <p key={idx} className="text-sm font-medium">
+                            <p
+                              key={idx}
+                              className="text-main text-xs font-medium"
+                            >
                               {slot.start} – {slot.end}
                             </p>
                           ))}
