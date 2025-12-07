@@ -455,23 +455,23 @@ export default function EventTypesPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            variant="ghost"
+                            variant="option"
                             size="icon"
-                            className="h-7 w-7 cursor-pointer"
+                            className="h-9 w-9 cursor-pointer"
                           >
-                            <EllipsisVertical className="h-4 w-4" />
+                            <EllipsisVertical className="h-9 w-9" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            className="cursor-pointer"
+                            className="text-muted-foreground cursor-pointer"
                             onClick={() => openEditDialog(eventType)}
                           >
                             <PencilLine className="text-muted-foreground mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="cursor-pointer"
+                            className="text-muted-foreground cursor-pointer"
                             onClick={() => openDuplicateDialog(eventType)}
                           >
                             <Copy className="text-muted-foreground mr-2 h-4 w-4" />
@@ -798,6 +798,7 @@ export default function EventTypesPage() {
               variant="outline"
               onClick={() => setCreateDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
@@ -1136,6 +1137,7 @@ export default function EventTypesPage() {
               variant="outline"
               onClick={() => setEditDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
@@ -1172,6 +1174,7 @@ export default function EventTypesPage() {
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
@@ -1179,6 +1182,7 @@ export default function EventTypesPage() {
               variant="destructive"
               onClick={handleDelete}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               {isDialogLoading ? (
                 <>
@@ -1221,6 +1225,7 @@ export default function EventTypesPage() {
               variant="outline"
               onClick={() => setDuplicateDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>

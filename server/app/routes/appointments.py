@@ -5,6 +5,7 @@ Appointments API routes for booking management
 from flask import Blueprint, request, jsonify
 from app.utils.auth import require_auth
 from app.services.supabase_service import get_supabase_client
+from app.services.google_calendar_service import get_calendar_service
 from datetime import datetime, date, time, timedelta, timezone
 
 appointments_bp = Blueprint("appointments", __name__, url_prefix="/api/appointments")
@@ -80,20 +81,31 @@ def get_appointments(user_id: str):
             student_info = None
             counselor_info = None
             
-            if apt["student_id"] != user_id:
-                # Fetch student info
-                student_resp = supabase.table("students").select(
-                    "given_name, family_name, id_number"
-                ).eq("auth_user_id", apt["student_id"]).execute()
-                if student_resp.data:
-                    s = student_resp.data[0]
-                    student_info = {
-                        "name": f"{s['given_name']} {s['family_name']}",
-                        "idNumber": s["id_number"]
-                    }
+            # Always fetch student info (for counselor view)
+            student_resp = supabase.table("students").select(
+                "given_name, family_name, id_number, auth_user_id"
+            ).eq("auth_user_id", apt["student_id"]).execute()
+            if student_resp.data:
+                s = student_resp.data[0]
+                
+                # Fetch avatar_url from auth.users using service role
+                avatar_url = None
+                try:
+                    # Use the admin API to get user metadata
+                    auth_user = supabase.auth.admin.get_user_by_id(s["auth_user_id"])
+                    if auth_user and auth_user.user:
+                        avatar_url = auth_user.user.user_metadata.get("avatar_url")
+                except Exception as e:
+                    print(f"Error fetching avatar for user {s['auth_user_id']}: {e}")
+                
+                student_info = {
+                    "name": f"{s['given_name']} {s['family_name']}",
+                    "idNumber": s["id_number"],
+                    "avatarUrl": avatar_url
+                }
             
+            # Fetch counselor info if needed (for student view)
             if apt["counselor_id"] != user_id:
-                # Fetch counselor info from profiles table
                 counselor_resp = supabase.table("profiles").select(
                     "first_name"
                 ).eq("id", apt["counselor_id"]).eq("role", "counselor").execute()
@@ -123,6 +135,7 @@ def get_appointments(user_id: str):
                 "counselorNotes": apt.get("counselor_notes"),
                 "locationType": apt["location_type"],
                 "locationDetails": apt.get("location_details"),
+                "cancellationReason": apt.get("cancellation_reason"),
                 "studentInfo": student_info,
                 "counselorInfo": counselor_info,
                 "createdAt": apt["created_at"],
@@ -174,6 +187,10 @@ def create_appointment(user_id: str):
         end_minutes = time_to_minutes(start) + duration
         end = minutes_to_time(end_minutes)
         
+        # Determine initial status: auto-confirm if approval not required
+        requires_approval = event_type.get("requires_approval", True)
+        initial_status = "confirmed" if not requires_approval else "pending"
+        
         # Create appointment
         insert_data = {
             "student_id": user_id,
@@ -182,11 +199,15 @@ def create_appointment(user_id: str):
             "scheduled_date": scheduled_date,
             "start_time": start_time,
             "end_time": end.strftime("%H:%M"),
-            "status": "pending",  # Will be auto-confirmed if event type doesn't require approval
+            "status": initial_status,
             "student_notes": student_notes,
             "location_type": event_type["location_type"],
             "location_details": event_type.get("location_details"),
         }
+        
+        # Set confirmed_at timestamp if auto-confirmed
+        if initial_status == "confirmed":
+            insert_data["confirmed_at"] = datetime.now(timezone.utc).isoformat()
         
         response = supabase.table("appointments").insert(insert_data).execute()
         
@@ -194,6 +215,106 @@ def create_appointment(user_id: str):
             return jsonify({"error": "Failed to create appointment"}), 500
         
         apt = response.data[0]
+        
+        # Sync to Google Calendar (if users have connected)
+        try:
+            calendar_service = get_calendar_service()
+            
+            # Get event type name for calendar event
+            event_type_name_resp = supabase.table("event_types").select(
+                "name"
+            ).eq("id", event_type_id).execute()
+            event_type_name = event_type_name_resp.data[0]["name"] if event_type_name_resp.data else "Appointment"
+            
+            # Get student and counselor info for calendar
+            student_resp = supabase.table("students").select(
+                "given_name, family_name"
+            ).eq("auth_user_id", user_id).execute()
+            student_name = f"{student_resp.data[0]['given_name']} {student_resp.data[0]['family_name']}" if student_resp.data else "Student"
+            
+            counselor_resp = supabase.table("profiles").select(
+                "first_name"
+            ).eq("id", counselor_id).execute()
+            counselor_name = counselor_resp.data[0].get("first_name", "Counselor") if counselor_resp.data else "Counselor"
+            
+            # Build datetime strings for calendar
+            start_datetime = f"{scheduled_date}T{start_time}:00"
+            end_datetime = f"{scheduled_date}T{end.strftime('%H:%M')}:00"
+            
+            # Get user emails for attendees
+            student_email = None
+            counselor_email = None
+            try:
+                student_auth = supabase.auth.admin.get_user_by_id(user_id)
+                if student_auth and student_auth.user:
+                    student_email = student_auth.user.email
+            except:
+                pass
+            
+            try:
+                counselor_auth = supabase.auth.admin.get_user_by_id(counselor_id)
+                if counselor_auth and counselor_auth.user:
+                    counselor_email = counselor_auth.user.email
+            except:
+                pass
+            
+            attendees = []
+            if student_email:
+                attendees.append(student_email)
+            if counselor_email:
+                attendees.append(counselor_email)
+            
+            # Create calendar events
+            google_event_id_student = None
+            google_event_id_counselor = None
+            
+            # Student calendar
+            if calendar_service.user_has_calendar_connected(user_id):
+                summary = f"{event_type_name} with {counselor_name}"
+                description = student_notes or f"Appointment: {event_type_name}"
+                location = event_type.get("location_details") or ""
+                
+                google_event_id_student = calendar_service.create_calendar_event(
+                    user_id=user_id,
+                    summary=summary,
+                    description=description,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                    attendees=attendees,
+                    location=location
+                )
+            
+            # Counselor calendar
+            if calendar_service.user_has_calendar_connected(counselor_id):
+                summary = f"{event_type_name} - {student_name}"
+                description = student_notes or f"Appointment with {student_name}"
+                location = event_type.get("location_details") or ""
+                
+                google_event_id_counselor = calendar_service.create_calendar_event(
+                    user_id=counselor_id,
+                    summary=summary,
+                    description=description,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                    attendees=attendees,
+                    location=location
+                )
+            
+            # Update appointment with Google event IDs
+            if google_event_id_student or google_event_id_counselor:
+                update_data = {
+                    "last_calendar_sync_at": datetime.now(timezone.utc).isoformat()
+                }
+                if google_event_id_student:
+                    update_data["google_event_id_student"] = google_event_id_student
+                if google_event_id_counselor:
+                    update_data["google_event_id_counselor"] = google_event_id_counselor
+                
+                supabase.table("appointments").update(update_data).eq("id", apt["id"]).execute()
+        
+        except Exception as calendar_error:
+            # Log error but don't fail appointment creation
+            print(f"Calendar sync error (non-fatal): {calendar_error}")
         
         return jsonify({
             "message": "Appointment booked successfully",
@@ -334,6 +455,119 @@ def update_appointment_status(user_id: str, appointment_id: str):
         
         if not response.data:
             return jsonify({"error": "Failed to update appointment"}), 500
+        
+        updated_apt = response.data[0]
+        
+        # Sync calendar events based on status change
+        try:
+            calendar_service = get_calendar_service()
+            
+            # Get full appointment details for calendar sync
+            apt_full = supabase.table("appointments").select(
+                "scheduled_date, start_time, end_time, student_id, counselor_id, google_event_id_student, google_event_id_counselor, event_type_id"
+            ).eq("id", appointment_id).execute()
+            
+            if apt_full.data:
+                apt_data = apt_full.data[0]
+                student_id = apt_data["student_id"]
+                counselor_id = apt_data["counselor_id"]
+                google_event_id_student = apt_data.get("google_event_id_student")
+                google_event_id_counselor = apt_data.get("google_event_id_counselor")
+                
+                # Build datetime strings
+                scheduled_date = apt_data["scheduled_date"]
+                start_time = apt_data["start_time"]
+                end_time = apt_data["end_time"]
+                start_datetime = f"{scheduled_date}T{start_time}:00"
+                end_datetime = f"{scheduled_date}T{end_time}:00"
+                
+                # Get event type name
+                event_type_resp = supabase.table("event_types").select("name").eq("id", apt_data.get("event_type_id")).execute()
+                event_type_name = event_type_resp.data[0]["name"] if event_type_resp.data else "Appointment"
+                
+                if new_status == "cancelled":
+                    # Delete calendar events
+                    deletion_errors = []
+                    
+                    if google_event_id_student and calendar_service.user_has_calendar_connected(student_id):
+                        success = calendar_service.delete_calendar_event(student_id, google_event_id_student)
+                        if not success:
+                            deletion_errors.append(f"Failed to delete student calendar event: {google_event_id_student}")
+                            print(f"Failed to delete student calendar event: {google_event_id_student}")
+                    
+                    if google_event_id_counselor and calendar_service.user_has_calendar_connected(counselor_id):
+                        success = calendar_service.delete_calendar_event(counselor_id, google_event_id_counselor)
+                        if not success:
+                            deletion_errors.append(f"Failed to delete counselor calendar event: {google_event_id_counselor}")
+                            print(f"Failed to delete counselor calendar event: {google_event_id_counselor}")
+                    
+                    # Clear event IDs even if deletion failed (to prevent retrying)
+                    supabase.table("appointments").update({
+                        "google_event_id_student": None,
+                        "google_event_id_counselor": None
+                    }).eq("id", appointment_id).execute()
+                    
+                    # Log any deletion errors but don't fail the request
+                    if deletion_errors:
+                        print(f"Calendar deletion errors: {', '.join(deletion_errors)}")
+                
+                elif new_status == "completed":
+                    # Delete calendar events for completed appointments (same as cancelled)
+                    deletion_errors = []
+                    
+                    if google_event_id_student and calendar_service.user_has_calendar_connected(student_id):
+                        success = calendar_service.delete_calendar_event(student_id, google_event_id_student)
+                        if not success:
+                            deletion_errors.append(f"Failed to delete student calendar event: {google_event_id_student}")
+                            print(f"Failed to delete student calendar event: {google_event_id_student}")
+                    
+                    if google_event_id_counselor and calendar_service.user_has_calendar_connected(counselor_id):
+                        success = calendar_service.delete_calendar_event(counselor_id, google_event_id_counselor)
+                        if not success:
+                            deletion_errors.append(f"Failed to delete counselor calendar event: {google_event_id_counselor}")
+                            print(f"Failed to delete counselor calendar event: {google_event_id_counselor}")
+                    
+                    # Clear event IDs even if deletion failed (to prevent retrying)
+                    supabase.table("appointments").update({
+                        "google_event_id_student": None,
+                        "google_event_id_counselor": None
+                    }).eq("id", appointment_id).execute()
+                    
+                    # Log any deletion errors but don't fail the request
+                    if deletion_errors:
+                        print(f"Calendar deletion errors: {', '.join(deletion_errors)}")
+                
+                elif new_status == "confirmed":
+                    # Update calendar events (add status to title)
+                    summary_suffix = " (Confirmed)"
+                    
+                    if google_event_id_student and calendar_service.user_has_calendar_connected(student_id):
+                        # Get current event to preserve summary
+                        calendar_service.update_calendar_event(
+                            user_id=student_id,
+                            event_id=google_event_id_student,
+                            summary=f"{event_type_name}{summary_suffix}",
+                            start_datetime=start_datetime,
+                            end_datetime=end_datetime
+                        )
+                    
+                    if google_event_id_counselor and calendar_service.user_has_calendar_connected(counselor_id):
+                        calendar_service.update_calendar_event(
+                            user_id=counselor_id,
+                            event_id=google_event_id_counselor,
+                            summary=f"{event_type_name}{summary_suffix}",
+                            start_datetime=start_datetime,
+                            end_datetime=end_datetime
+                        )
+                
+                # Update last sync time
+                supabase.table("appointments").update({
+                    "last_calendar_sync_at": datetime.now(timezone.utc).isoformat()
+                }).eq("id", appointment_id).execute()
+        
+        except Exception as calendar_error:
+            # Log error but don't fail status update
+            print(f"Calendar sync error (non-fatal): {calendar_error}")
         
         return jsonify({
             "message": f"Appointment {new_status}",

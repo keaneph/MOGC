@@ -1109,7 +1109,7 @@ export default function AvailabilityPage() {
                       size="icon"
                       className="h-9 w-9 cursor-pointer"
                     >
-                      <EllipsisVertical className="ml-1 h-9 w-9" />
+                      <EllipsisVertical className="h-9 w-9" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

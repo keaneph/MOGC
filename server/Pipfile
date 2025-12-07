@@ -11,6 +11,9 @@ supabase = "*"
 pyjwt = "*"
 cryptography = "*"
 gunicorn = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
+google-api-python-client = "*"
 
 [dev-packages]
 
