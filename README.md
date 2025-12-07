@@ -87,6 +87,12 @@ Create a `.env` file in the `server/` directory (or set env vars in your shell).
 PIPENV_VENV_IN_PROJECT=1
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=your-google-redirect-url
+ENCRYPTION_KEY=your-encryption-key
+
+To generate an encryption key, run this command in the server directory:
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
 ```
 
 ## Project layout (top-level)

@@ -38,6 +38,7 @@ export interface AppointmentEventType {
 export interface ParticipantInfo {
   name: string
   idNumber?: string
+  avatarUrl?: string | null
 }
 
 // Full appointment interface
