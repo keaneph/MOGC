@@ -1,6 +1,11 @@
 "use client"
 
-import { CircleUserRoundIcon, EllipsisIcon, NotepadText } from "lucide-react"
+import {
+  CircleUserRoundIcon,
+  EllipsisIcon,
+  NotepadText,
+  CircleCheckIcon,
+} from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import {
   Select,
@@ -11,7 +16,6 @@ import {
 import {
   updateStudentAssessment,
   updateStudentCounseling,
-  updateStudentInterview,
 } from "@/lib/api/counselors"
 import {
   DropdownMenu,
@@ -22,16 +26,10 @@ import {
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import StatusBadge, { StatusType } from "./status-badge"
-
-export type CounselorStudentListItem = {
-  idNumber: string
-  studentName: string
-  course: string
-  yearLevel: string
-  assessment: "pending" | "high risk" | "low risk"
-  initialInterview: "pending" | "scheduled" | "rescheduled" | "done"
-  counselingStatus: "no record" | "ongoing" | "closed"
-}
+import { CounselorStudentListItem } from "@/lib/api/counselors"
+import { toast } from "sonner"
+import CatImage from "@/components/feedback/happy-toast"
+import CatImageSad from "@/components/feedback/sad-toast"
 
 export const columns = (
   setStudents: React.Dispatch<React.SetStateAction<CounselorStudentListItem[]>>
@@ -79,23 +77,6 @@ export const columns = (
     size: 150,
   },
   {
-    accessorKey: "yearLevel",
-    header: ({ column }) => (
-      <button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="cursor-pointer"
-      >
-        Year Level
-        {column.getIsSorted() === "asc"}
-        {column.getIsSorted() === "desc"}
-      </button>
-    ),
-    size: 80,
-    cell: ({ getValue }) => (
-      <div className="text-center">{getValue() as string}</div>
-    ),
-  },
-  {
     accessorKey: "assessment",
     header: ({ column }) => (
       <button
@@ -109,21 +90,43 @@ export const columns = (
     ),
     size: 100,
     cell: ({ row, getValue }) => {
-      const value = getValue<string>() || "pending"
-      const id = row.original.idNumber
+      const value = (getValue() as string) || "pending"
+      const studentAuthId = row.original.studentAuthId
 
       const handleChange = async (newValue: string) => {
         const casted = newValue as "pending" | "high risk" | "low risk"
         setStudents((prev) =>
           prev.map((student) =>
-            student.idNumber === id
+            student.studentAuthId === studentAuthId
               ? { ...student, assessment: casted }
               : student
           )
         )
-        updateStudentAssessment(id, casted).catch((err) =>
+
+        try {
+          await updateStudentAssessment(studentAuthId, casted)
+          toast.success(
+            <div className="relative flex w-full items-center pr-18">
+              <span className="pl-2">Assessment status updated</span>
+              <CatImage />
+            </div>,
+            {
+              duration: 3000,
+              icon: <CircleCheckIcon className="size-4" />,
+            }
+          )
+        } catch (err) {
           console.error("Failed to update assessment:", err)
-        )
+          toast.error(
+            <div className="relative flex w-full items-center pr-14">
+              <span className="pl-2">
+                Failed to update assessment. Please try again
+              </span>
+              <CatImageSad />
+            </div>,
+            { duration: 3000 }
+          )
+        }
       }
 
       return (
@@ -146,53 +149,14 @@ export const columns = (
   },
   {
     accessorKey: "initialInterview",
-    header: ({ column }) => (
-      <button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="cursor-pointer"
-      >
-        Initial Interview
-        {column.getIsSorted() === "asc"}
-        {column.getIsSorted() === "desc"}
-      </button>
-    ),
+    header: "Interview",
     size: 104,
-    cell: ({ row, getValue }) => {
-      const value = (getValue() as string) || "pending"
-      const id = row.original.idNumber
-
-      const handleChange = async (newValue: string) => {
-        const casted = newValue as
-          | "pending"
-          | "scheduled"
-          | "rescheduled"
-          | "done"
-        setStudents((prev) =>
-          prev.map((student) =>
-            student.idNumber === id
-              ? { ...student, initialInterview: casted }
-              : student
-          )
-        )
-        updateStudentInterview(id, casted).catch((err) =>
-          console.error("Failed to update interview:", err)
-        )
-      }
+    cell: ({ row }) => {
+      const value = row.original.initialInterview
 
       return (
         <div className="flex justify-center">
-          <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger className="!h-[20px] cursor-pointer !border-none p-1 text-center text-[10px] leading-none [&>svg]:hidden">
-              <StatusBadge value={value as StatusType} />
-            </SelectTrigger>
-            <SelectContent className="!w-[140px] rounded-lg text-[10px]">
-              {["pending", "scheduled", "rescheduled", "done"].map((option) => (
-                <SelectItem key={option} value={option}>
-                  <StatusBadge value={option as StatusType} />
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <StatusBadge value={value} />
         </div>
       )
     },
@@ -204,7 +168,7 @@ export const columns = (
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="cursor-pointer"
       >
-        Counseling Status
+        Counseling
         {column.getIsSorted() === "asc"}
         {column.getIsSorted() === "desc"}
       </button>
@@ -212,20 +176,42 @@ export const columns = (
     size: 120,
     cell: ({ row, getValue }) => {
       const value = (getValue() as string) || "no record"
-      const id = row.original.idNumber
+      const studentAuthId = row.original.studentAuthId
 
       const handleChange = async (newValue: string) => {
         const casted = newValue as "no record" | "ongoing" | "closed"
         setStudents((prev) =>
           prev.map((student) =>
-            student.idNumber === id
+            student.studentAuthId === studentAuthId
               ? { ...student, counselingStatus: casted }
               : student
           )
         )
-        updateStudentCounseling(id, casted).catch((err) =>
+
+        try {
+          await updateStudentCounseling(studentAuthId, casted)
+          toast.success(
+            <div className="relative flex w-full items-center pr-18">
+              <span className="pl-2">Counseling status updated</span>
+              <CatImage />
+            </div>,
+            {
+              duration: 3000,
+              icon: <CircleCheckIcon className="size-4" />,
+            }
+          )
+        } catch (err) {
           console.error("Failed to update status:", err)
-        )
+          toast.error(
+            <div className="relative flex w-full items-center pr-14">
+              <span className="pl-2">
+                Failed to update status. Please try again
+              </span>
+              <CatImageSad />
+            </div>,
+            { duration: 3000 }
+          )
+        }
       }
 
       return (
@@ -242,6 +228,29 @@ export const columns = (
               ))}
             </SelectContent>
           </Select>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "exitInterview",
+    header: ({ column }) => (
+      <button
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="cursor-pointer"
+      >
+        Exit Interview
+        {column.getIsSorted() === "asc"}
+        {column.getIsSorted() === "desc"}
+      </button>
+    ),
+    size: 120,
+    cell: ({ row }) => {
+      const value = row.original.exitInterview
+
+      return (
+        <div className="flex justify-center">
+          <StatusBadge value={value} />
         </div>
       )
     },

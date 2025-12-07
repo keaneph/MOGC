@@ -64,9 +64,9 @@ import {
 import { getPublicEventTypes, type EventType } from "@/lib/api/event-types"
 import { getAssignedCounselor } from "@/lib/api/counselors"
 
-type BookingStatus = "not-booked" | "pending" | "confirmed" | "completed"
+export type BookingStatus = "not-booked" | "pending" | "confirmed" | "completed"
 
-interface BookingState {
+export interface BookingState {
   status: BookingStatus
   bookedDate?: string
   time?: string

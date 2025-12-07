@@ -5,8 +5,8 @@ export type StatusType =
   | "high risk"
   | "low risk"
   | "scheduled"
-  | "rescheduled"
-  | "done"
+  | "not started"
+  | "completed"
   | "no record"
   | "ongoing"
   | "closed"
@@ -15,52 +15,34 @@ interface Props {
   value: StatusType
 }
 
-const StatusBadge: React.FC<Props> = ({ value }) => {
-  const getBgColor = (val: string) => {
-    switch (val) {
-      case "high risk":
-        return "bg-[var(--status-red)]"
-      case "low risk":
-        return "bg-[var(--status-green)]"
-      case "scheduled":
-        return "bg-[var(--status-peach)]"
-      case "rescheduled":
-        return "bg-[var(--status-blue)]"
-      case "done":
-        return "bg-[var(--status-green)]"
-      case "ongoing":
-        return "bg-[var(--status-blue)]"
-      case "closed":
-        return "bg-[var(--status-green)]"
-      case "pending":
-        return "bg-[var(--status-yellow)]"
-      case "no record":
-      default:
-        return "bg-[var(--status-yellow)]"
-    }
-  }
+const STATUS_COLORS: Record<
+  StatusType,
+  { bg: string; text: string; dot?: string }
+> = {
+  pending: { bg: "bg-yellow-100", text: "text-yellow-600" },
+  completed: { bg: "bg-green-100", text: "text-green-600" },
+  scheduled: { bg: "bg-blue-100", text: "text-blue-600" },
+  "not started": { bg: "bg-purple-100", text: "text-purple-600" },
+  "high risk": { bg: "bg-red-100", text: "text-red-600" },
+  "low risk": { bg: "bg-green-200", text: "text-green-700" },
+  "no record": { bg: "bg-purple-100", text: "text-purple-600" },
+  ongoing: { bg: "bg-blue-200", text: "text-blue-700" },
+  closed: { bg: "bg-yellow-200", text: "text-yellow-700" },
+}
 
-  const getTextColor = (val: string) => {
-    switch (val) {
-      case "high risk":
-      case "low risk":
-      case "scheduled":
-      case "rescheduled":
-      case "done":
-      case "ongoing":
-      case "closed":
-        return "text-white"
-      default:
-        return "text-main2"
-    }
+const StatusBadge: React.FC<Props> = ({ value }) => {
+  const safeValue: StatusType = value ?? "not started"
+  const colors = STATUS_COLORS[safeValue] ?? {
+    bg: "bg-purple-100",
+    text: "text-purple-600",
   }
 
   return (
     <Badge
       variant="default"
-      className={`!h-5 cursor-pointer rounded-full text-[10px] font-semibold ring-0 shadow-none ${getBgColor(value)} ${getTextColor(value)}`}
+      className={`flex !h-5 cursor-pointer items-center gap-1 rounded-full text-[10px] font-semibold ring-0 shadow-none ${colors.bg} ${colors.text}`}
     >
-      {value.toUpperCase()}
+      {safeValue.toUpperCase()}
     </Badge>
   )
 }

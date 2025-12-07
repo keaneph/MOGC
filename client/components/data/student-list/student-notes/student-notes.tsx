@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { CounselorStudentListItem } from "../columns"
+import { CounselorStudentListItem } from "@/lib/api/counselors"
 import StatusBadge, { StatusType } from "../status-badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,14 +45,27 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
     })
   }, [student.idNumber])
 
+  const getTypeColorBar = (type: string) => {
+    switch (type) {
+      case "regular":
+        return "var(--chart-1)"
+      case "progress":
+        return "var(--chart-2)"
+      case "closure":
+        return "var(--status-green)"
+      default:
+        return "#d1d5db"
+    }
+  }
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case "regular":
-        return "bg-main/50"
+        return "bg-[var(--chart-1)]/50"
       case "progress":
-        return "bg-main3/50"
+        return "bg-[var(--chart-2)]/50"
       case "closure":
-        return "bg-link/50"
+        return "bg-[var(--status-green)]/50"
       default:
         return "bg-gray-300"
     }
@@ -187,10 +200,10 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
           <div>
             Course: <strong>{student.course}</strong>
           </div>
-          <div>
+          <div className="flex">
             Assessment: <StatusBadge value={student.assessment as StatusType} />
           </div>
-          <div>
+          <div className="flex">
             Counseling Status:{" "}
             <StatusBadge value={student.counselingStatus as StatusType} />
           </div>
@@ -201,7 +214,6 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
           <div className="flex h-full w-[30%] flex-col p-3">
             <div className="text-muted-foreground mt-1 mb-2 ml-2 w-full pr-4 text-[16px] font-semibold tracking-wide">
               Recent Sessions
-              <Separator orientation="horizontal" className="mt-1 w-full" />
             </div>
             <div className="mb-2 h-5 w-full">
               <SearchInput
@@ -211,7 +223,7 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
               />
             </div>
 
-            <ScrollArea className="mt-4 h-full w-full overflow-y-auto rounded-md">
+            <ScrollArea className="mt-4 h-full w-full overflow-y-auto">
               <ul className="space-y-2">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
@@ -227,20 +239,37 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
                   filteredNotes.map((note) => (
                     <li
                       key={note.id}
-                      className={`hover:bg-muted cursor-pointer rounded-md p-2 ${
+                      className={`hover:bg-muted relative cursor-pointer overflow-hidden rounded-md border p-2 pl-4 font-semibold text-gray-800 shadow-xs transition-shadow ${
                         selectedNote?.id === note.id ? "bg-muted" : ""
                       }`}
                       onClick={() => setSelectedNote(note)}
                     >
-                      <div className="flex items-center font-semibold">
-                        <div
-                          className={`${getTypeColor(note.note_type)} mr-3 h-5 w-2`}
-                        ></div>{" "}
+                      {/* Color bar */}
+                      <div
+                        className="absolute top-0 left-0 z-10 h-full w-1 rounded-l-md"
+                        style={{
+                          backgroundColor: getTypeColorBar(note.note_type),
+                        }}
+                      />
+
+                      <div className="mb-1 flex items-center font-semibold">
                         {note.note_title}
+                        <Badge
+                          variant="outline"
+                          className="ml-2 h-5 px-1.5 text-xs capitalize"
+                        >
+                          {note.note_type}
+                        </Badge>
                       </div>
-                      <div className="text-muted-foreground text-xs">
-                        {note.note_type} •{" "}
-                        {new Date(note.created_at).toLocaleDateString()}
+                      <div className="text-muted-foreground text-[10px] font-medium">
+                        {new Date(note.created_at).toLocaleDateString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
                       </div>
                     </li>
                   ))
@@ -337,7 +366,15 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
                 </div>
 
                 <p className="text-muted-foreground mb-4 text-sm">
-                  {new Date(selectedNote.created_at).toLocaleString()} •{" "}
+                  {new Date(selectedNote.created_at).toLocaleDateString(
+                    undefined,
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}{" "}
+                  •{" "}
                   <Badge
                     className={`${getTypeColor(selectedNote.note_type)} text-main2 font-semibold`}
                   >
@@ -360,17 +397,17 @@ const StudentNotes: React.FC<Props> = ({ student }) => {
           <span className="font-semibold">Legend:</span>
 
           <div className="flex items-center gap-2">
-            <div className="bg-main/50 h-4 w-4 rounded-sm"></div>
+            <div className="h-4 w-4 rounded-sm bg-[var(--chart-1)]"></div>
             <span>Regular Note</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="bg-main3/50 h-4 w-4 rounded-sm"></div>
+            <div className="h-4 w-4 rounded-sm bg-[var(--chart-2)]"></div>
             <span>Progress Note</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="bg-link/50 h-4 w-4 rounded-sm"></div>
+            <div className="h-4 w-4 rounded-sm bg-[var(--status-green)]"></div>
             <span>Closure Note</span>
           </div>
         </div>

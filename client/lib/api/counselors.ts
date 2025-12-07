@@ -2,6 +2,9 @@
  * API client for counselor routes
  */
 
+import { StatusType } from "@/components/data/student-list/status-badge"
+import { StudentRecord } from "./students"
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
@@ -10,9 +13,11 @@ export type CounselorStudentListItem = {
   studentName: string
   course: string
   yearLevel: string
-  assessment: "pending" | "high risk" | "low risk"
-  initialInterview: "pending" | "scheduled" | "rescheduled" | "done"
-  counselingStatus: "no record" | "ongoing" | "closed"
+  assessment: StatusType
+  initialInterview: StatusType
+  counselingStatus: StatusType
+  studentAuthId: string
+  exitInterview: StatusType
 }
 
 export type StudentNote = {
@@ -128,41 +133,25 @@ export async function updateStudentAssessment(
   }
 }
 
-export async function updateStudentInterview(
-  idNumber: string,
-  newInterview: "pending" | "scheduled" | "rescheduled" | "done"
-): Promise<void> {
-  try {
-    console.log(
-      "Calling:",
-      `${API_BASE_URL}/api/counselors/student/${idNumber}/initial_interview`
-    )
-
-    await apiRequest(`/api/counselors/student/${idNumber}/initial_interview`, {
-      method: "PUT",
-      body: JSON.stringify({ initial_interview: newInterview }),
-    })
-  } catch (error) {
-    console.error("Failed to update interview:", error)
-  }
-}
-
 export async function updateStudentCounseling(
-  idNumber: string,
+  studentAuthId: string,
   newStatus: "no record" | "ongoing" | "closed"
 ): Promise<void> {
   try {
     console.log(
       "Calling:",
-      `${API_BASE_URL}/api/counselors/student/${idNumber}/counseling_status`
+      `${API_BASE_URL}/api/counselors/student/${studentAuthId}/counseling_status`
     )
 
-    await apiRequest(`/api/counselors/student/${idNumber}/counseling_status`, {
-      method: "PUT",
-      body: JSON.stringify({ counseling_status: newStatus }),
-    })
+    await apiRequest(
+      `/api/counselors/student/${studentAuthId}/counseling_status`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ counseling_status: newStatus }),
+      }
+    )
   } catch (error) {
-    console.error("Failed to update interview:", error)
+    console.error("Failed to update counseling status:", error)
   }
 }
 
@@ -233,6 +222,63 @@ export async function deleteStudentNote(
     return true
   } catch (error) {
     console.error("Error deleting student note:", error)
+    return false
+  }
+}
+
+export async function getStudentProfilebyAuthId(
+  studentAuthId: string
+): Promise<StudentRecord | null> {
+  try {
+    const data = await apiRequest<{ profile: StudentRecord }>(
+      `/api/counselors/student/${studentAuthId}/profile`
+    )
+    return data.profile
+  } catch (error) {
+    console.error("Error getting student profile by auth ID:", error)
+    return null
+  }
+}
+
+export async function getStudentEmailbyAuthId(
+  studentAuthId: string
+): Promise<string | null> {
+  try {
+    const data = await apiRequest<{ email: string }>(
+      `/api/counselors/student/${studentAuthId}/email`
+    )
+    return data.email
+  } catch (error) {
+    console.error("Error getting student email by auth ID:", error)
+    return null
+  }
+}
+
+//check if profile exists by auth_user_id
+export async function profileExistsByAuthId(
+  studentAuthId: string
+): Promise<boolean> {
+  try {
+    const data = await apiRequest<{ exists: boolean }>(
+      `/api/counselors/student/${studentAuthId}/exists`
+    )
+    return data.exists
+  } catch (error) {
+    console.error("Error checking profile existence:", error)
+    return false
+  }
+}
+
+export async function isStudentProfileCompleteByAuthId(
+  studentAuthId: string
+): Promise<boolean> {
+  try {
+    const data = await apiRequest<{ complete: boolean }>(
+      `/api/counselors/student/${studentAuthId}/completion-status`
+    )
+    return data.complete
+  } catch (error) {
+    console.error("Error checking profile completion:", error)
     return false
   }
 }

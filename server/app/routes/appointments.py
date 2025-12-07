@@ -551,3 +551,4 @@ def get_counselor_upcoming(user_id: str, counselor_id: str):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
