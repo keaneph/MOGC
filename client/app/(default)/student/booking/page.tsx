@@ -74,7 +74,7 @@ function formatDateLocal(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
-interface BookingState {
+export interface BookingState {
   status: BookingStatus
   bookedDate?: string
   time?: string

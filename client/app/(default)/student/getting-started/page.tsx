@@ -192,7 +192,7 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to book an appointment with your counselor">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"
@@ -235,7 +235,7 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to take the initialization tests">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"
@@ -278,7 +278,7 @@ export default function GettingStartedPage() {
               </div>
               <div className="text-sm font-medium tracking-wide">
                 <TooltipThis label="Proceed to schedule counseling sessions">
-                  <Link href="/student/counseling">
+                  <Link href="/student/booking">
                     <Button
                       variant="outline"
                       className="cursor-pointer rounded-sm tracking-wide"

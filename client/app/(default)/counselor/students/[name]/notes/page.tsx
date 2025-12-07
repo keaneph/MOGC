@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { getCounselorStudentList } from "@/lib/api/counselors"
-import { CounselorStudentListItem } from "@/components/data/student-list/columns"
+import { CounselorStudentListItem } from "@/lib/api/counselors"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TooltipThis } from "@/components/feedback/tooltip-this"
 import { Button } from "@/components/ui/button"

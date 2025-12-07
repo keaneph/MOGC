@@ -12,6 +12,7 @@ import type {
   psychosocialDataSchema,
   needsAssessmentSchema,
 } from "@/lib/schemas"
+import { CounselorStudentListItem } from "./counselors"
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
@@ -321,5 +322,17 @@ export async function isStudentProfileComplete(): Promise<boolean> {
   } catch (error) {
     console.error("Error checking profile completion:", error)
     return false
+  }
+}
+
+export async function getStudentStatus(): Promise<CounselorStudentListItem | null> {
+  try {
+    const data = await apiRequest<{
+      data: CounselorStudentListItem | null
+    }>("/api/students/profile/status")
+    return data.data
+  } catch (error) {
+    console.error("Error getting student status:", error)
+    return null
   }
 }

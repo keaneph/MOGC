@@ -537,3 +537,18 @@ def get_student_profile_completion_status(user_id: str):
     except Exception as e:
         print("Unexpected error in /profile/completion-status:", e)
         return jsonify({"error": str(e)}), 500
+
+@students_bp.route("/profile/status", methods=["GET"])
+@require_auth
+def get_student_status(user_id: str):
+    try:
+        supabase = get_supabase_client()
+        result = supabase.table("student_list").select("*").eq("student_id", user_id).single().execute()
+
+        if not result.data:
+            return jsonify({"error": "Student status not found"}), 404
+        
+        return jsonify({"data": result.data}), 200
+    except Exception as e:
+        print("Unexpected error in /profile/status:", e)
+        return jsonify({"error": str(e)}), 500

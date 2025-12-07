@@ -5,7 +5,11 @@ import Image from "next/image"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSupabaseEmail } from "@/hooks/use-supabase-email"
 import { useSupabaseUser } from "@/hooks/use-supabase-user"
-import { getStudentProfileSummary, StudentRecord } from "@/lib/api/students"
+import {
+  getStudentProfileSummary,
+  getStudentStatus,
+  StudentRecord,
+} from "@/lib/api/students"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +32,10 @@ import PsychosocialSection from "@/components/profiling/student-summary/psychoso
 import NeedsSection from "./needs-section"
 import NeedsShowMoreSection from "./needs-showmore"
 import PsychosocialShowMoreSection from "./psychosocial-showmore"
+import { CounselorStudentListItem } from "@/lib/api/counselors"
+import StatusBadge, {
+  StatusType,
+} from "@/components/data/student-list/status-badge"
 
 export default function StudentSummaryPage() {
   const [summary, setSummary] = useState<StudentRecord | null>(null)
@@ -46,10 +54,15 @@ export default function StudentSummaryPage() {
     psychosocial: "Psychosocial Wellbeing",
     needs: "Needs Assessment",
   }
+  const [status, setStatus] = useState<CounselorStudentListItem | null>(null)
 
   useEffect(() => {
     getStudentProfileSummary().then((data) => {
       if (data) setSummary(data)
+    })
+
+    getStudentStatus().then((status) => {
+      if (status) setStatus(status)
     })
   }, [])
 
@@ -290,31 +303,22 @@ export default function StudentSummaryPage() {
           Within your residency in MSU-IIT, you have to complete the following
           interviews required by the Office of Guidance and Counseling.
         </span>
-        <div className="mt-2 ml-2 flex flex-row gap-10">
-          <div className="flex flex-row">
-            <div className="bg-link mr-3 h-3 w-3"></div>
-            <span className="text-[10px]">
-              STUDENT PROFILING AND NEEDS ASSESSMENT
-            </span>
+        <div className="mt-2 ml-2 flex gap-6 text-[12px]">
+          <div className="flex gap-3 font-semibold tracking-wide">
+            Student Profiling:
+            <StatusBadge value={"completed" as StatusType} />
           </div>
-          <div className="flex flex-row">
-            <div className="bg-main mr-3 h-3 w-3"></div>
-            <span className="text-[10px]">COUNSELOR INITIAL INTERVIEW</span>
+          <div className="flex gap-3 font-semibold tracking-wide">
+            Counselor Initial Interview:
+            <StatusBadge value={status?.initialInterview as StatusType} />
           </div>
-        </div>
-        <div className="mt-4 ml-2 flex flex-row gap-10">
-          <span className="text-[10px]">Legend:</span>
-          <div className="flex flex-row items-center">
-            <div className="bg-link mr-3 h-2.5 w-2.5"></div>
-            <span className="text-[10px]">Done</span>
+          <div className="flex gap-3 font-semibold tracking-wide">
+            Counseling
+            <StatusBadge value={status?.counselingStatus as StatusType} />
           </div>
-          <div className="flex flex-row items-center">
-            <div className="bg-main3 mr-3 h-2.5 w-2.5"></div>
-            <span className="text-[10px]">Pending</span>
-          </div>
-          <div className="flex flex-row items-center">
-            <div className="bg-main mr-3 h-2.5 w-2.5"></div>
-            <span className="text-[10px]">Not Started</span>
+          <div className="flex gap-3 font-semibold tracking-wide">
+            Exit Interview
+            <StatusBadge value={status?.exitInterview as StatusType} />
           </div>
         </div>
       </div>
