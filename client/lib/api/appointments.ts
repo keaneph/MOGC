@@ -426,8 +426,8 @@ export function getStatusDisplay(status: AppointmentStatus): {
     },
     confirmed: {
       label: "Confirmed",
-      color: "text-green-700",
-      bgColor: "bg-green-100",
+      color: "text-blue-700",
+      bgColor: "bg-blue-100",
     },
     cancelled: {
       label: "Cancelled",
@@ -436,8 +436,8 @@ export function getStatusDisplay(status: AppointmentStatus): {
     },
     completed: {
       label: "Completed",
-      color: "text-blue-700",
-      bgColor: "bg-blue-100",
+      color: "text-green-700",
+      bgColor: "bg-green-100",
     },
     no_show: {
       label: "No Show",

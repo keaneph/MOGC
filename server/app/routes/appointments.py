@@ -5,7 +5,7 @@ Appointments API routes for booking management
 from flask import Blueprint, request, jsonify
 from app.utils.auth import require_auth
 from app.services.supabase_service import get_supabase_client
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time, timedelta, timezone
 
 appointments_bp = Blueprint("appointments", __name__, url_prefix="/api/appointments")
 
@@ -316,14 +316,14 @@ def update_appointment_status(user_id: str, appointment_id: str):
         update_data = {"status": new_status}
         
         if new_status == "confirmed":
-            update_data["confirmed_at"] = datetime.now().isoformat()
+            update_data["confirmed_at"] = datetime.now(timezone.utc).isoformat()
         elif new_status == "cancelled":
-            update_data["cancelled_at"] = datetime.now().isoformat()
+            update_data["cancelled_at"] = datetime.now(timezone.utc).isoformat()
             update_data["cancelled_by"] = user_id
             if reason:
                 update_data["cancellation_reason"] = reason
         elif new_status == "completed":
-            update_data["completed_at"] = datetime.now().isoformat()
+            update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
         
         if counselor_notes and is_counselor:
             update_data["counselor_notes"] = counselor_notes
