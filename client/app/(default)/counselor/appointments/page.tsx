@@ -49,6 +49,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
+import { StudentAvatar } from "@/components/common/student-avatar"
 
 import {
   getCounselorAppointments,
@@ -153,9 +154,11 @@ function AppointmentCard({
             {/* Single Row Layout */}
             <div className="flex items-center gap-3">
               {/* Student Avatar */}
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-100">
-                <User className="h-3.5 w-3.5 text-gray-600" />
-              </div>
+              <StudentAvatar
+                avatarUrl={appointment.studentInfo?.avatarUrl}
+                name={appointment.studentInfo?.name}
+                size="sm"
+              />
 
               {/* Student Name */}
               <span className="min-w-[80px] font-medium text-gray-800">
@@ -707,13 +710,14 @@ export default function CounselorAppointmentsPage() {
               variant="outline"
               onClick={() => setConfirmDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               onClick={submitConfirm}
               disabled={isDialogLoading}
-              className="bg-green-600 hover:bg-green-700"
+              className="cursor-pointer bg-green-600 hover:bg-green-700"
             >
               {isDialogLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -869,13 +873,14 @@ export default function CounselorAppointmentsPage() {
               variant="outline"
               onClick={() => setNoShowDialogOpen(false)}
               disabled={isDialogLoading}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               onClick={submitNoShow}
               disabled={isDialogLoading}
-              className="bg-yellow-600 hover:bg-yellow-700"
+              className="cursor-pointer bg-yellow-600 hover:bg-yellow-700"
             >
               {isDialogLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -898,9 +903,11 @@ export default function CounselorAppointmentsPage() {
             <div className="space-y-4 py-4">
               {/* Student Info */}
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                  <User className="h-6 w-6 text-gray-600" />
-                </div>
+                <StudentAvatar
+                  avatarUrl={selectedAppointment.studentInfo?.avatarUrl}
+                  name={selectedAppointment.studentInfo?.name}
+                  size="lg"
+                />
                 <div>
                   <div className="font-semibold">
                     {selectedAppointment.studentInfo?.name || "Student"}
@@ -1071,7 +1078,12 @@ export default function CounselorAppointmentsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
+            <Button
+              onClick={() => setDetailsDialogOpen(false)}
+              className="cursor-pointer"
+            >
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

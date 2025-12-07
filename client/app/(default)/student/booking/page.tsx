@@ -803,7 +803,11 @@ function BookingDialog({
                     </div>
                   )}
 
-                  <Button variant="outline" onClick={() => setStep("date")}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep("date")}
+                    className="cursor-pointer"
+                  >
                     Back
                   </Button>
                 </div>
@@ -870,7 +874,7 @@ function BookingDialog({
                     <Button
                       variant="outline"
                       onClick={() => setStep("time")}
-                      className="flex-1"
+                      className="flex-1 cursor-pointer"
                     >
                       Back
                     </Button>
@@ -1283,7 +1287,7 @@ export default function BookingPage() {
             <Button
               variant="outline"
               onClick={() => setCancelDialogOpen(false)}
-              className="flex-1"
+              className="flex-1 cursor-pointer"
             >
               Keep Appointment
             </Button>
